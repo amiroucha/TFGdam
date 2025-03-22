@@ -11,6 +11,10 @@ class LoginViewModel : ViewModel() {
     private val _email = MutableLiveData<String>()
     val email: LiveData<String> get() = _email
 
+    fun updateEmail(newEmail: String) {
+        _email.value = newEmail
+    }
+
     private val _password = MutableLiveData<String>()
     val password: LiveData<String> get() = _password
 
@@ -21,15 +25,15 @@ class LoginViewModel : ViewModel() {
     val isLoading: LiveData<Boolean> = _isLoading
     //validar la contraseña
 
-    private fun ValidPassword(password: String): Boolean = password.length > 8
+    private fun validPassword(password: String): Boolean = password.length > 8
     //validar el correo
-    private fun ValidEmail(email: String): Boolean  = Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    private fun validEmail(email: String): Boolean  = Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
 
     fun onLoginChange(email: String, password: String) {
         _email.value = email
         _password.value = password
-        _loginEnable.value = ValidEmail(email) && ValidPassword(password)
+        _loginEnable.value = validEmail(email) && validPassword(password)
     }
 
     suspend fun onLoginSelected() { //para el carga

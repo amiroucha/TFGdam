@@ -64,8 +64,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-
     // Para LiveData y ViewModel en Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-livedata-compose:2.5.1")
-}
+    // No necesitas la dependencia de runtime-livedata
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
+
+    }
