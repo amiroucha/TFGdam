@@ -3,41 +3,30 @@ package com.example.tfg_1
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.tfg_1.ui.theme.Tfg_1Theme
+import com.example.tfg_1.ui.ui.Login
+import com.example.tfg_1.viewModel.LoginViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Tfg_1Theme {
-                // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Greeting("Android")
-                }
-            }
+
+            Login(LoginViewModel())
+
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Tfg_1Theme {
-        Greeting("Android")
-    }
-}
+/*
+* Image(
+            painter = painterResource(id= R.drawable.logotfg),
+            contentDescription = "Hogar",
+            modifier = Modifier
+                .padding(5.dp)
+                .size(79.dp)
+                .clip(CircleShape)
+                .border(7.dp, color = Color.Black)
+            , contentScale = ContentScale.None,
+        )
+* */
