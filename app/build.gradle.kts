@@ -68,5 +68,5 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     // No necesitas la dependencia de runtime-livedata
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
-
+    implementation("androidx.compose.material:material-icons-extended")
     }

@@ -2,11 +2,14 @@ package com.example.tfg_1.ui.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -86,7 +90,7 @@ fun Login (modifier: Modifier, viewModel: LoginViewModel) {
             EmailField(email) { viewModel.onLoginChanges(it, password) }
             Spacer(modifier = Modifier.padding(4.dp))
             PasswordField(password) { viewModel.onLoginChanges(email, it) }
-            Spacer(modifier = Modifier.padding(8.dp))
+            //Spacer(modifier = Modifier.padding(8.dp))
             ForgotPassword(Modifier.align(Alignment.End))
             Spacer(modifier = Modifier.padding(16.dp))
             Column(modifier = Modifier
@@ -149,16 +153,17 @@ fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
             modifier = Modifier
                 .height(90.dp)
                 .weight(1f)
-                .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 10.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 10.dp)
+                .border(2.dp, Color.Black),
             placeholder = { Text(text = "Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             maxLines = 1,
             colors = TextFieldDefaults.colors(
-                Color(0xFF636262),//color del texto
-                Color(0xFFDEDDDD),//color del fondo del input
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
+                focusedTextColor= colorResource(id = R.color.white),//color del texto
+                focusedContainerColor = colorResource(id = R.color.black),
+                unfocusedTextColor= colorResource(id = R.color.black),
+                unfocusedContainerColor = colorResource(id = R.color.white),
             )
         )
     }
@@ -175,7 +180,8 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
             modifier = Modifier
                 .height(90.dp)
                 .weight(1f)
-                .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 10.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 10.dp)
+                .border(2.dp, Color.Black),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
             maxLines = 1,
@@ -187,11 +193,11 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
                 }
             },
             colors = TextFieldDefaults.colors(
-                Color(0xFF636262),//color texto
-                Color(0xFFDEDDDD),//color fondo
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            )
+                focusedTextColor= colorResource(id = R.color.white),//color del texto
+                focusedContainerColor = colorResource(id = R.color.black),
+                unfocusedTextColor= colorResource(id = R.color.black),
+                unfocusedContainerColor = colorResource(id = R.color.white),
+            ),
         )
 
     }
@@ -203,9 +209,10 @@ fun ForgotPassword(modifier: Modifier) {
         modifier = modifier
             .clickable { }
             .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 16.dp),
-        fontSize = 20.sp,
+        fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
-        color = Color.Black
+        color = colorResource(id = R.color.black),
+        textDecoration = TextDecoration.Underline
     )
 }
 @Composable
@@ -217,12 +224,13 @@ fun LoginButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
         colors = ButtonDefaults.buttonColors(
             Color(0xFFFF4303),//boton habilitado
             Color(0xFFF78058),//boton desabilitado
-            Color.Black, //color contenido
+            colorResource(id= R.color.brown), //color contenido
             disabledContentColor = Color.White
         ), enabled = loginEnable
     ) {
         Text(text = "Iniciar sesión",
             fontSize = 20.sp,
+            color = colorResource(id = R.color.black),
             )
     }
 }
