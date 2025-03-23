@@ -18,7 +18,6 @@ class MainActivity : ComponentActivity() {
             Tfg_1Theme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = colorResource(id = R.color.greyBackground)
                 ) {
                     LoginScreen(LoginViewModel())
                 }
@@ -29,15 +28,3 @@ class MainActivity : ComponentActivity() {
 }
 
 
-/*
-* Image(
-            painter = painterResource(id= R.drawable.logotfg),
-            contentDescription = "Hogar",
-            modifier = Modifier
-                .padding(5.dp)
-                .size(79.dp)
-                .clip(CircleShape)
-                .border(7.dp, color = Color.Black)
-            , contentScale = ContentScale.None,
-        )
-* */

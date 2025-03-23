@@ -1,36 +1,33 @@
 package com.example.tfg_1.viewModel
-
-import android.util.Patterns
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.delay
+import android.util.Patterns
 
 class LoginViewModel : ViewModel() {
 
-    private val _email = MutableLiveData<String>()
-    val email: LiveData<String> get() = _email
+    // Usamos StateFlow en lugar de LiveData
+    private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email.asStateFlow()
 
-    fun updateEmail(newEmail: String) {
-        _email.value = newEmail
-    }
+    private val _password = MutableStateFlow("")
+    val password: StateFlow<String> = _password.asStateFlow()
 
-    private val _password = MutableLiveData<String>()
-    val password: LiveData<String> get() = _password
+    private val _loginEnable = MutableStateFlow(false)
+    val loginEnable: StateFlow<Boolean> = _loginEnable.asStateFlow()
 
-    private val _loginEnable = MutableLiveData<Boolean>()
-    val loginEnable: LiveData<Boolean> = _loginEnable
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
     //validar la contraseña
-
     private fun validPassword(password: String): Boolean = password.length > 8
+
     //validar el correo
     private fun validEmail(email: String): Boolean  = Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
-
-    fun onLoginChange(email: String, password: String) {
+    fun onLoginChanges(email: String, password: String) {
         _email.value = email
         _password.value = password
         _loginEnable.value = validEmail(email) && validPassword(password)
@@ -41,6 +38,8 @@ class LoginViewModel : ViewModel() {
         delay(4000)
         _isLoading.value = false
     }
+
+}
 
 
    /* private val _emailError = MutableLiveData<String?>() //para almacenar los errores
@@ -76,4 +75,3 @@ class LoginViewModel : ViewModel() {
         _isFormValid.value = isValid
         return isValid
     }*/
-}
