@@ -60,16 +60,23 @@ fun Login (modifier: Modifier, viewModel: LoginViewModel) {
         }
     }else{
         Column(modifier = modifier.fillMaxSize()) {
-            Box(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth()) {
-                Text( text = "FLOWHOME" ,
-                    modifier = modifier
-                        .align(Alignment.CenterStart)
-                        .padding(5.dp),
-                    fontSize = 40.sp,
-                    maxLines = 1, // Solo permite 1 línea
-                    fontWeight = FontWeight.Bold
-                )
-                LogoHeader(Modifier.align(Alignment.TopEnd))
+            Box(modifier = Modifier.align(Alignment.CenterHorizontally)
+                .fillMaxWidth().padding(16.dp))
+            {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically // Alinea verticalmente al centro
+                ) {
+                    Text(
+                        text = "FLOWHOME",
+                        modifier = Modifier.padding(start = 8.dp, end = 15.dp), // Espaciado a la izquierda
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
+
+                    LogoHeader(Modifier) // Ajusta el tamaño del logo según sea necesario
+                }
             }
 
 
@@ -82,17 +89,22 @@ fun Login (modifier: Modifier, viewModel: LoginViewModel) {
             Spacer(modifier = Modifier.padding(8.dp))
             ForgotPassword(Modifier.align(Alignment.End))
             Spacer(modifier = Modifier.padding(16.dp))
-            LoginButton(isLoginEnabled) {
-                coroutineScope.launch {
-                    viewModel.onLoginSelected()
+            Column(modifier = Modifier
+                .align(Alignment.End).padding(end = 20.dp))
+            {
+                LoginButton(isLoginEnabled) {
+                    coroutineScope.launch {
+                        viewModel.onLoginSelected()
+                    }
+                }
+                Spacer(modifier = Modifier.padding(16.dp))
+                GoogleButton(isLoginEnabled) {
+                    coroutineScope.launch {
+
+                    }
                 }
             }
-            Spacer(modifier = Modifier.padding(16.dp))
-            GoogleButton(isLoginEnabled) {
-                coroutineScope.launch {
-                    viewModel.onLoginSelected()
-                }
-            }
+
 
         }
 
@@ -108,7 +120,7 @@ fun LogoHeader(modifier:Modifier)
             painter = painterResource(id= R.drawable.logotfg),
             contentDescription = "Hogar",
             modifier = modifier
-                .padding(10.dp,20.dp)
+                .padding(10.dp,10.dp)
                 .size(120.dp)
                 .clip(CircleShape)
             // .border(7.dp, color = Color.Black)
@@ -137,7 +149,7 @@ fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
             modifier = Modifier
                 .height(90.dp)
                 .weight(1f)
-                .padding(16.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 10.dp),
             placeholder = { Text(text = "Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
@@ -162,7 +174,7 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
             modifier = Modifier
                 .height(90.dp)
                 .weight(1f)
-                .padding(16.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 10.dp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
             maxLines = 1,
@@ -182,7 +194,7 @@ fun ForgotPassword(modifier: Modifier) {
         text = "Olvidaste la contraseña?",
         modifier = modifier
             .clickable { }
-            .padding(10.dp),
+            .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 16.dp),
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
         color = Color.Black
@@ -193,7 +205,7 @@ fun LoginButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
     Button(
         onClick = { onLoginSelected() },
         modifier = Modifier
-            .height(48.dp).width(200.dp),
+            .height(48.dp).width(250.dp),
         colors = ButtonDefaults.buttonColors(
             Color(0xFFFF4303),//boton habilitado
             Color(0xFFF78058),//boton desabilitado
@@ -212,9 +224,7 @@ fun GoogleButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
     Button(
         onClick = { onLoginSelected() },
         modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp).
-            width(200.dp),
+            .height(48.dp).width(250.dp),
         colors = ButtonDefaults.buttonColors(
             Color(0xFFFF4303),//boton habilitado
             Color(0xFFF78058),//boton desabilitado
