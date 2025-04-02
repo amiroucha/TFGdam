@@ -30,16 +30,16 @@ import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 
-
+/*
 @Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
+fun RegisterScreenPreview() {
     val viewModel = LoginViewModel()
     LoginScreen(viewModel = viewModel)
 }
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) {
+fun RegisterScreen(viewModel: LoginViewModel) {
     Box(
         Modifier
             .fillMaxSize()
@@ -51,7 +51,7 @@ fun LoginScreen(viewModel: LoginViewModel) {
 }
 
 @Composable
-fun Login (modifier: Modifier, viewModel: LoginViewModel) {
+fun Register (modifier: Modifier, viewModel: LoginViewModel) {
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val isLoginEnabled by viewModel.loginEnable.collectAsState()
@@ -84,7 +84,7 @@ fun Login (modifier: Modifier, viewModel: LoginViewModel) {
             }
 
 
-            TituloLogin(Modifier.align(Alignment.CenterHorizontally))
+            TituloRegister(Modifier.align(Alignment.CenterHorizontally))
 
             Spacer(modifier = Modifier.padding(5.dp))
             EmailField(email) { viewModel.onLoginChanges(it, password) }
@@ -147,7 +147,7 @@ fun LogoHeader(modifier:Modifier)
 
 //Titulo---------------------------------------------
 @Composable
-fun TituloLogin(modifier:Modifier){
+fun TituloRegister(modifier:Modifier){
     Text( text = "Iniciar Sesión" ,
         modifier = modifier
             .padding(10.dp),
@@ -215,19 +215,7 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
 
     }
 }
-@Composable
-fun ForgotPassword(modifier: Modifier) {
-    Text(
-        text = "Olvidaste la contraseña?",
-        modifier = modifier
-            .clickable { }
-            .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 16.dp),
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Bold,
-        color = colorResource(id = R.color.black),
-        textDecoration = TextDecoration.Underline
-    )
-}
+
 @Composable
 fun LoginButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
     Button(
@@ -298,4 +286,11 @@ fun RegisterButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
         )
     }
 }
+
+* Boton registro
+* botoon cancelar
+*
+*
+*
+* */
 
