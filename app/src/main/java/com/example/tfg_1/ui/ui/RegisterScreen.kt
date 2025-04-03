@@ -91,8 +91,25 @@ fun Register (modifier: Modifier, viewModel: LoginViewModel) {
             PasswordField(password) { viewModel.onLoginChanges(email, it) }
             Spacer(modifier = Modifier.padding(4.dp))
             PasswordFieldReg2(password) { viewModel.onLoginChanges(email, it) }
-            Spacer(modifier = Modifier.padding(4.dp))
+            Spacer(modifier = Modifier.padding(10.dp))
+            Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
+            {
+                RegisterButtonReg(isLoginEnabled) {
+                    coroutineScope.launch {
 
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.padding(20.dp))
+            Column(modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 25.dp))
+            {
+                backButton(isLoginEnabled) {
+                    coroutineScope.launch {
+
+                    }
+                }
+            }
         }
 
     }
@@ -217,6 +234,46 @@ fun PasswordFieldReg2(password: String, onTextFieldChanged: (String) -> Unit) {
             ),
         )
 
+    }
+}
+
+@Composable
+fun RegisterButtonReg(loginEnable: Boolean, onLoginSelected: () -> Unit) {
+    Button(
+        onClick = { onLoginSelected() },
+        modifier = Modifier
+            .height(48.dp).width(250.dp),
+        colors = ButtonDefaults.buttonColors(
+            Color(0xFFFF4303),//boton habilitado
+            Color(0xFFF78058),//boton desabilitado
+            colorResource(id= R.color.green), //color contenido
+            disabledContentColor = Color.White
+        ), enabled = loginEnable
+    ) {
+        Text(text = "Registrarse",
+            fontSize = 20.sp,
+            color = colorResource(id = R.color.black),
+        )
+    }
+}
+
+@Composable
+fun backButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
+    Button(
+        onClick = { onLoginSelected() },
+        modifier = Modifier
+            .height(48.dp).width(250.dp),
+        colors = ButtonDefaults.buttonColors(
+            Color(0xFFFF4303),//boton habilitado
+            Color(0xFFF78058),//boton desabilitado
+            colorResource(id= R.color.red), //color contenido
+            disabledContentColor = Color.White
+        ), enabled = loginEnable
+    ) {
+        Text(text = "Cancelar",
+            fontSize = 20.sp,
+            color = colorResource(id = R.color.black),
+        )
     }
 }
 /*
