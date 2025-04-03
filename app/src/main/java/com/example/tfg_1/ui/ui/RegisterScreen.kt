@@ -3,7 +3,6 @@ package com.example.tfg_1.ui.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,12 +28,12 @@ import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 
-/*
+
 @Preview(showBackground = true)
 @Composable
-fun RegisterScreenPreview() {
+fun registerScreenPreview() {
     val viewModel = LoginViewModel()
-    LoginScreen(viewModel = viewModel)
+    RegisterScreen(viewModel = viewModel)
 }
 
 @Composable
@@ -46,7 +44,7 @@ fun RegisterScreen(viewModel: LoginViewModel) {
             //.padding(5.dp)
             .background( color = colorResource(id = R.color.greyBackground))
     ) {
-        Login(Modifier.align(Alignment.Center), viewModel)
+        Register(Modifier.align(Alignment.Center), viewModel)
     }
 }
 
@@ -65,7 +63,8 @@ fun Register (modifier: Modifier, viewModel: LoginViewModel) {
     }else{
         Column(modifier = modifier.fillMaxSize()) {
             Box(modifier = Modifier.align(Alignment.CenterHorizontally)
-                .fillMaxWidth().padding(16.dp))
+                .fillMaxWidth().padding(top = 10.dp, bottom= 16.dp, end = 16.dp, start = 16.dp)
+            )
             {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -79,7 +78,7 @@ fun Register (modifier: Modifier, viewModel: LoginViewModel) {
                         maxLines = 1
                     )
 
-                    LogoHeader(Modifier) // Ajusta el tamaño del logo según sea necesario
+                    LogoHeaderReg(Modifier) // Ajusta el tamaño del logo según sea necesario
                 }
             }
 
@@ -87,41 +86,12 @@ fun Register (modifier: Modifier, viewModel: LoginViewModel) {
             TituloRegister(Modifier.align(Alignment.CenterHorizontally))
 
             Spacer(modifier = Modifier.padding(5.dp))
-            EmailField(email) { viewModel.onLoginChanges(it, password) }
+            EmailFieldReg(email) { viewModel.onLoginChanges(it, password) }
             Spacer(modifier = Modifier.padding(4.dp))
             PasswordField(password) { viewModel.onLoginChanges(email, it) }
-            //Spacer(modifier = Modifier.padding(8.dp))
-            ForgotPassword(Modifier.align(Alignment.End))
-            Spacer(modifier = Modifier.padding(16.dp))
-            Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
-            {
-                LoginButton(isLoginEnabled) {
-                    coroutineScope.launch {
-                        viewModel.onLoginSelected()
-                    }
-                }
-                Spacer(modifier = Modifier.padding(16.dp))
-                GoogleButton(isLoginEnabled) {
-                    coroutineScope.launch {
-
-                    }
-                }
-            }
-            Column(modifier = Modifier.align(Alignment.CenterHorizontally)){
-                Spacer(modifier = Modifier.padding(16.dp))
-                Text(text = "¿ No tienes cuenta ?",
-                    fontSize = 20.sp,
-                    color = colorResource(id = R.color.black),
-                    modifier = Modifier.padding(10.dp).align(Alignment.CenterHorizontally)
-                )
-                RegisterButton(isLoginEnabled) {
-                    coroutineScope.launch {
-
-                    }
-                }
-
-            }
-
+            Spacer(modifier = Modifier.padding(4.dp))
+            PasswordFieldReg2(password) { viewModel.onLoginChanges(email, it) }
+            Spacer(modifier = Modifier.padding(4.dp))
 
         }
 
@@ -131,7 +101,7 @@ fun Register (modifier: Modifier, viewModel: LoginViewModel) {
 }
 //Imagen Logo------------------------------------------------
 @Composable
-fun LogoHeader(modifier:Modifier)
+fun LogoHeaderReg(modifier:Modifier)
 {
         Image(
             painter = painterResource(id= R.drawable.logotfg),
@@ -148,18 +118,17 @@ fun LogoHeader(modifier:Modifier)
 //Titulo---------------------------------------------
 @Composable
 fun TituloRegister(modifier:Modifier){
-    Text( text = "Iniciar Sesión" ,
+    Text( text = "REGISTRO" ,
         modifier = modifier
-            .padding(10.dp),
-        fontSize = 40.sp,
+            .padding(top = 0.dp, bottom= 5.dp, end = 5.dp, start = 5.dp),
+        fontSize = 50.sp,
         maxLines = 1, // Solo permite 1 línea
         fontWeight = FontWeight.Bold
     )
 }
-
-//Email------------------------------------------------
+//email ----------------------------------------------------------------
 @Composable
-fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
+fun EmailFieldReg(email: String, onTextFieldChanged: (String) -> Unit) {
     Row(modifier = Modifier){
         TextField(
             value = email, onValueChange = { onTextFieldChanged(it) },
@@ -183,7 +152,7 @@ fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
 }
 //Contraseña------------------------------------------------
 @Composable
-fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
+fun PasswordFieldReg(password: String, onTextFieldChanged: (String) -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) } //mostrar/ocultar contraseña
     Row(modifier = Modifier)
     {
@@ -216,77 +185,41 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
     }
 }
 
+//Contraseña  2 ------------------------------------------------
 @Composable
-fun LoginButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
-    Button(
-        onClick = { onLoginSelected() },
-        modifier = Modifier
-            .height(48.dp).width(250.dp),
-        colors = ButtonDefaults.buttonColors(
-            Color(0xFFFF4303),//boton habilitado
-            Color(0xFFF78058),//boton desabilitado
-            colorResource(id= R.color.brown), //color contenido
-            disabledContentColor = Color.White
-        ), enabled = loginEnable
-    ) {
-        Text(text = "Iniciar sesión",
-            fontSize = 20.sp,
-            color = colorResource(id = R.color.black),
-            )
+fun PasswordFieldReg2(password: String, onTextFieldChanged: (String) -> Unit) {
+    var passwordVisible by remember { mutableStateOf(false) } //mostrar/ocultar contraseña
+    Row(modifier = Modifier)
+    {
+        TextField(
+            value = password, onValueChange = { onTextFieldChanged(it) },
+            placeholder = { Text(text = "Repite tu contraseña") },
+            modifier = Modifier
+                .height(90.dp)
+                .weight(1f)
+                .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 10.dp)
+                .border(2.dp, Color.Black),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            singleLine = true,
+            maxLines = 1,
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(), // Muestra u oculta la contraseña
+            trailingIcon = {
+                val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, contentDescription = "Mostrar contraseña")
+                }
+            },
+            colors = TextFieldDefaults.colors(
+                focusedTextColor= colorResource(id = R.color.white),//color del texto
+                focusedContainerColor = colorResource(id = R.color.black),
+                unfocusedTextColor= colorResource(id = R.color.black),
+                unfocusedContainerColor = colorResource(id = R.color.white),
+            ),
+        )
+
     }
 }
-
-@Composable
-fun GoogleButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
-    Button(
-        onClick = { onLoginSelected() },
-        modifier = Modifier
-            .height(48.dp).width(250.dp),
-        colors = ButtonDefaults.buttonColors(
-            Color(0xFFFF4303),//boton habilitado
-            Color(0xFFF78058),//boton desabilitado
-            colorResource(id = R.color.blue), //color contenido
-            disabledContentColor = Color.White
-        ), enabled = loginEnable
-    ) {
-
-        Text(text = "Iniciar con Google",
-                fontSize = 20.sp,
-                color = colorResource(id = R.color.black)
-        )
-        Spacer(modifier = Modifier.width(8.dp)) // Espacio entre icono y texto
-        Icon(
-            painter = painterResource(id = R.drawable.ic_google), // Ícono de Google
-            contentDescription = "Google Icon",
-            modifier = Modifier.size(24.dp),
-            tint = Color.Unspecified // Mantiene los colores originales del icono
-        )
-    }
-}
-
-
-@Composable
-fun RegisterButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
-    Button(
-        onClick = { onLoginSelected() },
-        modifier = Modifier
-            .height(48.dp).width(250.dp),
-        colors = ButtonDefaults.buttonColors(
-            colorResource(id = R.color.brownRegister),
-            colorResource(id = R.color.brownRegister),
-            colorResource(id = R.color.brownRegister),
-            disabledContentColor = Color.White
-        ), enabled = loginEnable
-    ) {
-
-        Spacer(modifier = Modifier.width(8.dp)) // Espacio entre icono y texto
-        Text(text = "Registrate aquí",
-            fontSize = 20.sp,
-            color = colorResource(id = R.color.black)
-        )
-    }
-}
-
+/*
 * Boton registro
 * botoon cancelar
 *
