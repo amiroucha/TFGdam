@@ -25,19 +25,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tfg_1.R
-import com.example.tfg_1.viewModel.LoginViewModel
+import com.example.tfg_1.viewModel.RegisterViewModel
 import kotlinx.coroutines.launch
 
 
 @Preview(showBackground = true)
 @Composable
 fun registerScreenPreview() {
-    val viewModel = LoginViewModel()
+    val viewModel = RegisterViewModel()
     RegisterScreen(viewModel = viewModel)
 }
 
 @Composable
-fun RegisterScreen(viewModel: LoginViewModel) {
+fun RegisterScreen(viewModel: RegisterViewModel) {
     Box(
         Modifier
             .fillMaxSize()
@@ -49,11 +49,12 @@ fun RegisterScreen(viewModel: LoginViewModel) {
 }
 
 @Composable
-fun Register (modifier: Modifier, viewModel: LoginViewModel) {
+fun Register (modifier: Modifier, viewModel: RegisterViewModel) {
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
-    val isLoginEnabled by viewModel.loginEnable.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val password2 by viewModel.password2.collectAsState()
+    val isRegisterEnabled by viewModel.registerEnable.collectAsState()
+    val isLoading by viewModel.isLoadingR.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
     if (isLoading) {
@@ -86,15 +87,15 @@ fun Register (modifier: Modifier, viewModel: LoginViewModel) {
             TituloRegister(Modifier.align(Alignment.CenterHorizontally))
 
             Spacer(modifier = Modifier.padding(5.dp))
-            EmailFieldReg(email) { viewModel.onLoginChanges(it, password) }
+            EmailFieldReg(email) { viewModel.onLoginChanges(it, password, password2) }
             Spacer(modifier = Modifier.padding(4.dp))
-            PasswordField(password) { viewModel.onLoginChanges(email, it) }
+            PasswordField(password) { viewModel.onLoginChanges(email, it, password2) }
             Spacer(modifier = Modifier.padding(4.dp))
-            PasswordFieldReg2(password) { viewModel.onLoginChanges(email, it) }
+            PasswordFieldReg2(password2) { viewModel.onLoginChanges(email,password, it) }
             Spacer(modifier = Modifier.padding(10.dp))
             Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
             {
-                RegisterButtonReg(isLoginEnabled) {
+                RegisterButtonReg(isRegisterEnabled) {
                     coroutineScope.launch {
 
                     }
@@ -104,7 +105,7 @@ fun Register (modifier: Modifier, viewModel: LoginViewModel) {
             Spacer(modifier = Modifier.padding(20.dp))
             Column(modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 25.dp))
             {
-                backButton(isLoginEnabled) {
+                backButton(isRegisterEnabled) {
                     coroutineScope.launch {
 
                     }
