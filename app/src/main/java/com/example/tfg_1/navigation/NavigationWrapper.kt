@@ -23,7 +23,7 @@ fun NavigationWrapper() {
         }
         composable(Screens.Register.route) {
             val viewModelR = RegisterViewModel()
-            RegisterScreen(viewModelR) // Asegúrate de que tienes esta pantalla creada
+            RegisterScreen(viewModel =viewModelR)
         }
     }
 }

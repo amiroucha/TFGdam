@@ -30,13 +30,13 @@ import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 
-
+/*
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
     val viewModel = LoginViewModel()
     LoginScreen(viewModel = viewModel, navigateToRegister = {})
-}
+}*/
 
 @Composable
 fun LoginScreen(
@@ -99,15 +99,11 @@ fun Login (modifier: Modifier, viewModel: LoginViewModel, navigateToRegister: ()
             Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
             {
                 LoginButton(isLoginEnabled) {
-                    coroutineScope.launch {
-                        viewModel.onLoginSelected()
-                    }
+
                 }
                 Spacer(modifier = Modifier.padding(16.dp))
                 GoogleButton(isLoginEnabled) {
-                    coroutineScope.launch {
 
-                    }
                 }
             }
             Column(modifier = Modifier.align(Alignment.CenterHorizontally)){
