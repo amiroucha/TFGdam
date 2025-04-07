@@ -35,23 +35,26 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreenPreview() {
     val viewModel = LoginViewModel()
-    LoginScreen(viewModel = viewModel)
+    LoginScreen(viewModel = viewModel, navigateToRegister = {})
 }
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) {
+fun LoginScreen(
+    viewModel: LoginViewModel,
+    navigateToRegister: () -> Unit
+) {
     Box(
         Modifier
             .fillMaxSize()
             //.padding(5.dp)
             .background( color = colorResource(id = R.color.greyBackground))
     ) {
-        Login(Modifier.align(Alignment.Center), viewModel)
+        Login(Modifier.align(Alignment.Center), viewModel,navigateToRegister )
     }
 }
 
 @Composable
-fun Login (modifier: Modifier, viewModel: LoginViewModel) {
+fun Login (modifier: Modifier, viewModel: LoginViewModel, navigateToRegister: () -> Unit) {
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val isLoginEnabled by viewModel.loginEnable.collectAsState()
@@ -115,9 +118,7 @@ fun Login (modifier: Modifier, viewModel: LoginViewModel) {
                     modifier = Modifier.padding(10.dp).align(Alignment.CenterHorizontally)
                 )
                 RegisterButton(isLoginEnabled) {
-                    coroutineScope.launch {
-
-                    }
+                    navigateToRegister()
                 }
 
             }

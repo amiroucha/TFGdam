@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    kotlin("plugin.serialization") version "1.9.22"
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -37,7 +39,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
     packaging {
         resources {
@@ -69,4 +71,21 @@ dependencies {
     // No necesitas la dependencia de runtime-livedata
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
     implementation("androidx.compose.material:material-icons-extended")
-    }
+
+    // Jetpack Compose integration
+    implementation("androidx.navigation:navigation-compose:2.8.9")
+
+    // Views/Fragments integration
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.9")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.9")
+
+    // Feature module support for Fragments
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.8.9")
+
+    // Testing Navigation
+    androidTestImplementation("androidx.navigation:navigation-testing:2.8.9")
+
+    // JSON serialization library, works with the Kotlin serialization plugin
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+}
