@@ -106,9 +106,7 @@ fun Register (modifier: Modifier, viewModel: RegisterViewModel) {
             Column(modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 25.dp))
             {
                 backButton(isRegisterEnabled) {
-                    coroutineScope.launch {
 
-                    }
                 }
             }
         }

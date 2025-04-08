@@ -18,7 +18,7 @@ fun NavigationWrapper() {
             val viewModel = LoginViewModel()
             LoginScreen(
                 viewModel = viewModel,
-                navigateToRegister = { navController.navigate(Screens.Register.route) }
+                navController
             )
         }
         composable(Screens.Register.route) {

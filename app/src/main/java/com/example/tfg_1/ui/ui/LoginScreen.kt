@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -26,7 +27,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.tfg_1.R
+import com.example.tfg_1.navigation.Screens
 import com.example.tfg_1.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 
@@ -41,7 +44,7 @@ fun LoginScreenPreview() {
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    navigateToRegister: () -> Unit
+    navController: NavController
 ) {
     Box(
         Modifier
@@ -49,12 +52,12 @@ fun LoginScreen(
             //.padding(5.dp)
             .background( color = colorResource(id = R.color.greyBackground))
     ) {
-        Login(Modifier.align(Alignment.Center), viewModel,navigateToRegister )
+        Login(Modifier.align(Alignment.Center), viewModel, navController)
     }
 }
 
 @Composable
-fun Login (modifier: Modifier, viewModel: LoginViewModel, navigateToRegister: () -> Unit) {
+fun Login (modifier: Modifier, viewModel: LoginViewModel, navController: NavController) {
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val isLoginEnabled by viewModel.loginEnable.collectAsState()
@@ -113,9 +116,9 @@ fun Login (modifier: Modifier, viewModel: LoginViewModel, navigateToRegister: ()
                     color = colorResource(id = R.color.black),
                     modifier = Modifier.padding(10.dp).align(Alignment.CenterHorizontally)
                 )
-                RegisterButton(isLoginEnabled) {
-                    navigateToRegister()
-                }
+                RegisterButton(navController)
+                //flecha atras
+                //scaffold
 
             }
 
@@ -275,9 +278,9 @@ fun GoogleButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
 
 
 @Composable
-fun RegisterButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
+fun RegisterButton(navController: NavController) {
     Button(
-        onClick = { onLoginSelected() },
+        onClick = {  navController.navigate(Screens.Register.route)},
         modifier = Modifier
             .height(48.dp).width(250.dp),
         colors = ButtonDefaults.buttonColors(
@@ -285,7 +288,7 @@ fun RegisterButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
             colorResource(id = R.color.brownRegister),
             colorResource(id = R.color.brownRegister),
             disabledContentColor = Color.White
-        ), enabled = loginEnable
+        ), enabled = true
     ) {
 
         Spacer(modifier = Modifier.width(8.dp)) // Espacio entre icono y texto
