@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.ui.ui.HomeScreen
 import com.example.tfg_1.ui.ui.LoginScreen
 import com.example.tfg_1.ui.ui.RegisterScreen
+import com.example.tfg_1.viewModel.AuthViewModel
 import com.example.tfg_1.viewModel.HomeViewModel
 import com.example.tfg_1.viewModel.LoginViewModel
 import com.example.tfg_1.viewModel.RegisterViewModel
@@ -17,7 +18,7 @@ fun NavigationWrapper() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Screens.Login.route) {
         composable(Screens.Login.route) {
-            val viewModel = LoginViewModel()
+            val viewModel = AuthViewModel()
             LoginScreen(
                 viewModel = viewModel,
                 navController

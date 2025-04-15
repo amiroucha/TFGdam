@@ -59,7 +59,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("com.google.firebase:firebase-auth-ktx:23.2.0")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
@@ -77,20 +77,18 @@ dependencies {
     // Jetpack Compose integration
     implementation("androidx.navigation:navigation-compose:2.8.9")
 
-    // Views/Fragments integration
-  /*  implementation("androidx.navigation:navigation-fragment-ktx:2.8.9")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.9")
-
-    // Feature module support for Fragments
-    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.8.9")
-
-    // Testing Navigation
-    androidTestImplementation("androidx.navigation:navigation-testing:2.8.9")
-*/
     // JSON serialization library, works with the Kotlin serialization plugin
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-
-
+/*
     // firebase
+   implementation("com.google.firebase:firebase-auth-ktx:23.1.1")
+
     implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+
+ */
+
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+
 }

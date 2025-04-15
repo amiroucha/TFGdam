@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.R
 import com.example.tfg_1.navigation.Screens
+import com.example.tfg_1.viewModel.AuthViewModel
 import com.example.tfg_1.viewModel.LoginViewModel
 
 
@@ -37,13 +38,13 @@ import com.example.tfg_1.viewModel.LoginViewModel
 @Composable
 fun LoginScreenPreview() {
     val navController = rememberNavController()
-    val viewModel = LoginViewModel()
+    val viewModel = AuthViewModel()
     LoginScreen(viewModel = viewModel, navController)
 }
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel,
+    viewModel: AuthViewModel,
     navController: NavController
 ) {
     Box(
@@ -57,11 +58,12 @@ fun LoginScreen(
 }
 
 @Composable
-fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavController) {
+fun LoginBody(modifier: Modifier, viewModel: AuthViewModel, navController: NavController) {
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    val authState = viewModel.authState.collectAsState()
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -102,7 +104,23 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
 
             Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
             {
-                LoginButton(navController)
+                //LoginButton(navController)
+                //boton de login ----------------------
+                Button(
+                    onClick = { viewModel.login(email, password)
+                        //navController.navigate(Screens.Home.route)
+                    },
+                    modifier = Modifier
+                        .height(48.dp).width(250.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        colorResource(id= R.color.brown), //color contenido
+                    ), enabled = true
+                ) {
+                    Text(text = "Iniciar sesión",
+                        fontSize = 20.sp,
+                        color = colorResource(id = R.color.black),
+                    )
+                }
 
                 Spacer(modifier = Modifier.padding(16.dp))
                 GoogleButton()
@@ -225,9 +243,11 @@ fun ForgotPassword(modifier: Modifier) {
     )
 }
 @Composable
-fun LoginButton(navController: NavController) {
+fun LoginButton(navController: NavController, viewModel: AuthViewModel) {
     Button(
-        onClick = { navController.navigate(Screens.Home.route) },
+        onClick = {
+        //navController.navigate(Screens.Home.route)
+                  },
         modifier = Modifier
             .height(48.dp).width(250.dp),
         colors = ButtonDefaults.buttonColors(

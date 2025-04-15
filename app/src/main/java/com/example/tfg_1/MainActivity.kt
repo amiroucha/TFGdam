@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.navigation.NavigationWrapper
 import com.example.tfg_1.ui.theme.Tfg_1Theme
 import com.example.tfg_1.ui.ui.LoginScreen
+import com.example.tfg_1.viewModel.AuthViewModel
 import com.example.tfg_1.viewModel.LoginViewModel
 
 class MainActivity : ComponentActivity() {
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PreviewMain() {
     val navController = rememberNavController()
-    val viewModel = LoginViewModel()
+    val viewModel = AuthViewModel()
     LoginScreen(viewModel = viewModel, navController)
 }
 
