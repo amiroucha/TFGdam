@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "725600754180",
+    "project_id": "flowhome-e81a7",
+    "storage_bucket": "flowhome-e81a7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725600754180:android:c2a0445bc85ffbfa06f351",
+        "android_client_info": {
+          "package_name": "com.example.tfg_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWHkODB5670ItQEmj3GZYh-aswd00Z2f8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

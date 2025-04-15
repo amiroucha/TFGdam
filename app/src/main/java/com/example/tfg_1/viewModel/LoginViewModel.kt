@@ -22,7 +22,10 @@ class LoginViewModel : ViewModel() {
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     //validar la contraseña
-    private fun validPassword(password: String): Boolean = password.length > 8
+    fun validPassword(password: String): Boolean {
+        return password.length > 8 and password.isNotEmpty()
+
+    }
 
     //validar el correo
     private fun validEmail(email: String): Boolean  = Patterns.EMAIL_ADDRESS.matcher(email).matches()

@@ -6,8 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.navigation.NavigationWrapper
 import com.example.tfg_1.ui.theme.Tfg_1Theme
 import com.example.tfg_1.ui.ui.LoginScreen
@@ -20,7 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Tfg_1Theme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     //LoginScreen(LoginViewModel())
                     NavigationWrapper()
@@ -30,5 +33,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
+@Preview(showBackground = true)
+@Composable
+fun PreviewMain() {
+    val navController = rememberNavController()
+    val viewModel = LoginViewModel()
+    LoginScreen(viewModel = viewModel, navController)
+}
 

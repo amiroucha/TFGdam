@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.tfg_1.ui.ui.HomeScreen
 import com.example.tfg_1.ui.ui.LoginScreen
 import com.example.tfg_1.ui.ui.RegisterScreen
+import com.example.tfg_1.viewModel.HomeViewModel
 import com.example.tfg_1.viewModel.LoginViewModel
 import com.example.tfg_1.viewModel.RegisterViewModel
 
@@ -22,8 +24,12 @@ fun NavigationWrapper() {
             )
         }
         composable(Screens.Register.route) {
-            val viewModelR = RegisterViewModel()
-            RegisterScreen(viewModel =viewModelR)
+            val viewModel = RegisterViewModel()
+            RegisterScreen(viewModel = viewModel,navController)
+        }
+        composable(Screens.Home.route) {
+            val viewModel = HomeViewModel()
+            HomeScreen(viewModel = viewModel,navController)
         }
     }
 }

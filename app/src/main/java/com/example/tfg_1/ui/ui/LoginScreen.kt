@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -28,18 +27,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.R
 import com.example.tfg_1.navigation.Screens
 import com.example.tfg_1.viewModel.LoginViewModel
-import kotlinx.coroutines.launch
 
-/*
+
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
+    val navController = rememberNavController()
     val viewModel = LoginViewModel()
-    LoginScreen(viewModel = viewModel, navigateToRegister = {})
-}*/
+    LoginScreen(viewModel = viewModel, navController)
+}
 
 @Composable
 fun LoginScreen(
@@ -52,15 +52,14 @@ fun LoginScreen(
             //.padding(5.dp)
             .background( color = colorResource(id = R.color.greyBackground))
     ) {
-        Login(Modifier.align(Alignment.Center), viewModel, navController)
+        LoginBody(Modifier.align(Alignment.Center), viewModel, navController)
     }
 }
 
 @Composable
-fun Login (modifier: Modifier, viewModel: LoginViewModel, navController: NavController) {
+fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavController) {
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
-    val isLoginEnabled by viewModel.loginEnable.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -94,20 +93,19 @@ fun Login (modifier: Modifier, viewModel: LoginViewModel, navController: NavCont
 
             Spacer(modifier = Modifier.padding(5.dp))
             EmailField(email) { viewModel.onLoginChanges(it, password) }
+
             Spacer(modifier = Modifier.padding(4.dp))
             PasswordField(password) { viewModel.onLoginChanges(email, it) }
-            //Spacer(modifier = Modifier.padding(8.dp))
+
             ForgotPassword(Modifier.align(Alignment.End))
             Spacer(modifier = Modifier.padding(16.dp))
+
             Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
             {
-                LoginButton(isLoginEnabled) {
+                LoginButton(navController)
 
-                }
                 Spacer(modifier = Modifier.padding(16.dp))
-                GoogleButton(isLoginEnabled) {
-
-                }
+                GoogleButton()
             }
             Column(modifier = Modifier.align(Alignment.CenterHorizontally)){
                 Spacer(modifier = Modifier.padding(16.dp))
@@ -117,8 +115,6 @@ fun Login (modifier: Modifier, viewModel: LoginViewModel, navController: NavCont
                     modifier = Modifier.padding(10.dp).align(Alignment.CenterHorizontally)
                 )
                 RegisterButton(navController)
-                //flecha atras
-                //scaffold
 
             }
 
@@ -229,17 +225,14 @@ fun ForgotPassword(modifier: Modifier) {
     )
 }
 @Composable
-fun LoginButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
+fun LoginButton(navController: NavController) {
     Button(
-        onClick = { onLoginSelected() },
+        onClick = { navController.navigate(Screens.Home.route) },
         modifier = Modifier
             .height(48.dp).width(250.dp),
         colors = ButtonDefaults.buttonColors(
-            Color(0xFFFF4303),//boton habilitado
-            Color(0xFFF78058),//boton desabilitado
             colorResource(id= R.color.brown), //color contenido
-            disabledContentColor = Color.White
-        ), enabled = loginEnable
+        ), enabled = true
     ) {
         Text(text = "Iniciar sesión",
             fontSize = 20.sp,
@@ -249,9 +242,9 @@ fun LoginButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
 }
 
 @Composable
-fun GoogleButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
+fun GoogleButton() {
     Button(
-        onClick = { onLoginSelected() },
+        onClick = { },
         modifier = Modifier
             .height(48.dp).width(250.dp),
         colors = ButtonDefaults.buttonColors(
@@ -259,7 +252,7 @@ fun GoogleButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
             Color(0xFFF78058),//boton desabilitado
             colorResource(id = R.color.blue), //color contenido
             disabledContentColor = Color.White
-        ), enabled = loginEnable
+        ), enabled = true
     ) {
 
         Text(text = "Iniciar con Google",

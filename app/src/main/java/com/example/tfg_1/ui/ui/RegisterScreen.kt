@@ -1,12 +1,15 @@
 package com.example.tfg_1.ui.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -24,6 +27,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.RegisterViewModel
 import kotlinx.coroutines.launch
@@ -33,87 +38,122 @@ import kotlinx.coroutines.launch
 @Composable
 fun registerScreenPreview() {
     val viewModel = RegisterViewModel()
-    RegisterScreen(viewModel = viewModel)
+    val navController = rememberNavController()
+    RegisterScreen(viewModel = viewModel, navController)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(viewModel: RegisterViewModel) {
-    Box(
+fun RegisterScreen(viewModel: RegisterViewModel, navcontroller : NavController) {
+    /*
+    *    Box(
         Modifier
             .fillMaxSize()
             //.padding(5.dp)
             .background( color = colorResource(id = R.color.greyBackground))
     ) {
-        Register(Modifier.align(Alignment.Center), viewModel)
+        RegisterBody(Modifier.align(Alignment.Center), viewModel, navcontroller)
     }
+    * */
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(state = rememberTopAppBarState())
+    Scaffold(
+        topBar = { TopBar(navcontroller) }
+    ) {
+        paddingValues ->
+        Box(
+            Modifier
+                .fillMaxSize()
+                //.padding(5.dp)
+                .background( color = colorResource(id = R.color.greyBackground))
+                //.padding(paddingValues)
+        ) {
+            RegisterBody(Modifier.align(Alignment.Center).padding(paddingValues), viewModel ,navcontroller )
+        }
+
+    }
+
 }
 
+
 @Composable
-fun Register (modifier: Modifier, viewModel: RegisterViewModel) {
-    val email by viewModel.email.collectAsState()
-    val password by viewModel.password.collectAsState()
-    val password2 by viewModel.password2.collectAsState()
-    val isRegisterEnabled by viewModel.registerEnable.collectAsState()
-    val isLoading by viewModel.isLoadingR.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
-
-    if (isLoading) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            CircularProgressIndicator(Modifier.align(Alignment.Center))
-        }
-    }else{
-        Column(modifier = modifier.fillMaxSize()) {
-            Box(modifier = Modifier.align(Alignment.CenterHorizontally)
-                .fillMaxWidth().padding(top = 10.dp, bottom= 16.dp, end = 16.dp, start = 16.dp)
-            )
-            {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically // Alinea verticalmente al centro
-                ) {
-                    Text(
-                        text = "FLOWHOME",
-                        modifier = Modifier.padding(start = 8.dp, end = 15.dp), // Espaciado a la izquierda
-                        fontSize = 40.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1
-                    )
-
-                    LogoHeaderReg(Modifier) // Ajusta el tamaño del logo según sea necesario
-                }
+fun TopBar(navcontroller: NavController)
+{
+    Icon(imageVector = Icons.Default.ArrowBack,
+        contentDescription = "Back",
+        modifier = Modifier
+            .clickable{
+                navcontroller.popBackStack()
             }
+            .padding(top = 40.dp, start = 10.dp)
+            .size(34.dp)
+    )
 
+}
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel, navcontroller : NavController) {
+        val email by viewModel.email.collectAsState()
+        val password by viewModel.password.collectAsState()
+        val password2 by viewModel.password2.collectAsState()
+        val isRegisterEnabled by viewModel.registerEnable.collectAsState()
+        val isLoading by viewModel.isLoadingR.collectAsState()
+        val coroutineScope = rememberCoroutineScope()
 
-            TituloRegister(Modifier.align(Alignment.CenterHorizontally))
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(Modifier.align(Alignment.Center))
+            }
+        }else{
+            Column(modifier = modifier.fillMaxSize().padding(top = 16.dp)) {
+                Box(modifier = Modifier.align(Alignment.CenterHorizontally)
+                    .fillMaxWidth().padding(top = 5.dp, bottom= 16.dp, end = 16.dp, start = 16.dp)
+                )
+                {
+                    Row(
+                        modifier = Modifier,
+                        verticalAlignment = Alignment.CenterVertically // Alinea verticalmente al centro
+                    ) {
+                        Text(
+                            text = "FLOWHOME",
+                            modifier = Modifier.padding(start = 8.dp, end = 15.dp), // Espaciado a la izquierda
+                            fontSize = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
 
-            Spacer(modifier = Modifier.padding(5.dp))
-            EmailFieldReg(email) { viewModel.onLoginChanges(it, password, password2) }
-            Spacer(modifier = Modifier.padding(4.dp))
-            PasswordField(password) { viewModel.onLoginChanges(email, it, password2) }
-            Spacer(modifier = Modifier.padding(4.dp))
-            PasswordFieldReg2(password2) { viewModel.onLoginChanges(email,password, it) }
-            Spacer(modifier = Modifier.padding(10.dp))
-            Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
-            {
-                RegisterButtonReg(isRegisterEnabled) {
-                    coroutineScope.launch {
-
+                        LogoHeaderReg(Modifier) // Ajusta el tamaño del logo según sea necesario
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.padding(20.dp))
-            Column(modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 25.dp))
-            {
-                backButton(isRegisterEnabled) {
 
+                TituloRegister(Modifier.align(Alignment.CenterHorizontally))
+
+                Spacer(modifier = Modifier.padding(5.dp))
+                EmailFieldReg(email) { viewModel.onLoginChanges(it, password, password2) }
+                Spacer(modifier = Modifier.padding(4.dp))
+                PasswordField(password) { viewModel.onLoginChanges(email, it, password2) }
+                Spacer(modifier = Modifier.padding(4.dp))
+                PasswordFieldReg2(password2) { viewModel.onLoginChanges(email,password, it) }
+                Spacer(modifier = Modifier.padding(15.dp))
+                Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
+                {
+                    RegisterButtonReg(isRegisterEnabled) {
+                        coroutineScope.launch {
+
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.padding(20.dp))
+                Column(modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 25.dp))
+                {
+                    //backButton(isRegisterEnabled) {
+
+                    //}
                 }
             }
+
         }
-
-    }
-
-
 }
 //Imagen Logo------------------------------------------------
 @Composable
@@ -123,7 +163,7 @@ fun LogoHeaderReg(modifier:Modifier)
             painter = painterResource(id= R.drawable.logotfg),
             contentDescription = "Hogar",
             modifier = modifier
-                .padding(10.dp,10.dp)
+                .padding(start = 10.dp, end = 10.dp)
                 .size(120.dp)
                 .clip(CircleShape)
             // .border(7.dp, color = Color.Black)
