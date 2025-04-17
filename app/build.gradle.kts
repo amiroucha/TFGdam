@@ -79,16 +79,10 @@ dependencies {
 
     // JSON serialization library, works with the Kotlin serialization plugin
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-/*
-    // firebase
-   implementation("com.google.firebase:firebase-auth-ktx:23.1.1")
 
-    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
-
- */
-
-    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
-    implementation("com.google.firebase:firebase-auth")
+    //firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     implementation("com.google.firebase:firebase-firestore")
 
 }
