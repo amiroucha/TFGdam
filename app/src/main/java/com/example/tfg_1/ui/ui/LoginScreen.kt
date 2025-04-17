@@ -30,7 +30,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.R
 import com.example.tfg_1.navigation.Screens
-import com.example.tfg_1.viewModel.AuthViewModel
 import com.example.tfg_1.viewModel.LoginViewModel
 
 
@@ -38,13 +37,13 @@ import com.example.tfg_1.viewModel.LoginViewModel
 @Composable
 fun LoginScreenPreview() {
     val navController = rememberNavController()
-    val viewModel = AuthViewModel()
+    val viewModel = LoginViewModel(navController)
     LoginScreen(viewModel = viewModel, navController)
 }
 
 @Composable
 fun LoginScreen(
-    viewModel: AuthViewModel,
+    viewModel: LoginViewModel,
     navController: NavController
 ) {
     Box(
@@ -58,7 +57,7 @@ fun LoginScreen(
 }
 
 @Composable
-fun LoginBody(modifier: Modifier, viewModel: AuthViewModel, navController: NavController) {
+fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavController) {
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -104,10 +103,10 @@ fun LoginBody(modifier: Modifier, viewModel: AuthViewModel, navController: NavCo
 
             Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
             {
-                //LoginButton(navController)
+                LoginButton(email, password, viewModel)
                 //boton de login ----------------------
-                Button(
-                    onClick = { viewModel.login(email, password)
+               /*Button(
+                    onClick = { //viewModel.login(email, password)
                         //navController.navigate(Screens.Home.route)
                     },
                     modifier = Modifier
@@ -120,7 +119,7 @@ fun LoginBody(modifier: Modifier, viewModel: AuthViewModel, navController: NavCo
                         fontSize = 20.sp,
                         color = colorResource(id = R.color.black),
                     )
-                }
+                }*/
 
                 Spacer(modifier = Modifier.padding(16.dp))
                 GoogleButton()
@@ -243,11 +242,13 @@ fun ForgotPassword(modifier: Modifier) {
     )
 }
 @Composable
-fun LoginButton(navController: NavController, viewModel: AuthViewModel) {
+fun LoginButton(email: String, password: String, viewModel: LoginViewModel) {
     Button(
         onClick = {
-        //navController.navigate(Screens.Home.route)
-                  },
+            viewModel.login(email,password)
+            /*if (viewModel.login()){
+                navController.navigate(Screens.Home.route)
+            } */},
         modifier = Modifier
             .height(48.dp).width(250.dp),
         colors = ButtonDefaults.buttonColors(

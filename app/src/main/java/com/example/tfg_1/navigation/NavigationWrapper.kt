@@ -18,7 +18,7 @@ fun NavigationWrapper() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Screens.Login.route) {
         composable(Screens.Login.route) {
-            val viewModel = AuthViewModel()
+            val viewModel = LoginViewModel(navController)
             LoginScreen(
                 viewModel = viewModel,
                 navController

@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PreviewMain() {
     val navController = rememberNavController()
-    val viewModel = AuthViewModel()
+    val viewModel = LoginViewModel(navController)
     LoginScreen(viewModel = viewModel, navController)
 }
 
