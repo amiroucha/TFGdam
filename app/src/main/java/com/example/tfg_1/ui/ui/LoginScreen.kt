@@ -1,5 +1,6 @@
 package com.example.tfg_1.ui.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +32,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.R
 import com.example.tfg_1.navigation.Screens
+import com.example.tfg_1.viewModel.AuthState
 import com.example.tfg_1.viewModel.LoginViewModel
 
 
@@ -38,7 +41,7 @@ import com.example.tfg_1.viewModel.LoginViewModel
 fun LoginScreenPreview() {
     val navController = rememberNavController()
     val viewModel = LoginViewModel(navController)
-    LoginScreen(viewModel = viewModel, navController)
+    LoginScreen(viewModel = viewModel, navController = navController)
 }
 
 @Composable
@@ -49,8 +52,7 @@ fun LoginScreen(
     Box(
         Modifier
             .fillMaxSize()
-            //.padding(5.dp)
-            .background( color = colorResource(id = R.color.greyBackground))
+            .background(color = colorResource(id = R.color.greyBackground))
     ) {
         LoginBody(Modifier.align(Alignment.Center), viewModel, navController)
     }
@@ -61,157 +63,180 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
-    val authState = viewModel.authState.collectAsState()
+    val emailError by viewModel.emailError.collectAsState()
+    val passwordError by viewModel.passwordError.collectAsState()
+    val authState by viewModel.authState.collectAsState()
+    val context = LocalContext.current
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
             CircularProgressIndicator(Modifier.align(Alignment.Center))
         }
-    }else{
+    } else {
         Column(modifier = modifier.fillMaxSize()) {
-            Box(modifier = Modifier.align(Alignment.CenterHorizontally)
-                .fillMaxWidth().padding(16.dp))
-            {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically // Alinea verticalmente al centro
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "FLOWHOME",
-                        modifier = Modifier.padding(start = 8.dp, end = 15.dp), // Espaciado a la izquierda
+                        modifier = Modifier.padding(start = 8.dp, end = 15.dp),
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1
                     )
-
-                    LogoHeader(Modifier) // Ajusta el tamaño del logo según sea necesario
+                    LogoHeader(Modifier)
                 }
             }
-
 
             TituloLogin(Modifier.align(Alignment.CenterHorizontally))
 
             Spacer(modifier = Modifier.padding(5.dp))
-            EmailField(email) { viewModel.onLoginChanges(it, password) }
+
+            EmailField(email = email, error = emailError) {
+                viewModel.onLoginChanges(it, password)
+            }
 
             Spacer(modifier = Modifier.padding(4.dp))
-            PasswordField(password) { viewModel.onLoginChanges(email, it) }
+
+            PasswordField(password = password, error = passwordError) {
+                viewModel.onLoginChanges(email, it)
+            }
 
             ForgotPassword(Modifier.align(Alignment.End))
             Spacer(modifier = Modifier.padding(16.dp))
+            //alert errores de firebase-------------------------
+            var showDialog by remember { mutableStateOf(false) }
+            var errorMessage by remember { mutableStateOf("") }
+            LaunchedEffect(authState) {
+                if (authState is AuthState.Error) {
+                    errorMessage = (authState as AuthState.Error).error
+                    showDialog = true
+                }
+            }
 
-            Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
-            {
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text(text = "Error de inicio de sesión") },
+                    text = { Text(text = errorMessage) },
+                    confirmButton = {
+                        Button(
+                            onClick = { showDialog = false }
+                        ) {
+                            Text("Aceptar")
+                        }
+                    }
+                )
+            }
+            //--------------------------------------------------
+
+            Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp)) {
+
                 LoginButton(email, password, viewModel)
-                //boton de login ----------------------
-               /*Button(
-                    onClick = { //viewModel.login(email, password)
-                        //navController.navigate(Screens.Home.route)
-                    },
-                    modifier = Modifier
-                        .height(48.dp).width(250.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        colorResource(id= R.color.brown), //color contenido
-                    ), enabled = true
-                ) {
-                    Text(text = "Iniciar sesión",
-                        fontSize = 20.sp,
-                        color = colorResource(id = R.color.black),
-                    )
-                }*/
 
                 Spacer(modifier = Modifier.padding(16.dp))
                 GoogleButton()
             }
-            Column(modifier = Modifier.align(Alignment.CenterHorizontally)){
+
+            Column(modifier = Modifier.align(Alignment.CenterHorizontally)) {
                 Spacer(modifier = Modifier.padding(16.dp))
-                Text(text = "¿ No tienes cuenta ?",
+                Text(
+                    text = "¿ No tienes cuenta ?",
                     fontSize = 20.sp,
                     color = colorResource(id = R.color.black),
-                    modifier = Modifier.padding(10.dp).align(Alignment.CenterHorizontally)
+                    modifier = Modifier.padding(10.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
                 RegisterButton(navController)
-
             }
-
-
         }
-
     }
-
-
-}
-//Imagen Logo------------------------------------------------
-@Composable
-fun LogoHeader(modifier:Modifier)
-{
-        Image(
-            painter = painterResource(id= R.drawable.logotfg),
-            contentDescription = "Hogar",
-            modifier = modifier
-                .padding(10.dp,10.dp)
-                .size(120.dp)
-                .clip(CircleShape)
-            // .border(7.dp, color = Color.Black)
-        )
-
 }
 
-//Titulo---------------------------------------------
+// Imagen Logo
 @Composable
-fun TituloLogin(modifier:Modifier){
-    Text( text = "Iniciar Sesión" ,
+fun LogoHeader(modifier: Modifier) {
+    Image(
+        painter = painterResource(id = R.drawable.logotfg),
+        contentDescription = "Hogar",
         modifier = modifier
-            .padding(10.dp),
+            .padding(10.dp)
+            .size(120.dp)
+            .clip(CircleShape)
+    )
+}
+
+// Título
+@Composable
+fun TituloLogin(modifier: Modifier) {
+    Text(
+        text = "Iniciar Sesión",
+        modifier = modifier.padding(10.dp),
         fontSize = 40.sp,
-        maxLines = 1, // Solo permite 1 línea
+        maxLines = 1,
         fontWeight = FontWeight.Bold
     )
 }
 
-//Email------------------------------------------------
+// EmailField con error
 @Composable
-fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
-    Row(modifier = Modifier){
+fun EmailField(email: String, error: String?, onTextFieldChanged: (String) -> Unit) {
+    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         TextField(
-            value = email, onValueChange = { onTextFieldChanged(it) },
+            value = email,
+            onValueChange = { onTextFieldChanged(it) },
             modifier = Modifier
-                .height(90.dp)
-                .weight(1f)
-                .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 10.dp)
+                .fillMaxWidth()
+                .height(70.dp)
                 .border(2.dp, Color.Black),
             placeholder = { Text(text = "Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
-            maxLines = 1,
+            isError = error != null,
             colors = TextFieldDefaults.colors(
-                focusedTextColor= colorResource(id = R.color.white),//color del texto
+                focusedTextColor = colorResource(id = R.color.white),
                 focusedContainerColor = colorResource(id = R.color.black),
-                unfocusedTextColor= colorResource(id = R.color.black),
+                unfocusedTextColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
+                errorIndicatorColor = colorResource(id = R.color.red)
             )
         )
+        error?.let { //si el error!=null -> hay error , entonces:
+            Text(
+                text = it,//it es el valor del error (no null)
+                color = Color.Red,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
     }
 }
-//Contraseña------------------------------------------------
+
+// PasswordField con error
 @Composable
-fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
-    var passwordVisible by remember { mutableStateOf(false) } //mostrar/ocultar contraseña
-    Row(modifier = Modifier)
-    {
+fun PasswordField(password: String, error: String?, onTextFieldChanged: (String) -> Unit) {
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         TextField(
-            value = password, onValueChange = { onTextFieldChanged(it) },
-            placeholder = { Text(text = "Contraseña") },
+            value = password,
+            onValueChange = { onTextFieldChanged(it) },
             modifier = Modifier
-                .height(90.dp)
-                .weight(1f)
-                .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 10.dp)
+                .fillMaxWidth()
+                .height(70.dp)
                 .border(2.dp, Color.Black),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            placeholder = { Text("Contraseña") },
             singleLine = true,
-            maxLines = 1,
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(), // Muestra u oculta la contraseña
+            isError = error != null,
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             trailingIcon = {
                 val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -219,19 +244,28 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
                 }
             },
             colors = TextFieldDefaults.colors(
-                focusedTextColor= colorResource(id = R.color.white),//color del texto
+                focusedTextColor = colorResource(id = R.color.white),
                 focusedContainerColor = colorResource(id = R.color.black),
-                unfocusedTextColor= colorResource(id = R.color.black),
+                unfocusedTextColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-            ),
+                errorIndicatorColor = Color.Red
+            )
         )
-
+        error?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
     }
 }
+
 @Composable
 fun ForgotPassword(modifier: Modifier) {
     Text(
-        text = "Olvidaste la contraseña?",
+        text = "¿Olvidaste la contraseña?",
         modifier = modifier
             .clickable { }
             .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 16.dp),
@@ -241,24 +275,23 @@ fun ForgotPassword(modifier: Modifier) {
         textDecoration = TextDecoration.Underline
     )
 }
+
 @Composable
 fun LoginButton(email: String, password: String, viewModel: LoginViewModel) {
     Button(
-        onClick = {
-            viewModel.login(email,password)
-            /*if (viewModel.login()){
-                navController.navigate(Screens.Home.route)
-            } */},
+        onClick = { viewModel.login(email, password) },
         modifier = Modifier
-            .height(48.dp).width(250.dp),
+            .height(48.dp)
+            .width(250.dp),
         colors = ButtonDefaults.buttonColors(
-            colorResource(id= R.color.brown), //color contenido
-        ), enabled = true
+            colorResource(id = R.color.brown)
+        )
     ) {
-        Text(text = "Iniciar sesión",
+        Text(
+            text = "Iniciar sesión",
             fontSize = 20.sp,
-            color = colorResource(id = R.color.black),
-            )
+            color = colorResource(id = R.color.black)
+        )
     }
 }
 
@@ -267,49 +300,46 @@ fun GoogleButton() {
     Button(
         onClick = { },
         modifier = Modifier
-            .height(48.dp).width(250.dp),
+            .height(48.dp)
+            .width(250.dp),
         colors = ButtonDefaults.buttonColors(
-            Color(0xFFFF4303),//boton habilitado
-            Color(0xFFF78058),//boton desabilitado
-            colorResource(id = R.color.blue), //color contenido
+            Color(0xFFFF4303),
+            Color(0xFFF78058),
+            colorResource(id = R.color.blue),
             disabledContentColor = Color.White
-        ), enabled = true
-    ) {
-
-        Text(text = "Iniciar con Google",
-                fontSize = 20.sp,
-                color = colorResource(id = R.color.black)
         )
-        Spacer(modifier = Modifier.width(8.dp)) // Espacio entre icono y texto
+    ) {
+        Text(
+            text = "Iniciar con Google",
+            fontSize = 20.sp,
+            color = colorResource(id = R.color.black)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
         Icon(
-            painter = painterResource(id = R.drawable.ic_google), // Ícono de Google
+            painter = painterResource(id = R.drawable.ic_google),
             contentDescription = "Google Icon",
             modifier = Modifier.size(24.dp),
-            tint = Color.Unspecified // Mantiene los colores originales del icono
+            tint = Color.Unspecified
         )
     }
 }
 
-
 @Composable
 fun RegisterButton(navController: NavController) {
     Button(
-        onClick = {  navController.navigate(Screens.Register.route)},
+        onClick = { navController.navigate(Screens.Register.route) },
         modifier = Modifier
-            .height(48.dp).width(250.dp),
+            .height(48.dp)
+            .width(250.dp),
         colors = ButtonDefaults.buttonColors(
-            colorResource(id = R.color.brownRegister),
-            colorResource(id = R.color.brownRegister),
-            colorResource(id = R.color.brownRegister),
-            disabledContentColor = Color.White
-        ), enabled = true
+            colorResource(id = R.color.brownRegister)
+        )
     ) {
-
-        Spacer(modifier = Modifier.width(8.dp)) // Espacio entre icono y texto
-        Text(text = "Registrate aquí",
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "Registrate aquí",
             fontSize = 20.sp,
             color = colorResource(id = R.color.black)
         )
     }
 }
-

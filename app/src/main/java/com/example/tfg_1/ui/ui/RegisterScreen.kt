@@ -93,7 +93,7 @@ fun TopBar(navcontroller: NavController)
 @Composable
 fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel, navcontroller : NavController) {
         val email by viewModel.email.collectAsState()
-        val password by viewModel.password.collectAsState()
+        val passwordR by viewModel.password.collectAsState()
         val password2 by viewModel.password2.collectAsState()
         val isRegisterEnabled by viewModel.registerEnable.collectAsState()
         val isLoading by viewModel.isLoadingR.collectAsState()
@@ -129,11 +129,11 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel, navcontrolle
                 TituloRegister(Modifier.align(Alignment.CenterHorizontally))
 
                 Spacer(modifier = Modifier.padding(5.dp))
-                EmailFieldReg(email) { viewModel.onLoginChanges(it, password, password2) }
+                EmailFieldReg(email) { viewModel.onLoginChanges(it, passwordR, password2) }
                 Spacer(modifier = Modifier.padding(4.dp))
-                PasswordField(password) { viewModel.onLoginChanges(email, it, password2) }
+                PasswordFieldReg(passwordR) { viewModel.onLoginChanges(email, it, password2) }
                 Spacer(modifier = Modifier.padding(4.dp))
-                PasswordFieldReg2(password2) { viewModel.onLoginChanges(email,password, it) }
+                PasswordFieldReg2(password2) { viewModel.onLoginChanges(email,passwordR, it) }
                 Spacer(modifier = Modifier.padding(15.dp))
                 Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
                 {

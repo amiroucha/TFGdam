@@ -22,10 +22,10 @@ class LoginViewModel(navController: NavController) : ViewModel() {
     val password: StateFlow<String> = _password.asStateFlow()
 
     private val _emailError = MutableStateFlow<String?>(null)
-    val emailError: StateFlow<String?> get() = _emailError
+    val emailError: StateFlow<String?> = _emailError
 
     private val _passwordError = MutableStateFlow<String?>(null)
-    val passwordError: StateFlow<String?> get() = _passwordError
+    val passwordError: StateFlow<String?> = _passwordError
 
     private val _loginEnable = MutableStateFlow(false)
     val loginEnable: StateFlow<Boolean> = _loginEnable.asStateFlow()
@@ -51,6 +51,13 @@ class LoginViewModel(navController: NavController) : ViewModel() {
         _email.value = email
         _password.value = password
         _loginEnable.value = validEmail(email) && validPassword(password)
+
+        // Limpiar errores al modificar campos
+        _emailError.value = null
+        _passwordError.value = null
+        if (_authState.value is AuthState.Error) {
+            _authState.value = AuthState.Unauthenticated
+        }
     }
 
     suspend fun onLoginSelected() {
@@ -77,7 +84,7 @@ class LoginViewModel(navController: NavController) : ViewModel() {
             else -> null
         }
 
-        return validEmail(email) && validPassword(password)
+        return _emailError.value == null && _passwordError.value == null
     }
 
     private fun checkAuthStatus() {
@@ -93,7 +100,8 @@ class LoginViewModel(navController: NavController) : ViewModel() {
                         _authState.value = AuthState.Authenticated
                         _navController.navigate(Screens.Home.route)
                     } else {
-                        _authState.value = AuthState.Error(task.exception?.message ?: "ERROR. Algo fue mal")
+                        val errorMsg = task.exception?.message ?: "ERROR. Algo fue mal"
+                        _authState.value = AuthState.Error(errorMsg)
                     }
                 }
         } else {
@@ -108,6 +116,7 @@ sealed class AuthState {
     object Loading : AuthState()
     data class Error(val error: String) : AuthState()
 }
+
 
    /* private val _emailError = MutableLiveData<String?>() //para almacenar los errores
     val emailError: LiveData<String?> get() = _emailError
