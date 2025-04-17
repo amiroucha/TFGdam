@@ -66,11 +66,11 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
     val emailError by viewModel.emailError.collectAsState()
     val passwordError by viewModel.passwordError.collectAsState()
     val authState by viewModel.authState.collectAsState()
-    val context = LocalContext.current
+
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
-            CircularProgressIndicator(Modifier.align(Alignment.Center))
+            CircularProgressIndicator(Modifier.size(48.dp).align(Alignment.Center))
         }
     } else {
         Column(modifier = modifier.fillMaxSize()) {
@@ -191,7 +191,7 @@ fun EmailField(email: String, error: String?, onTextFieldChanged: (String) -> Un
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         TextField(
             value = email,
-            onValueChange = { onTextFieldChanged(it) },
+            onValueChange = { onTextFieldChanged(it) },//actualiza rl valor
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
@@ -279,7 +279,10 @@ fun ForgotPassword(modifier: Modifier) {
 @Composable
 fun LoginButton(email: String, password: String, viewModel: LoginViewModel) {
     Button(
-        onClick = { viewModel.login(email, password) },
+        onClick = {
+
+            viewModel.login(email, password)
+        },
         modifier = Modifier
             .height(48.dp)
             .width(250.dp),

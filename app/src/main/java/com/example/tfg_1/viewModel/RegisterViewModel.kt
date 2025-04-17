@@ -5,8 +5,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(navController: NavController) : ViewModel() {
+    private val _navController = navController
 
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()

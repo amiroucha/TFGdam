@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.delay
 import android.util.Patterns
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import com.example.tfg_1.navigation.Screens
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
@@ -27,8 +27,9 @@ class LoginViewModel(navController: NavController) : ViewModel() {
     private val _passwordError = MutableStateFlow<String?>(null)
     val passwordError: StateFlow<String?> = _passwordError
 
-    private val _loginEnable = MutableStateFlow(false)
-    val loginEnable: StateFlow<Boolean> = _loginEnable.asStateFlow()
+    //para desactivar el boton login
+    /*private val _loginEnable = MutableStateFlow(false)
+    val loginEnable: StateFlow<Boolean> = _loginEnable.asStateFlow()*/
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -50,7 +51,7 @@ class LoginViewModel(navController: NavController) : ViewModel() {
     fun onLoginChanges(email: String, password: String) {
         _email.value = email
         _password.value = password
-        _loginEnable.value = validEmail(email) && validPassword(password)
+       // _loginEnable.value = validEmail(email) && validPassword(password)
 
         // Limpiar errores al modificar campos
         _emailError.value = null
@@ -60,15 +61,8 @@ class LoginViewModel(navController: NavController) : ViewModel() {
         }
     }
 
-    suspend fun onLoginSelected() {
-        if (validateOnSubmit()) {
-            _isLoading.value = true
-            delay(2000)
-            _isLoading.value = false
-        }
-    }
 
-    fun validateOnSubmit(): Boolean {
+    private fun validateOnSubmit(): Boolean {
         val email = _email.value
         val password = _password.value
 
@@ -93,9 +87,12 @@ class LoginViewModel(navController: NavController) : ViewModel() {
 
     fun login(email: String, password: String) {
         if (validateOnSubmit()) {
+            _isLoading.value = true
             _authState.value = AuthState.Loading
+
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task: Task<AuthResult> ->
+                    _isLoading.value = false
                     if (task.isSuccessful) {
                         _authState.value = AuthState.Authenticated
                         _navController.navigate(Screens.Home.route)
@@ -111,9 +108,9 @@ class LoginViewModel(navController: NavController) : ViewModel() {
 }
 
 sealed class AuthState {
-    object Authenticated : AuthState()
-    object Unauthenticated : AuthState()
-    object Loading : AuthState()
+    data object Authenticated : AuthState()
+    data object Unauthenticated : AuthState()
+    data object Loading : AuthState()
     data class Error(val error: String) : AuthState()
 }
 

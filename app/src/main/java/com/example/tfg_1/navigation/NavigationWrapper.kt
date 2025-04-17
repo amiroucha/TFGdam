@@ -25,7 +25,7 @@ fun NavigationWrapper() {
             )
         }
         composable(Screens.Register.route) {
-            val viewModel = RegisterViewModel()
+            val viewModel = RegisterViewModel(navController)
             RegisterScreen(viewModel = viewModel,navController)
         }
         composable(Screens.Home.route) {
