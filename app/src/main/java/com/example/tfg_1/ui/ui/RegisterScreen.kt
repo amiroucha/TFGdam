@@ -32,7 +32,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.RegisterViewModel
-import kotlinx.coroutines.launch
 import java.util.Calendar
 import androidx.compose.material.icons.filled.CalendarToday
 
@@ -142,7 +141,7 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel, navcontrolle
             Spacer(modifier = Modifier.padding(4.dp))
             PasswordFieldReg2(password2, error = passwordError2) { viewModel.onLoginChanges(email,passwordR, it) }
             //Spacer(modifier = Modifier.padding(15.dp))
-            DatePicker()
+            FechaNacimientoField(viewModel)
             Spacer(modifier = Modifier.padding(15.dp))
             Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
             {
@@ -209,7 +208,8 @@ fun EmailFieldReg(email: String,error: String?, onTextFieldChanged: (String) -> 
                 focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-                errorIndicatorColor = colorResource(id = R.color.red)
+                errorIndicatorColor = colorResource(id = R.color.red),
+                cursorColor = colorResource(id = R.color.black),
             )
         )
         error?.let { //si el error!=null -> hay error , entonces:
@@ -251,7 +251,8 @@ fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (Stri
                 focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = Color.Red,
+                cursorColor = colorResource(id = R.color.black),
             )
         )
         error?.let {
@@ -295,7 +296,8 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
                 focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = Color.Red,
+                cursorColor = colorResource(id = R.color.black),
             )
         )
         error?.let {
@@ -309,83 +311,60 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
 
     }
 }
+//fecha de nacimiento
 
 @Composable
-fun DatePicker() {
-    // Manejamos el estado de la fecha seleccionada
-    val selectedDate = remember { mutableStateOf("") }
+fun FechaNacimientoField(viewModel: RegisterViewModel) {
+    val fecha by viewModel.date.collectAsState()
+    val mostrarDialog by viewModel.showDatePicker.collectAsState()
 
-    // Estado para abrir o cerrar el DatePicker
-    val openDatePicker = remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    // Crear un calendario (similar a Calendar.getInstance())
-    val calendar = Calendar.getInstance()
-    val currentYear = calendar.get(Calendar.YEAR)
-    val currentMonth = calendar.get(Calendar.MONTH)
-    val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+    val calendar = remember { Calendar.getInstance() }
+    val anio = calendar.get(Calendar.YEAR)
+    val mes = calendar.get(Calendar.MONTH)
+    val dia = calendar.get(Calendar.DAY_OF_MONTH)
 
-    // Mostrar el DatePicker cuando el usuario hace clic
-    if (openDatePicker.value) {
-        DatePickerDialog(
-            onDateSelected = { year, month, day ->
-                // Aquí se formatea la fecha seleccionada
-                val formattedDate = String.format(
-                    "%02d/%02d/%04d", day, month + 1, year
-                )
-                selectedDate.value = formattedDate
-                openDatePicker.value = false // Cerrar el DatePicker después de seleccionar
+    if (mostrarDialog) { // mostrar el calendario
+        android.app.DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                viewModel.dateSeleccionada(year, month, dayOfMonth)
             },
-            initialYear = currentYear,
-            initialMonth = currentMonth,
-            initialDay = currentDay
-        )
+            anio, mes, dia
+        ).show()
     }
 
-    // Interfaz con un TextField para mostrar la fecha seleccionada
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = "Fecha de nacimiento:")
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            TextField(
-                value = selectedDate.value,
-                onValueChange = {},
-                enabled = false, // El campo solo se puede leer
-                modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
-                label = { Text("Selecciona la fecha") }
+    // Campo de texto con botón
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextField(
+            value = fecha,
+            onValueChange = {},
+            label = { Text("Fecha de nacimiento") },
+            modifier = Modifier.weight(1f),
+            readOnly = true,
+            enabled = false, // para qur no sea editable
+            colors = TextFieldDefaults.colors(
+                disabledTextColor =  colorResource(id = R.color.black),
+                focusedContainerColor = colorResource(id = R.color.white), // o el color que uses de fondo
             )
+        )
 
-            IconButton(onClick = { openDatePicker.value = true }) {
-                Icon(Icons.Default.CalendarToday, contentDescription = "Seleccionar fecha")
-            }
+        IconButton(onClick = { viewModel.showMenuDate() }) {
+            Icon(
+                imageVector = Icons.Filled.CalendarToday,
+                contentDescription = "Seleccionar fecha"
+            )
         }
     }
 }
 
-// menu DatePicker
-@Composable
-fun DatePickerDialog(
-    onDateSelected: (Int, Int, Int) -> Unit,
-    initialYear: Int,
-    initialMonth: Int,
-    initialDay: Int
-) {
-    val context = LocalContext.current
-    val datePickerDialog = remember {
-        android.app.DatePickerDialog(
-            context,
-            { _, year, month, dayOfMonth ->
-                onDateSelected(year, month, dayOfMonth)
-            },
-            initialYear,
-            initialMonth,
-            initialDay
-        )
-    }
-
-    LaunchedEffect(Unit) {
-        datePickerDialog.show()
-    }
-}
+//boton de acceder/registro
 @Composable
 fun RegisterButtonReg(loginEnable: Boolean, onLoginSelected: () -> Unit) {
     Button(
