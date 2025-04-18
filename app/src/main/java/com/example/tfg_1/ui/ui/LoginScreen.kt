@@ -209,7 +209,7 @@ fun EmailField(email: String, error: String?, onTextFieldChanged: (String) -> Un
         error?.let { //si el error!=null -> hay error , entonces:
             Text(
                 text = it,//it es el valor del error (no null)
-                color = Color.Red,
+                color = colorResource(id = R.color.red),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(start = 4.dp)
             )
@@ -246,13 +246,13 @@ fun PasswordField(password: String, error: String?, onTextFieldChanged: (String)
                 focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = colorResource(id = R.color.red)
             )
         )
         error?.let {
             Text(
                 text = it,
-                color = Color.Red,
+                color = colorResource(id = R.color.red),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(start = 4.dp)
             )

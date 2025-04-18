@@ -47,16 +47,6 @@ fun registerScreenPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(viewModel: RegisterViewModel, navcontroller : NavController) {
-    /*
-    *    Box(
-        Modifier
-            .fillMaxSize()
-            //.padding(5.dp)
-            .background( color = colorResource(id = R.color.greyBackground))
-    ) {
-        RegisterBody(Modifier.align(Alignment.Center), viewModel, navcontroller)
-    }
-    * */
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(state = rememberTopAppBarState())
     Scaffold(
         topBar = { TopBar(navcontroller) }
@@ -178,9 +168,8 @@ fun LogoHeaderReg(modifier:Modifier)
 @Composable
 fun TituloRegister(modifier:Modifier){
     Text( text = "REGISTRO" ,
-        modifier = modifier
-            .padding(top = 0.dp, bottom= 5.dp, end = 5.dp, start = 5.dp),
-        fontSize = 50.sp,
+        modifier = modifier.padding(top = 0.dp, bottom= 5.dp, end = 5.dp, start = 5.dp),
+        fontSize = 40.sp,
         maxLines = 1, // Solo permite 1 línea
         fontWeight = FontWeight.Bold
     )
@@ -188,7 +177,7 @@ fun TituloRegister(modifier:Modifier){
 //email ----------------------------------------------------------------
 @Composable
 fun EmailFieldReg(email: String,error: String?, onTextFieldChanged: (String) -> Unit) {
-    Column (modifier = Modifier.padding(horizontal = 20.dp)) {
+    Column (modifier = Modifier.padding(top = 5.dp, bottom=1.dp, end = 20.dp, start = 20.dp )) {
         TextField(
             value = email,
             onValueChange = { onTextFieldChanged(it) },//actualiza rl valor
@@ -211,7 +200,7 @@ fun EmailFieldReg(email: String,error: String?, onTextFieldChanged: (String) -> 
         error?.let { //si el error!=null -> hay error , entonces:
             Text(
                 text = it,//it es el valor del error (no null)
-                color = Color.Red,
+                color = colorResource(id = R.color.red),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(start = 4.dp)
             )
@@ -222,7 +211,7 @@ fun EmailFieldReg(email: String,error: String?, onTextFieldChanged: (String) -> 
 @Composable
 fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (String) -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) } //mostrar/ocultar contraseña
-    Column (modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp))
+    Column (modifier = Modifier.padding(top = 1.dp, bottom=1.dp, end = 20.dp, start = 20.dp ))
     {
         TextField(
             value = password,
@@ -247,13 +236,13 @@ fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (Stri
                 focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = colorResource(id = R.color.red)
             )
         )
         error?.let {
             Text(
                 text = it,
-                color = Color.Red,
+                color = colorResource(id = R.color.red),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(start = 4.dp)
             )
@@ -266,7 +255,7 @@ fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (Stri
 @Composable
 fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (String) -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) } //mostrar/ocultar contraseña
-    Column(modifier = Modifier.padding(horizontal = 20.dp))
+    Column(modifier = Modifier.padding(top = 1.dp, bottom=1.dp, end = 20.dp, start = 20.dp ))
     {
         TextField(
             value = password,
@@ -291,13 +280,13 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
                 focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-                errorIndicatorColor = Color.Red
+                errorIndicatorColor = colorResource(id = R.color.red)
             )
         )
         error?.let {
             Text(
                 text = it,
-                color = Color.Red,
+                color = colorResource(id = R.color.red),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(start = 4.dp)
             )
