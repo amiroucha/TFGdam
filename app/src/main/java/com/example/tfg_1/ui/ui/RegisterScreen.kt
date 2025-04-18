@@ -129,14 +129,11 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel, navcontrolle
                     LogoHeaderReg(Modifier) // Ajusta el tamaño del logo según sea necesario
                 }
             }
-
-
             TituloRegister(Modifier.align(Alignment.CenterHorizontally))
 
             Spacer(modifier = Modifier.padding(5.dp))
-            EmailFieldReg(email, error = emailError)
-            { viewModel.onLoginChanges(it, passwordR, password2) }
-            Spacer(modifier = Modifier.padding(4.dp))
+            EmailFieldReg(email, error = emailError) { viewModel.onLoginChanges(it, passwordR, password2) }
+            Spacer(modifier = Modifier.padding(2.dp))
             PasswordFieldReg(passwordR, error = passwordError1) { viewModel.onLoginChanges(email, it, password2) }
             Spacer(modifier = Modifier.padding(4.dp))
             PasswordFieldReg2(password2, error = passwordError2) { viewModel.onLoginChanges(email,passwordR, it) }
@@ -191,7 +188,7 @@ fun TituloRegister(modifier:Modifier){
 //email ----------------------------------------------------------------
 @Composable
 fun EmailFieldReg(email: String,error: String?, onTextFieldChanged: (String) -> Unit) {
-    Row(modifier = Modifier.padding(20.dp,10.dp)) {
+    Column (modifier = Modifier.padding(horizontal = 20.dp)) {
         TextField(
             value = email,
             onValueChange = { onTextFieldChanged(it) },//actualiza rl valor
@@ -208,8 +205,7 @@ fun EmailFieldReg(email: String,error: String?, onTextFieldChanged: (String) -> 
                 focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-                errorIndicatorColor = colorResource(id = R.color.red),
-                cursorColor = colorResource(id = R.color.black),
+                errorIndicatorColor = colorResource(id = R.color.red)
             )
         )
         error?.let { //si el error!=null -> hay error , entonces:
@@ -226,7 +222,7 @@ fun EmailFieldReg(email: String,error: String?, onTextFieldChanged: (String) -> 
 @Composable
 fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (String) -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) } //mostrar/ocultar contraseña
-    Row(modifier = Modifier.padding(20.dp,10.dp))
+    Column (modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp))
     {
         TextField(
             value = password,
@@ -251,8 +247,7 @@ fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (Stri
                 focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-                errorIndicatorColor = Color.Red,
-                cursorColor = colorResource(id = R.color.black),
+                errorIndicatorColor = Color.Red
             )
         )
         error?.let {
@@ -271,7 +266,7 @@ fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (Stri
 @Composable
 fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (String) -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) } //mostrar/ocultar contraseña
-    Row(modifier = Modifier.padding(20.dp,10.dp))
+    Column(modifier = Modifier.padding(horizontal = 20.dp))
     {
         TextField(
             value = password,
@@ -296,8 +291,7 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
                 focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-                errorIndicatorColor = Color.Red,
-                cursorColor = colorResource(id = R.color.black),
+                errorIndicatorColor = Color.Red
             )
         )
         error?.let {
@@ -350,8 +344,10 @@ fun FechaNacimientoField(viewModel: RegisterViewModel) {
             readOnly = true,
             enabled = false, // para qur no sea editable
             colors = TextFieldDefaults.colors(
-                disabledTextColor =  colorResource(id = R.color.black),
-                focusedContainerColor = colorResource(id = R.color.white), // o el color que uses de fondo
+                disabledTextColor = Color.Black,
+                focusedContainerColor = Color.Transparent, // o el color que uses de fondo
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
             )
         )
 
