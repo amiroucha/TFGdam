@@ -191,9 +191,11 @@ fun EmailFieldReg(email: String,error: String?, onTextFieldChanged: (String) -> 
             isError = error != null,
             colors = TextFieldDefaults.colors(
                 focusedTextColor = colorResource(id = R.color.white),
-                focusedContainerColor = colorResource(id = R.color.black),
-                unfocusedTextColor = colorResource(id = R.color.black),
+                unfocusedTextColor = colorResource(id = R.color.white),
+                focusedContainerColor = colorResource(id = R.color.white),
                 unfocusedContainerColor = colorResource(id = R.color.white),
+                disabledContainerColor = colorResource(id = R.color.white),
+                errorContainerColor = colorResource(id = R.color.white),
                 errorIndicatorColor = colorResource(id = R.color.red)
             )
         )
@@ -228,14 +230,18 @@ fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (Stri
             trailingIcon = {
                 val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = "Mostrar contraseña")
+                    Icon(imageVector = image,
+                        contentDescription = "Mostrar contraseña",
+                        tint = colorResource(id = R.color.black) )
                 }
             },
             colors = TextFieldDefaults.colors(
-                focusedTextColor = colorResource(id = R.color.white),
-                focusedContainerColor = colorResource(id = R.color.black),
+                focusedTextColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
+                focusedContainerColor = colorResource(id = R.color.white),
                 unfocusedContainerColor = colorResource(id = R.color.white),
+                disabledContainerColor = colorResource(id = R.color.white),
+                errorContainerColor = colorResource(id = R.color.white),
                 errorIndicatorColor = colorResource(id = R.color.red)
             )
         )
@@ -264,7 +270,7 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
                 .fillMaxWidth()
                 .height(70.dp)
                 .border(2.dp, Color.Black),
-            placeholder = { Text("Contraseña") },
+            placeholder = { Text("Repite tu contraseña") },
             singleLine = true,
             isError = error != null,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -272,14 +278,18 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
             trailingIcon = {
                 val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = "Mostrar contraseña")
+                    Icon(imageVector = image,
+                        contentDescription = "Mostrar contraseña",
+                        tint = colorResource(id = R.color.black))
                 }
             },
             colors = TextFieldDefaults.colors(
-                focusedTextColor = colorResource(id = R.color.white),
-                focusedContainerColor = colorResource(id = R.color.black),
+                focusedTextColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
+                focusedContainerColor = colorResource(id = R.color.white),
                 unfocusedContainerColor = colorResource(id = R.color.white),
+                disabledContainerColor = colorResource(id = R.color.white),
+                errorContainerColor = colorResource(id = R.color.white),
                 errorIndicatorColor = colorResource(id = R.color.red)
             )
         )
@@ -328,13 +338,13 @@ fun FechaNacimientoField(viewModel: RegisterViewModel) {
         TextField(
             value = fecha,
             onValueChange = {},
-            label = { Text("Fecha de nacimiento") },
+            label = { Text("Fecha de nacimiento", color = colorResource(id = R.color.black)) },
             modifier = Modifier.weight(1f),
             readOnly = true,
             enabled = false, // para qur no sea editable
             colors = TextFieldDefaults.colors(
                 disabledTextColor = Color.Black,
-                focusedContainerColor = Color.Transparent, // o el color que uses de fondo
+                focusedContainerColor = colorResource(id = R.color.white),
                 unfocusedContainerColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent,
             )

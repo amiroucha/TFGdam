@@ -243,8 +243,8 @@ fun PasswordField(password: String, error: String?, onTextFieldChanged: (String)
             },
             colors = TextFieldDefaults.colors(
                 focusedTextColor = colorResource(id = R.color.white),
-                focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedTextColor = colorResource(id = R.color.black),
+                focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
                 errorIndicatorColor = colorResource(id = R.color.red)
             )
