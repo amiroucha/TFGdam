@@ -111,6 +111,7 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
 
             ForgotPassword(Modifier.align(Alignment.End))
             Spacer(modifier = Modifier.padding(16.dp))
+
             //alert errores de firebase-------------------------
             var showDialog by remember { mutableStateOf(false) }
             var errorMessage by remember { mutableStateOf("") }

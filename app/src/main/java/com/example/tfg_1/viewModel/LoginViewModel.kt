@@ -7,8 +7,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
 import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.tfg_1.R
@@ -36,6 +34,9 @@ class LoginViewModel(navController: NavController) : ViewModel() {
 
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password.asStateFlow()
+
+    private val _passwordResetMessage = MutableStateFlow<String?>(null)
+    val passwordResetMessage: StateFlow<String?> = _passwordResetMessage
 
     private val _emailError = MutableStateFlow<String?>(null)
     val emailError: StateFlow<String?> = _emailError
@@ -101,6 +102,19 @@ class LoginViewModel(navController: NavController) : ViewModel() {
         _authState.value = if (auth.currentUser != null) AuthState.Authenticated else AuthState.Unauthenticated
     }
 
+    fun resetPassword(email: String) {
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    _passwordResetMessage.value = "Se ha enviado un correo para restablecer tu contraseña."
+                } else {
+                    _passwordResetMessage.value = "No se pudo enviar el correo. Verifica el email."
+                }
+            }
+    }
+    fun clearPasswordResetMessage() {
+        _passwordResetMessage.value = null
+    }
     fun login(email: String, password: String) {
         if (validateOnSubmit()) {
             _isLoading.value = true
@@ -174,47 +188,9 @@ class LoginViewModel(navController: NavController) : ViewModel() {
     }
 }
 
-
-
-
 sealed class AuthState {
     data object Authenticated : AuthState()
     data object Unauthenticated : AuthState()
     data object Loading : AuthState()
     data class Error(val error: String) : AuthState()
 }
-
-
-   /* private val _emailError = MutableLiveData<String?>() //para almacenar los errores
-    val emailError: LiveData<String?> get() = _emailError
-
-    private val _passwordError = MutableLiveData<String?>() //para almacenar los errores
-    val passwordError: LiveData<String?> get() = _passwordError
-
-    private val _isFormValid = MutableLiveData<Boolean>()
-    val isFormValid: LiveData<Boolean> get() = _isFormValid
-
-
-    fun setEmail(email: String) {
-        _email.value = email
-        if (email.isNotEmpty()) _emailError.value = null
-        //cuando ya no esta vaciose quita el mensaje de errir
-    }
-
-    fun setPassword(password: String) {
-        _password.value = password
-        if (password.isNotEmpty()) _passwordError.value = null
-    //cuando ya no esta vaciose quita el mensaje de errir
-    }
-
-    fun validateOnSubmit(): Boolean {
-        val email = _email.value.orEmpty()
-        val password = _password.value.orEmpty()
-
-        _emailError.value = if (email.isEmpty()) "El correo no puede estar vacío" else null
-        _passwordError.value = if (password.isEmpty()) "La contraseña no puede estar vacía" else null
-
-        val isValid = email.isNotEmpty() && password.isNotEmpty()
-        _isFormValid.value = isValid
-        return isValid
-    }*/

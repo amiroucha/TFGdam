@@ -381,10 +381,11 @@ fun RegisterButtonReg(viewModel: RegisterViewModel) {
         modifier = Modifier
             .height(48.dp).width(250.dp),
         colors = ButtonDefaults.buttonColors(
-            Color(0xFFFF4303),//boton habilitado
-            Color(0xFFF78058),//boton desabilitado
+            colorResource(id= R.color.green),//boton habilitado
+            colorResource(id= R.color.white),//boton desabilitado
             colorResource(id= R.color.green), //color contenido
-            disabledContentColor = Color.White
+            disabledContentColor = colorResource(id= R.color.green)
+
         ), enabled = true
     ) {
         Text(text = "Registrarse",
