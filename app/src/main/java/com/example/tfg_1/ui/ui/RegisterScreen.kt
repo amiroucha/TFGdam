@@ -86,12 +86,11 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel, navcontrolle
     val email by viewModel.email.collectAsState()
     val passwordR by viewModel.password.collectAsState()
     val password2 by viewModel.password2.collectAsState()
-    val isRegisterEnabled by viewModel.registerEnable.collectAsState()
     val isLoading by viewModel.isLoadingR.collectAsState()
     val emailError by viewModel.emailError.collectAsState()
     val passwordError1 by viewModel.passwordError.collectAsState()
-    val passwordError2 by viewModel.passwordError.collectAsState()
-
+    val passwordError2 by viewModel.passwordError2.collectAsState()
+    val passwordSameError by viewModel.passwordsame.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
     if (isLoading) {
@@ -126,24 +125,27 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel, navcontrolle
             Spacer(modifier = Modifier.padding(2.dp))
             PasswordFieldReg(passwordR, error = passwordError1) { viewModel.onLoginChanges(email, it, password2) }
             Spacer(modifier = Modifier.padding(4.dp))
-            PasswordFieldReg2(password2, error = passwordError2) { viewModel.onLoginChanges(email,passwordR, it) }
-            //Spacer(modifier = Modifier.padding(15.dp))
+            PasswordFieldReg2(password2, error = passwordError2)
+            { viewModel.onLoginChanges(email,passwordR, it) }
+
+            // error de contraseñas diferentes
+            if (passwordSameError.isNotEmpty()) {
+                Text(
+                    text = passwordSameError,
+                    color = colorResource(id = R.color.red),
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(start = 20.dp)
+                )
+            }
+
             FechaNacimientoField(viewModel)
             Spacer(modifier = Modifier.padding(15.dp))
             Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
             {
-                RegisterButtonReg(isRegisterEnabled) {
-
-                }
+                RegisterButtonReg(viewModel)
             }
 
             Spacer(modifier = Modifier.padding(20.dp))
-            Column(modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 25.dp))
-            {
-                //backButton(isRegisterEnabled) {
-
-                //}
-            }
         }
 
     }
@@ -203,7 +205,7 @@ fun EmailFieldReg(email: String,error: String?, onTextFieldChanged: (String) -> 
             Text(
                 text = it,//it es el valor del error (no null)
                 color = colorResource(id = R.color.red),
-                fontSize = 14.sp,
+                fontSize = 15.sp,
                 modifier = Modifier.padding(start = 4.dp)
             )
         }
@@ -249,7 +251,7 @@ fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (Stri
             Text(
                 text = it,
                 color = colorResource(id = R.color.red),
-                fontSize = 14.sp,
+                fontSize = 15.sp,
                 modifier = Modifier.padding(start = 4.dp)
             )
         }
@@ -297,7 +299,7 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
             Text(
                 text = it,
                 color = colorResource(id = R.color.red),
-                fontSize = 14.sp,
+                fontSize = 15.sp,
                 modifier = Modifier.padding(start = 4.dp)
             )
         }
@@ -310,15 +312,15 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
 fun FechaNacimientoField(viewModel: RegisterViewModel) {
     val fecha by viewModel.date.collectAsState()
     val mostrarDialog by viewModel.showDatePicker.collectAsState()
+    val dateError by viewModel.dateError.collectAsState()
 
     val context = LocalContext.current
-
     val calendar = remember { Calendar.getInstance() }
     val anio = calendar.get(Calendar.YEAR)
     val mes = calendar.get(Calendar.MONTH)
     val dia = calendar.get(Calendar.DAY_OF_MONTH)
 
-    if (mostrarDialog) { // mostrar el calendario
+    if (mostrarDialog) {
         android.app.DatePickerDialog(
             context,
             { _, year, month, dayOfMonth ->
@@ -328,32 +330,44 @@ fun FechaNacimientoField(viewModel: RegisterViewModel) {
         ).show()
     }
 
-    // Campo de texto con botón
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        TextField(
-            value = fecha,
-            onValueChange = {},
-            label = { Text("Fecha de nacimiento", color = colorResource(id = R.color.black)) },
-            modifier = Modifier.weight(1f),
-            readOnly = true,
-            enabled = false, // para qur no sea editable
-            colors = TextFieldDefaults.colors(
-                disabledTextColor = Color.Black,
-                focusedContainerColor = colorResource(id = R.color.white),
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 20.dp, end = 20.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = fecha,
+                onValueChange = {},
+                label = { Text("Fecha de nacimiento", color = colorResource(id = R.color.black)) },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(70.dp)
+                    .border(2.dp, Color.Black),
+                readOnly = true,
+                enabled = false,
+                colors = TextFieldDefaults.colors(
+                    disabledTextColor = Color.Black,
+                    focusedContainerColor = colorResource(id = R.color.white),
+                    unfocusedContainerColor = colorResource(id = R.color.white),
+                    disabledContainerColor = colorResource(id = R.color.white)
+                )
             )
-        )
 
-        IconButton(onClick = { viewModel.showMenuDate() }) {
-            Icon(
-                imageVector = Icons.Filled.CalendarToday,
-                contentDescription = "Seleccionar fecha"
+            IconButton(onClick = { viewModel.showMenuDate() }) {
+                Icon(
+                    imageVector = Icons.Filled.CalendarToday,
+                    contentDescription = "Seleccionar fecha"
+                )
+            }
+        }
+
+        if (dateError.isNotEmpty()) {
+            Text(
+                text = dateError,
+                color = colorResource(id = R.color.red),
+                fontSize = 15.sp,
+                modifier = Modifier.padding(top = 4.dp, start = 4.dp)
             )
         }
     }
@@ -361,9 +375,9 @@ fun FechaNacimientoField(viewModel: RegisterViewModel) {
 
 //boton de acceder/registro
 @Composable
-fun RegisterButtonReg(loginEnable: Boolean, onLoginSelected: () -> Unit) {
+fun RegisterButtonReg(viewModel: RegisterViewModel) {
     Button(
-        onClick = { onLoginSelected() },
+        onClick = { viewModel.botonRegistro() },
         modifier = Modifier
             .height(48.dp).width(250.dp),
         colors = ButtonDefaults.buttonColors(
@@ -371,7 +385,7 @@ fun RegisterButtonReg(loginEnable: Boolean, onLoginSelected: () -> Unit) {
             Color(0xFFF78058),//boton desabilitado
             colorResource(id= R.color.green), //color contenido
             disabledContentColor = Color.White
-        ), enabled = loginEnable
+        ), enabled = true
     ) {
         Text(text = "Registrarse",
             fontSize = 20.sp,

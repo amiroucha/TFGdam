@@ -3,12 +3,15 @@ import android.util.Patterns
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.*
 
 class RegisterViewModel(navController: NavController) : ViewModel() {
     private val _navController = navController
+    private lateinit var auth: FirebaseAuth
 
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
@@ -35,24 +38,28 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
 
     //para almacenar los errores-------------------------------
     private val _emailError = MutableStateFlow("")
-    val emailError: StateFlow<String?> get() = _emailError.asStateFlow()
+    val emailError: StateFlow<String> = _emailError.asStateFlow()
 
     private val _passwordError = MutableStateFlow("")
-    val passwordError: StateFlow<String?> get() = _passwordError.asStateFlow()
+    val passwordError: StateFlow<String> = _passwordError.asStateFlow()
 
     private val _passwordError2 = MutableStateFlow("")
-    val passwordError2: StateFlow<String?> get() = _passwordError2.asStateFlow()
+    val passwordError2: StateFlow<String> = _passwordError2.asStateFlow()
+
+    private val _passwordsame = MutableStateFlow("")
+    val passwordsame: StateFlow<String> = _passwordsame.asStateFlow()
 
     private val _dateError = MutableStateFlow("")
-    val dateError: StateFlow<String?> get() = _dateError.asStateFlow()
+    val dateError: StateFlow<String> = _dateError.asStateFlow()
 
    // private val _isFormValid = MutableStateFlow<Boolean>(false)
     //FUNCIONES------------------------------------------------------------------------
 
     //validar el correo y contraseñas -----------------------------------
     private fun validEmail(email: String): Boolean  = Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    private fun validPassword(password: String): Boolean = password.length > 8
+    private fun validPassword(password: String): Boolean = password.length >= 8
     private fun passwordsSame(password: String, password2: String): Boolean = password == password2
+
 
     fun onLoginChanges(email: String, password: String, password2: String) {
         _email.value = email
@@ -70,34 +77,72 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
     fun showMenuDate() {
         _showDatePicker.value = true
     }
-    /*fun setEmail(email: String) {
-        _email.value = email
-        if (email.isNotEmpty()) _emailError.value = null.toString()
+    private fun validateOnSubmit(): Boolean {
+        val email = _email.value
+        val password = _password.value
+        val password2 = _password2.value
+        val date = _date.value
+
+        _emailError.value = when {
+            email.isEmpty() -> "El correo no puede estar vacío"
+            !validEmail(email) -> "Correo incorrecto"
+            else -> ""
+        }
+
+        _passwordError.value = when {
+            password.isEmpty() -> "La contraseña no puede estar vacía"
+            !validPassword(password) -> "La contraseña debe tener más longitud"
+            else -> ""
+        }
+        _passwordError2.value = when {
+            password2.isEmpty() -> "La contraseña no puede estar vacía"
+            !validPassword(password2) -> "La contraseña debe tener más longitud"
+            else -> ""
+        }
+        _passwordsame.value = when {
+            !passwordsSame(password, password2) -> "La contraseñas deben ser iguales"
+            else -> ""
+        }
+        // Validación de la fecha de nacimiento
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val dateMini = dateFormat.parse("01/01/1900")
+        val dateMaxi = Calendar.getInstance().time
+
+        _dateError.value = when {
+            date.isEmpty() -> "La fecha no puede estar vacía"
+            else -> {
+                try {
+                    val selectedDate = dateFormat.parse(date)
+                    if (selectedDate.before(dateMini) || selectedDate.after(dateMaxi)) {
+                        "Fecha fuera de rango"
+                    } else ""
+                } catch (e: Exception) {
+                    "Formato de fecha inválido"
+                }
+            }
+        }
+        return _emailError.value.isEmpty() &&
+                _passwordError.value.isEmpty() &&
+                _passwordError2.value.isEmpty() &&
+                _passwordsame.value.isEmpty()
     }
+    fun botonRegistro(){
+        if (!validateOnSubmit()) return
 
-    fun setPassword(password: String) {
-        _password.value = password
-        if (password.isNotEmpty()) _passwordError.value = null.toString()
+        _isLoadingR.value = true
+        auth = FirebaseAuth.getInstance()
+
+        auth.createUserWithEmailAndPassword(_email.value, _password.value)
+            .addOnCompleteListener { task ->
+                _isLoadingR.value = false
+                if (task.isSuccessful) {
+                    _navController.navigate("Home") {
+                        popUpTo("Register") { inclusive = true }//que no pueda volver al registro una vez entrado a home
+                    }
+                } else {
+                    // Mostrar error si hubo un problema
+                    _emailError.value = task.exception?.localizedMessage ?: "Error al registrar"
+                }
+            }
     }
-
-    fun setPassword2(password2: String) {
-        _password2.value = password2
-        if (password2.isNotEmpty()) _passwordError2.value = null.toString()
-    }*/
-
-
-    /* fun validateOnSubmit(): Boolean {
-         val email = _email.value.orEmpty()
-         val password = _password.value.orEmpty()
-         val date = _date.value.orEmpty()
-
-         _emailError.value = if (email.isEmpty()) "El correo no puede estar vacío" else null.toString()
-         _passwordError.value = if (password.isEmpty()) "La contraseña no puede estar vacía" else null.toString()
-         _dateError.value = if (date.isEmpty() || date == "d-M-yyyy") "Debes seleccionar una fecha" else null.toString()
-
-
-         val isValid = email.isNotEmpty() && password.isNotEmpty() && date.isNotEmpty() && date != "d-M-yyyy"
-         _isFormValid.value = isValid
-         return isValid
-     }*/
 }

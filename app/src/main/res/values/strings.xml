@@ -8,4 +8,5 @@
         725600754180-7311aaq26n083lavdnoti4b5ccl6bvl0.apps.googleusercontent.com
     </string>
     <!--Registro ................................................................-->
+    <string name="camposIncompletos">Por favor, complete todos los campos</string>
 </resources>
