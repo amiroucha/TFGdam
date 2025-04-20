@@ -128,7 +128,7 @@ class LoginViewModel(navController: NavController) : ViewModel() {
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false) //false y elegir cuenta de Google
-            .setServerClientId((R.string.idWeb).toString())
+            .setServerClientId(context.getString(R.string.idWeb))
             .setAutoSelectEnabled(false) // No selecciona automáticamente una cuenta
             .build()
 

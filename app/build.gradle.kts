@@ -87,9 +87,10 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
 
     //-----------------------------------------------
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation ("androidx.credentials:credentials:1.5.0-rc01")
     implementation ("androidx.credentials:credentials-play-services-auth:1.5.0-rc01")
-    implementation ("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    //implementation ("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
 
     /*-----------------------------------------------
@@ -97,6 +98,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-auth")
     //Agregar la dependencia para Google Play services si vas a usar autenticación con Google
     implementation ("com.google.android.gms:play-services-auth:21.3.0")
+
     // Agregar la dependencia para Credential Manager
     implementation ("androidx.credentials:credentials:1.5.0-rc01")
     implementation ("androidx.credentials:credentials-play-services-auth:1.5.0-rc01")
