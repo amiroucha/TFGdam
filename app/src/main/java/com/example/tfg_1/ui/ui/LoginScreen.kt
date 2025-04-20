@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.R
@@ -140,7 +142,7 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
                 LoginButton(email, password, viewModel)
 
                 Spacer(modifier = Modifier.padding(16.dp))
-                GoogleButton()
+                GoogleButton(viewModel)
             }
 
             Column(modifier = Modifier.align(Alignment.CenterHorizontally)) {
@@ -297,9 +299,12 @@ fun LoginButton(email: String, password: String, viewModel: LoginViewModel) {
 }
 
 @Composable
-fun GoogleButton() {
+fun GoogleButton(viewModel: LoginViewModel) {
+    val context = LocalContext.current
     Button(
-        onClick = { },
+        onClick = {
+            viewModel.loginGoogle(context)
+        },
         modifier = Modifier
             .height(48.dp)
             .width(250.dp),
@@ -318,7 +323,7 @@ fun GoogleButton() {
         Spacer(modifier = Modifier.width(8.dp))
         Icon(
             painter = painterResource(id = R.drawable.ic_google),
-            contentDescription = "Google Icon",
+            contentDescription = "Google",
             modifier = Modifier.size(24.dp),
             tint = Color.Unspecified
         )

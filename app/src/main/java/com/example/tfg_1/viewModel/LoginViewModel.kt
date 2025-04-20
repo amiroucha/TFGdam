@@ -1,19 +1,35 @@
 package com.example.tfg_1.viewModel
+
+import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.delay
 import android.util.Patterns
-import androidx.compose.runtime.rememberCoroutineScope
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.example.tfg_1.R
 import com.example.tfg_1.navigation.Screens
 import com.google.android.gms.tasks.Task
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+
+
+
 
 class LoginViewModel(navController: NavController) : ViewModel() {
     private val _navController = navController
+    private lateinit var credentialManager: androidx.credentials.CredentialManager
 
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
@@ -105,7 +121,60 @@ class LoginViewModel(navController: NavController) : ViewModel() {
             _authState.value = AuthState.Unauthenticated
         }
     }
+
+
+    fun loginGoogle(context: Context) {
+        val auth = FirebaseAuth.getInstance() // inicializar FirebaseAuth
+
+        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false) //false y elegir cuenta de Google
+            .setServerClientId((R.string.idWeb).toString())
+            .setAutoSelectEnabled(false) // No selecciona automáticamente una cuenta
+            .build()
+
+        //solicitud para obtener las credenciales
+        val request: androidx.credentials.GetCredentialRequest = androidx.credentials.GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+        viewModelScope.launch {
+            credentialManager = androidx.credentials.CredentialManager.create(context)
+            try {
+                val result = credentialManager.getCredential(context, request)
+                val credential = result.credential //obtener credenciales
+
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                val googleIdToken = googleIdTokenCredential.idToken // Extraemos el token de ID de Google
+                // crea una credencial de Firebase usando el token de ID de Google
+                val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
+                // Intento autenticar al usuario con la credencial
+                val authResult = auth.signInWithCredential(firebaseCredential).await()
+
+                if(authResult != null) {
+                    withContext(Dispatchers.Main)
+                    {
+                        Toast.makeText(context, "stringResource(id = R.string.login_exitoso)", Toast.LENGTH_SHORT).show()
+                        _navController.navigate(Screens.Home.route)
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "stringResource(id = R.string.error_login_google)", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+            }
+            catch (e: androidx.credentials.exceptions.GetCredentialException) {
+                withContext(Dispatchers.Main)
+                {
+                    Toast.makeText(context, e.localizedMessage , Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+
+    }
 }
+
+
 
 sealed class AuthState {
     data object Authenticated : AuthState()
