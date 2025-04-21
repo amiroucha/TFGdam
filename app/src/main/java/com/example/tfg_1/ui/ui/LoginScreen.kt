@@ -66,6 +66,7 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
     val emailError by viewModel.emailError.collectAsState()
     val passwordError by viewModel.passwordError.collectAsState()
     val authState by viewModel.authState.collectAsState()
+    val passwordResetMessage by viewModel.passwordResetMessage.collectAsState()
 
 
     if (isLoading) {
@@ -109,7 +110,23 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
                 viewModel.onLoginChanges(email, it)
             }
 
-            ForgotPassword(Modifier.align(Alignment.End))
+            ForgotPassword(Modifier.align(Alignment.End), viewModel)
+
+
+            if (passwordResetMessage != null) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.clearPasswordResetMessage() },
+                    title = { Text("Recuperación de contraseña") },
+                    text = { Text(passwordResetMessage!!) },
+                    confirmButton = {
+                        Button(
+                            onClick = { viewModel.clearPasswordResetMessage() }
+                        ) {
+                            Text("Aceptar")
+                        }
+                    }
+                )
+            }
             Spacer(modifier = Modifier.padding(16.dp))
 
             //alert errores de firebase-------------------------
@@ -264,18 +281,60 @@ fun PasswordField(password: String, error: String?, onTextFieldChanged: (String)
 }
 
 @Composable
-fun ForgotPassword(modifier: Modifier) {
+fun ForgotPassword(modifier: Modifier, viewModel: LoginViewModel) {
+    var showDialog by remember { mutableStateOf(false) }
+    var emailInput by remember { mutableStateOf("") }
+
     Text(
         text = "¿Olvidaste la contraseña?",
         modifier = modifier
-            .clickable { }
+            .clickable { showDialog = true }
             .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 16.dp),
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
         color = colorResource(id = R.color.black),
         textDecoration = TextDecoration.Underline
     )
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Recuperar contraseña") },
+            text = {
+                Column {
+                    Text("Introduce tu correo para recuperar tu contraseña:")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextField(
+                        value = emailInput,
+                        onValueChange = { emailInput = it },
+                        placeholder = { Text("Email") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    if (emailInput.isBlank()) {
+                        // mensaje de error si lo quieres mostrar
+                        viewModel.setPasswordResetError("Por favor, introduce un email válido")
+                    } else {
+                        viewModel.sendResetPassword(emailInput)
+                        showDialog = false
+                    }
+                }) {
+                    Text("Enviar")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 }
+
 
 @Composable
 fun LoginButton(email: String, password: String, viewModel: LoginViewModel) {

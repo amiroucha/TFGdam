@@ -102,7 +102,7 @@ class LoginViewModel(navController: NavController) : ViewModel() {
         _authState.value = if (auth.currentUser != null) AuthState.Authenticated else AuthState.Unauthenticated
     }
 
-    fun resetPassword(email: String) {
+    fun sendResetPassword(email: String) {
         FirebaseAuth.getInstance().sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -115,6 +115,10 @@ class LoginViewModel(navController: NavController) : ViewModel() {
     fun clearPasswordResetMessage() {
         _passwordResetMessage.value = null
     }
+    fun setPasswordResetError(message: String) {
+        _passwordResetMessage.value = message
+    }
+
     fun login(email: String, password: String) {
         if (validateOnSubmit()) {
             _isLoading.value = true
