@@ -7,7 +7,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.ui.ui.HomeScreen
 import com.example.tfg_1.ui.ui.LoginScreen
 import com.example.tfg_1.ui.ui.RegisterScreen
-import com.example.tfg_1.viewModel.AuthViewModel
 import com.example.tfg_1.viewModel.HomeViewModel
 import com.example.tfg_1.viewModel.LoginViewModel
 import com.example.tfg_1.viewModel.RegisterViewModel

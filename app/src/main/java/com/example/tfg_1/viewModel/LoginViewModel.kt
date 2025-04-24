@@ -23,8 +23,6 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 
-
-
 class LoginViewModel(navController: NavController) : ViewModel() {
     private val _navController = navController
     private lateinit var credentialManager: androidx.credentials.CredentialManager
@@ -187,14 +185,14 @@ class LoginViewModel(navController: NavController) : ViewModel() {
                 }
             }
         }
-
-
+    }
+    sealed class AuthState {
+        data object Authenticated : AuthState()
+        data object Unauthenticated : AuthState()
+        data object Loading : AuthState()
+        data class Error(val error: String) : AuthState()
     }
 }
 
-sealed class AuthState {
-    data object Authenticated : AuthState()
-    data object Unauthenticated : AuthState()
-    data object Loading : AuthState()
-    data class Error(val error: String) : AuthState()
-}
+
+

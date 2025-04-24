@@ -1,9 +1,6 @@
 package com.example.tfg_1.ui.ui
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,7 +29,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.R
 import com.example.tfg_1.navigation.Screens
-import com.example.tfg_1.viewModel.AuthState
 import com.example.tfg_1.viewModel.LoginViewModel
 
 
@@ -74,7 +70,14 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
             CircularProgressIndicator(Modifier.size(48.dp).align(Alignment.Center))
         }
     } else {
-        Column(modifier = modifier.fillMaxSize()) {
+        val scrollState = rememberScrollState()
+
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)//se pueda desplazar verticalmente
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
@@ -133,8 +136,8 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
             var showDialog by remember { mutableStateOf(false) }
             var errorMessage by remember { mutableStateOf("") }
             LaunchedEffect(authState) {
-                if (authState is AuthState.Error) {
-                    errorMessage = (authState as AuthState.Error).error
+                if (authState is LoginViewModel.AuthState.Error) {
+                    errorMessage = (authState as LoginViewModel.AuthState.Error).error
                     showDialog = true
                 }
             }

@@ -1,10 +1,7 @@
 package com.example.tfg_1.ui.ui
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -44,10 +41,8 @@ fun registerScreenPreview() {
     RegisterScreen(viewModel = viewModel, navController)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(viewModel: RegisterViewModel, navcontroller : NavController) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(state = rememberTopAppBarState())
     Scaffold(
         topBar = { TopBar(navcontroller) }
     ) {
@@ -91,14 +86,18 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel, navcontrolle
     val passwordError1 by viewModel.passwordError.collectAsState()
     val passwordError2 by viewModel.passwordError2.collectAsState()
     val passwordSameError by viewModel.passwordsame.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
             CircularProgressIndicator(Modifier.align(Alignment.Center))
         }
     }else{
-        Column(modifier = modifier.fillMaxSize().padding(top = 16.dp)) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()) // ← Aquí agregamos el scroll
+                .padding(top = 16.dp)
+        ) {
             Box(modifier = Modifier.align(Alignment.CenterHorizontally)
                 .fillMaxWidth().padding(top = 5.dp, bottom= 16.dp, end = 16.dp, start = 16.dp)
             )

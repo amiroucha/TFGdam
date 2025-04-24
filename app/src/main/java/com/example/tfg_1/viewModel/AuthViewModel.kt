@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-
+/*
 class AuthViewModel : ViewModel(){
 
     private val _email = MutableStateFlow("")
@@ -22,7 +22,7 @@ class AuthViewModel : ViewModel(){
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    private val _authState= MutableStateFlow<AuthState>(AuthState.Unauthenticated)
+    private val _authState= MutableStateFlow<LoginViewModel.AuthState>(AuthState.Unauthenticated)
     val authState: StateFlow<AuthState> = _authState
 
     init {
@@ -91,7 +91,7 @@ class AuthViewModel : ViewModel(){
 
 }
 
-/*
+
 sealed class AuthState{
     object Authenticated : AuthState()
     object Unauthenticated : AuthState()
