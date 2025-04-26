@@ -24,10 +24,8 @@ fun TasksScreenPreview() {
     TasksScreen(viewModel = viewModel, navController)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TasksScreen(viewModel: TasksViewModel, navcontroller : NavController) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(state = rememberTopAppBarState())
     Scaffold(
         topBar = { TopBar(navcontroller) }
     ) {
