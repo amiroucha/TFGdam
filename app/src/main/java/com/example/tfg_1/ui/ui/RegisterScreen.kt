@@ -31,6 +31,7 @@ import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.RegisterViewModel
 import java.util.Calendar
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.ui.res.stringResource
 
 
 @Preview(showBackground = true)
@@ -93,7 +94,7 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
                     verticalAlignment = Alignment.CenterVertically // Alinea verticalmente al centro
                 ) {
                     Text(
-                        text = "FLOWHOME",
+                        text = stringResource(R.string.app),
                         modifier = Modifier.padding(start = 8.dp, end = 15.dp), // Espaciado a la izquierda
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
@@ -154,7 +155,7 @@ fun LogoHeaderReg(modifier:Modifier)
 //Titulo---------------------------------------------
 @Composable
 fun TituloRegister(modifier:Modifier){
-    Text( text = "REGISTRO" ,
+    Text( text = stringResource(R.string.registro) ,
         modifier = modifier.padding(top = 0.dp, bottom= 5.dp, end = 5.dp, start = 5.dp),
         fontSize = 40.sp,
         maxLines = 1, // Solo permite 1 línea
@@ -172,7 +173,7 @@ fun EmailFieldReg(email: String,error: String?, onTextFieldChanged: (String) -> 
                 .fillMaxWidth()
                 .height(70.dp)
                 .border(2.dp, Color.Black),
-            placeholder = { Text(text = "Email") },
+            placeholder = { Text(text = stringResource(R.string.email)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             isError = error != null,
@@ -209,7 +210,7 @@ fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (Stri
                 .fillMaxWidth()
                 .height(70.dp)
                 .border(2.dp, Color.Black),
-            placeholder = { Text("Contraseña") },
+            placeholder = { Text(stringResource(R.string.contraseña)) },
             singleLine = true,
             isError = error != null,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -218,7 +219,7 @@ fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (Stri
                 val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(imageVector = image,
-                        contentDescription = "Mostrar contraseña",
+                        contentDescription = stringResource(R.string.mostrarContraseña),
                         tint = colorResource(id = R.color.black) )
                 }
             },
@@ -257,7 +258,7 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
                 .fillMaxWidth()
                 .height(70.dp)
                 .border(2.dp, Color.Black),
-            placeholder = { Text("Repite tu contraseña") },
+            placeholder = { Text(stringResource(R.string.repetirContraseña)) },
             singleLine = true,
             isError = error != null,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -266,7 +267,7 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
                 val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(imageVector = image,
-                        contentDescription = "Mostrar contraseña",
+                        contentDescription = stringResource(R.string.mostrarContraseña),
                         tint = colorResource(id = R.color.black))
                 }
             },
@@ -324,7 +325,7 @@ fun FechaNacimientoField(viewModel: RegisterViewModel) {
             TextField(
                 value = fecha,
                 onValueChange = {},
-                label = { Text("Fecha de nacimiento", color = colorResource(id = R.color.black)) },
+                label = { Text(stringResource(R.string.fechanacimiento), color = colorResource(id = R.color.black)) },
                 modifier = Modifier
                     .weight(1f)
                     .height(70.dp)
@@ -342,7 +343,7 @@ fun FechaNacimientoField(viewModel: RegisterViewModel) {
             IconButton(onClick = { viewModel.showMenuDate() }) {
                 Icon(
                     imageVector = Icons.Filled.CalendarToday,
-                    contentDescription = "Seleccionar fecha"
+                    contentDescription = stringResource(R.string.seleccionaFecha)
                 )
             }
         }
@@ -373,7 +374,7 @@ fun RegisterButtonReg(viewModel: RegisterViewModel) {
 
         ), enabled = true
     ) {
-        Text(text = "Registrarse",
+        Text(text = stringResource(R.string.registrarseBtn),
             fontSize = 20.sp,
             color = colorResource(id = R.color.black),
         )

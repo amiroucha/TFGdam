@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.R
@@ -89,7 +90,7 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "FLOWHOME",
+                        text = stringResource(R.string.app),
                         modifier = Modifier.padding(start = 8.dp, end = 15.dp),
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
@@ -119,13 +120,13 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
             if (passwordResetMessage != null) {
                 AlertDialog(
                     onDismissRequest = { viewModel.clearPasswordResetMessage() },
-                    title = { Text("Recuperación de contraseña") },
+                    title = { Text(stringResource(R.string.RecuperaContrasenia)) },
                     text = { Text(passwordResetMessage!!) },
                     confirmButton = {
                         Button(
                             onClick = { viewModel.clearPasswordResetMessage() }
                         ) {
-                            Text("Aceptar")
+                            Text(stringResource(R.string.aceptar))
                         }
                     }
                 )

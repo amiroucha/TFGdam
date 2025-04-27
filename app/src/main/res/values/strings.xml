@@ -1,16 +1,30 @@
 <resources>
     <string name="app_name">tfg_1</string>
+    <string name="app">FLOWHOME</string>
     <string name="vacio"> </string>
+    <string name="aceptar">Aceptar</string>
     <!--Login ................................................................-->
     <string name="login_exitoso">...Login exitoso...</string>
     <string name="error_login_google">Error en el login con google</string>
-    <!--Google-->
+    <string name="RecuperaContrasenia">Recuperación de contraseña</string>
+    <!--Google................................................................-->
     <string name="idWeb">
         725600754180-7311aaq26n083lavdnoti4b5ccl6bvl0.apps.googleusercontent.com
     </string>
     <!--Registro ................................................................-->
     <string name="camposIncompletos">Por favor, complete todos los campos</string>
-    <!--Registro ................................................................-->
-    <string name="tasks">Tasks</string>
+    <string name="hogar">Hogar</string>
+    <string name="registro">REGISTRO</string>
+    <string name="email">Email</string>
+    <string name="contraseña">Contraseña</string>
+    <string name="mostrarContraseña">Mostrar contraseña</string>
+    <string name="repetirContraseña">Repite tu contraseña</string>
+    <string name="fechanacimiento">Fecha de nacimiento</string>
+    <string name="seleccionaFecha">Seleccionar fecha</string>
+    <string name="registrarseBtn">Registrarse</string>
+
+    <!--Tareas ................................................................-->
+    <string name="tasks">Tareas</string>
+    <string name="atras">Atras</string>
 
 </resources>

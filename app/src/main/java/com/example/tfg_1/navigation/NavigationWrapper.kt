@@ -1,8 +1,6 @@
 package com.example.tfg_1.navigation
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.List
@@ -17,8 +15,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.tfg_1.R
 import com.example.tfg_1.ui.ui.LoginScreen
 import com.example.tfg_1.ui.ui.RegisterScreen
@@ -54,7 +50,7 @@ fun NavigationWrapper() {
                     navigationIcon = {
                         if (currentRoute == Screens.Register.route) { //en el registro debe aparecer la flecha hacia atras
                             IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+                                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.atras))
                             }
                         }
                     },
@@ -98,8 +94,8 @@ fun NavigationWrapper() {
 fun BottomBar(navController: NavHostController) {
     NavigationBar {
         NavigationBarItem(
-            icon = { Icon(Icons.Default.List, contentDescription = "Tareas") },
-            label = { Text("Tareas") },
+            icon = { Icon(Icons.Default.List, contentDescription = stringResource(R.string.tasks)) },
+            label = { Text(stringResource(R.string.tasks)) },
             selected = false, // Lo mejoramos luego
             onClick = { navController.navigate(Screens.Tasks.route) }
         )
