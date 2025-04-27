@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -124,44 +126,54 @@ data class TabData(val title: String, val icon: ImageVector)
 //caja de item
 @Composable
 fun tareaItem(tarea: Tarea, modificarCompletada: (Tarea) -> Unit) {
-    Column(
+    // Contenedor de la tarea con padding y márgenes
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
-            .background(color = colorResource(id = R.color.white))
-            .clickable { modificarCompletada(tarea) } // si toca cambia el estado de la tarea
+            .padding(16.dp) // Añadimos padding para toda la caja de la tarea
+            .background(colorResource(id = R.color.white), RoundedCornerShape(8.dp)) // Fondo con bordes redondeados
+            .clickable { modificarCompletada(tarea) } // Al hacer clic cambia el estado de la tarea
     ) {
         // Checkbox para marcar la tarea como completada o no
         Checkbox(
             checked = tarea.completada,
-            onCheckedChange = { modificarCompletada(tarea) }
+            onCheckedChange = { modificarCompletada(tarea) }, // Cuando cambia el checkbox, alterna completada
+            modifier = Modifier.padding(end = 16.dp) // Separar el checkbox del texto
         )
 
-        // Texto de la tarea
-        Spacer(modifier = Modifier
-            .fillMaxWidth())
-        Text(
-            text = tarea.titulo,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f) // Esto hace que el texto ocupe el espacio disponible
-        )
+        // Columna para colocar el título y la fecha de la tarea
+        Column(
+            modifier = Modifier
+                .weight(1f) // Esto asegura que el texto ocupe el espacio restante disponible
+                .padding(end = 8.dp)
+        ) {
+            // Título de la tarea
+            Text(
+                text = tarea.titulo,
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1, // Limitar a una línea,
+                modifier = Modifier.padding(8.dp),
+                overflow = TextOverflow.Ellipsis // si es muy largo ...
+            )
 
-        // Fecha de la tarea
-        Spacer(modifier = Modifier
-            .fillMaxWidth())
-        Text(
-            text = tarea.fecha,
-            style = MaterialTheme.typography.bodyMedium
-        )
-        //para quien es
-        Spacer(modifier = Modifier
-            .fillMaxWidth())
-        Text(
-            text = tarea.asignadoA,
-            style = MaterialTheme.typography.bodyMedium
-        )
+            // Fecha de la tarea
+            Text(
+                text = "Fecha: ${tarea.fecha}",
+                style = MaterialTheme.typography.bodyLarge,
+                color = colorResource(id = R.color.black) ,
+                modifier = Modifier.padding(8.dp)
+            )
+
+            Text(
+                text = "Asignado a: ${tarea.asignadoA}",
+                style = MaterialTheme.typography.bodyLarge,
+                color = colorResource(id = R.color.black), // Estilo de texto más tenue para el asignado
+                modifier = Modifier.padding(8.dp)
+            )
+        }
     }
 }
+
 
 //para el dialog que aparece y rellenar datos
 //le paso 2 funciones: cuando se cancela - para los datos
