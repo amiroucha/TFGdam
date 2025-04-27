@@ -4,7 +4,7 @@
     <string name="vacio"> </string>
     <string name="aceptar">Aceptar</string>
     <!--Login ................................................................-->
-    <string name="login_exitoso">...Login exitoso...</string>
+    <string name="login_exitoso">…Login exitoso…</string>
     <string name="error_login_google">Error en el login con google</string>
     <string name="RecuperaContrasenia">Recuperación de contraseña</string>
     <!--Google................................................................-->
