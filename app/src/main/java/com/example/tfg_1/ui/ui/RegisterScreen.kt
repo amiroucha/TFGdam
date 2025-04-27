@@ -82,7 +82,7 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()) // ← Aquí agregamos el scroll
+                .verticalScroll(rememberScrollState())
                 .padding(top = 16.dp)
         ) {
             Box(modifier = Modifier.align(Alignment.CenterHorizontally)

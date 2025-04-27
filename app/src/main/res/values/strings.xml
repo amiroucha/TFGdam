@@ -3,6 +3,7 @@
     <string name="app">FLOWHOME</string>
     <string name="vacio"> </string>
     <string name="aceptar">Aceptar</string>
+    <string name="guardar">Guardar</string>
     <!--Login ................................................................-->
     <string name="login_exitoso">…Login exitoso…</string>
     <string name="error_login_google">Error en el login con google</string>
@@ -35,5 +36,13 @@
     <!--Tareas ................................................................-->
     <string name="tasks">Tareas</string>
     <string name="atras">Atras</string>
+    <string name="pendientes">Pendientes</string>
+    <string name="completadas">Completadas</string>
+    <string name="nuevaTarea">Nueva tarea</string>
+    <string name="titulo">Título</string>
+    <string name="fechaMax">Fecha límite (dd/mm/aaaa)</string>
+    <string name="asignadoA.">Asignado a...</string>
+    <string name="completaTodosCampos">Por favor, completa todos los campos.</string>
+    <string name="cancelar">Cancelar</string>
 
 </resources>

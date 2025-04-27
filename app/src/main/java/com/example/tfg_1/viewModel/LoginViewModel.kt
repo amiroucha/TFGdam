@@ -128,7 +128,9 @@ class LoginViewModel(navController: NavController) : ViewModel() {
                     _isLoading.value = false
                     if (task.isSuccessful) {
                         _authState.value = AuthState.Authenticated
-                        _navController.navigate(Screens.Tasks.route)
+                        _navController.navigate(Screens.Tasks.route){
+                            popUpTo("login") { inclusive = true }
+                        }
                     } else {
                         val errorMsg = task.exception?.message ?: "ERROR. Algo fue mal"
                         _authState.value = AuthState.Error(errorMsg)

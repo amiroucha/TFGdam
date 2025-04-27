@@ -158,7 +158,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
                             .addOnSuccessListener {
                                 _navController.navigate("tasks") {
                                     popUpTo("register") { inclusive = true }//que no pueda volver al registro una vez entrado a la app
-                                    popUpTo("login") { inclusive = false }
+                                    popUpTo("login") { inclusive = true }
                                 }
                             }.addOnFailureListener { e ->
                                 _emailError.value = e.localizedMessage ?: context.getString(R.string.errorGuardarUsuario)
