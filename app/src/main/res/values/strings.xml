@@ -11,6 +11,8 @@
     <string name="idWeb">
         725600754180-7311aaq26n083lavdnoti4b5ccl6bvl0.apps.googleusercontent.com
     </string>
+
+
     <!--Registro ................................................................-->
     <string name="camposIncompletos">Por favor, complete todos los campos</string>
     <string name="hogar">Hogar</string>
@@ -22,6 +24,13 @@
     <string name="fechanacimiento">Fecha de nacimiento</string>
     <string name="seleccionaFecha">Seleccionar fecha</string>
     <string name="registrarseBtn">Registrarse</string>
+    <!--Base de datos Registro .........-->
+    <string name="emailBD">email</string>
+    <string name="fechaNacimientoBD">fechaNacimiento</string>
+    <string name="hogarIdBD">hogarId</string>
+    <string name="errorGuardarUsuario">Error al guardar usuario</string>
+    <string name="erroRegistrar">Error al registrar</string>
+
 
     <!--Tareas ................................................................-->
     <string name="tasks">Tareas</string>

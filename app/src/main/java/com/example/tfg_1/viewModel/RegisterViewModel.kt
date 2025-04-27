@@ -1,17 +1,23 @@
 package com.example.tfg_1.viewModel
+import android.content.Context
 import android.util.Patterns
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
+import com.example.tfg_1.R
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
 class RegisterViewModel(navController: NavController) : ViewModel() {
     private val _navController = navController
     private lateinit var auth: FirebaseAuth
+    //val context = LocalContext.current
 
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
@@ -100,7 +106,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
             else -> ""
         }
         _passwordsame.value = when {
-            !passwordsSame(password, password2) -> "La contraseñas deben ser iguales"
+            !passwordsSame(password, password2) -> "Las contraseñas deben ser iguales"
             else -> ""
         }
         // Validación de la fecha de nacimiento
@@ -124,10 +130,11 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
         return _emailError.value.isEmpty() &&
                 _passwordError.value.isEmpty() &&
                 _passwordError2.value.isEmpty() &&
-                _passwordsame.value.isEmpty()
+                _passwordsame.value.isEmpty() &&
+                _dateError.value.isEmpty()
     }
-    fun botonRegistro(){
-        if (!validateOnSubmit()) return
+    fun botonRegistro(context: Context){
+        if (!validateOnSubmit()) return //si hay un dato incorrecto se sale
 
         _isLoadingR.value = true
         auth = FirebaseAuth.getInstance()
@@ -136,12 +143,31 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
             .addOnCompleteListener { task ->
                 _isLoadingR.value = false
                 if (task.isSuccessful) {
-                    _navController.navigate("Home") {
-                        popUpTo("Register") { inclusive = true }//que no pueda volver al registro una vez entrado a home
+                    val userUid = auth.currentUser?.uid
+                    val user  = hashMapOf(
+                        context.getString(R.string.emailBD) to _email.value,
+                        context.getString(R.string.fechaNacimientoBD) to date.value,
+                        context.getString(R.string.hogarIdBD) to "",
+                    )
+
+                    userUid?.let { id -> // si el id no es null
+                        FirebaseFirestore.getInstance()
+                            .collection("usuarios")
+                            .document(id)
+                            .set(user)
+                            .addOnSuccessListener {
+                                _navController.navigate("tasks") {
+                                    popUpTo("register") { inclusive = true }//que no pueda volver al registro una vez entrado a la app
+                                    popUpTo("login") { inclusive = false }
+                                }
+                            }.addOnFailureListener { e ->
+                                _emailError.value = e.localizedMessage ?: context.getString(R.string.errorGuardarUsuario)
+                            }
                     }
+
                 } else {
                     // Mostrar error si hubo un problema
-                    _emailError.value = task.exception?.localizedMessage ?: "Error al registrar"
+                    _emailError.value = task.exception?.localizedMessage ?: context.getString(R.string.erroRegistrar)
                 }
             }
     }

@@ -17,6 +17,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -143,49 +144,71 @@ class LoginViewModel(navController: NavController) : ViewModel() {
         val auth = FirebaseAuth.getInstance() // inicializar FirebaseAuth
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false) //false y elegir cuenta de Google
+            .setFilterByAuthorizedAccounts(false) // false para cuenta de Google
             .setServerClientId(context.getString(R.string.idWeb))
             .setAutoSelectEnabled(false) // No selecciona automáticamente una cuenta
             .build()
 
-        //solicitud para obtener las credenciales
+        // solicitud para obtener las credenciales
         val request: androidx.credentials.GetCredentialRequest = androidx.credentials.GetCredentialRequest.Builder()
             .addCredentialOption(googleIdOption)
             .build()
+
         viewModelScope.launch {
             credentialManager = androidx.credentials.CredentialManager.create(context)
             try {
+                // cojo las credenciales
                 val result = credentialManager.getCredential(context, request)
-                val credential = result.credential //obtener credenciales
+                val credential = result.credential
 
+                // extraer token de Google
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                val googleIdToken = googleIdTokenCredential.idToken // Extraemos el token de ID de Google
-                // crea una credencial de Firebase usando el token de ID de Google
+                val googleIdToken = googleIdTokenCredential.idToken
+
+                // crea una credencial de Firebase usndo google
                 val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
-                // Intento autenticar al usuario con la credencial
+
+                // Intento autenticar al user
                 val authResult = auth.signInWithCredential(firebaseCredential).await()
 
-                if(authResult != null) {
-                    withContext(Dispatchers.Main)
-                    {
-                        Toast.makeText(context, "stringResource(id = R.string.login_exitoso)", Toast.LENGTH_SHORT).show()
-                        _navController.navigate(Screens.Tasks.route)
+                // Si la autenticación es exitosa
+                if (authResult != null) {
+                    //recojo datos
+                    val user = auth.currentUser
+                    val userUid = user?.uid
+                    val userEmail = user?.email
+                    val userMap = hashMapOf(
+                        "email" to (userEmail ?: ""),
+                        "uid" to userUid,
+                    )
+
+                    // guardo en usuarios BD
+                    userUid?.let {
+                        FirebaseFirestore.getInstance()
+                            .collection("usuarios")
+                            .document(it) //UID en Firebase =  ID del documento de ese user
+                            .set(userMap)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, context.getString(R.string.login_exitoso), Toast.LENGTH_LONG).show()
+                                _navController.navigate(Screens.Tasks.route)
+                            }
+                            .addOnFailureListener { e ->
+                                // error al guardar
+                                Toast.makeText(context, "Error al guardar los datos del usuario: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                            }
                     }
                 } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "stringResource(id = R.string.error_login_google)", Toast.LENGTH_SHORT).show()
-                    }
+                    // error en autenticación
+                    Toast.makeText(context, context.getString(R.string.error_login_google), Toast.LENGTH_LONG).show()
                 }
-
-            }
-            catch (e: androidx.credentials.exceptions.GetCredentialException) {
-                withContext(Dispatchers.Main)
-                {
-                    Toast.makeText(context, e.localizedMessage , Toast.LENGTH_SHORT).show()
-                }
+            } catch (e: androidx.credentials.exceptions.GetCredentialException) {
+                // error al obtener las credenciales
+                Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
             }
         }
     }
+
+
     sealed class AuthState {
         data object Authenticated : AuthState()
         data object Unauthenticated : AuthState()

@@ -362,8 +362,9 @@ fun FechaNacimientoField(viewModel: RegisterViewModel) {
 //boton de acceder/registro
 @Composable
 fun RegisterButtonReg(viewModel: RegisterViewModel) {
+    val context = LocalContext.current
     Button(
-        onClick = { viewModel.botonRegistro() },
+        onClick = { viewModel.botonRegistro(context) },
         modifier = Modifier
             .height(48.dp).width(250.dp),
         colors = ButtonDefaults.buttonColors(
