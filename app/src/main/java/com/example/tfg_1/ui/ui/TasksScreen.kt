@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.R
@@ -26,18 +27,15 @@ fun TasksScreenPreview() {
 
 @Composable
 fun TasksScreen(viewModel: TasksViewModel, navcontroller : NavController) {
-    Scaffold(
-        topBar = { TopBar(navcontroller) }
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background( color = colorResource(id = R.color.greyBackground))
     ) {
-            paddingValues ->
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background( color = colorResource(id = R.color.greyBackground))
-        ) {
-            TasksBody(Modifier.align(Alignment.Center).padding(paddingValues), viewModel ,navcontroller )
-        }
+        TasksBody(Modifier.align(Alignment.Center).padding(10.dp), viewModel ,navcontroller )
     }
+
 }
 
 

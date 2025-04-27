@@ -127,7 +127,7 @@ class LoginViewModel(navController: NavController) : ViewModel() {
                     _isLoading.value = false
                     if (task.isSuccessful) {
                         _authState.value = AuthState.Authenticated
-                        _navController.navigate(Screens.Home.route)
+                        _navController.navigate(Screens.Tasks.route)
                     } else {
                         val errorMsg = task.exception?.message ?: "ERROR. Algo fue mal"
                         _authState.value = AuthState.Error(errorMsg)
@@ -169,7 +169,7 @@ class LoginViewModel(navController: NavController) : ViewModel() {
                     withContext(Dispatchers.Main)
                     {
                         Toast.makeText(context, "stringResource(id = R.string.login_exitoso)", Toast.LENGTH_SHORT).show()
-                        _navController.navigate(Screens.Home.route)
+                        _navController.navigate(Screens.Tasks.route)
                     }
                 } else {
                     withContext(Dispatchers.Main) {

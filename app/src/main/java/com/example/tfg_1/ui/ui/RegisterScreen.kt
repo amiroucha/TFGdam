@@ -38,46 +38,32 @@ import androidx.compose.material.icons.filled.CalendarToday
 fun registerScreenPreview() {
     val navController = rememberNavController()
     val viewModel = RegisterViewModel(navController)
-    RegisterScreen(viewModel = viewModel, navController)
+    RegisterScreen(viewModel = viewModel/*, navController*/)
 }
 
 @Composable
-fun RegisterScreen(viewModel: RegisterViewModel, navcontroller : NavController) {
-    Scaffold(
-        topBar = { TopBar(navcontroller) }
+fun RegisterScreen(viewModel: RegisterViewModel/*, navcontroller : NavController*/) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            //.padding(5.dp)
+            .background( color = colorResource(id = R.color.greyBackground))
     ) {
-        paddingValues ->
-        Box(
+        RegisterBody(
             Modifier
-                .fillMaxSize()
-                //.padding(5.dp)
-                .background( color = colorResource(id = R.color.greyBackground))
-                //.padding(paddingValues)
-        ) {
-            RegisterBody(Modifier.align(Alignment.Center).padding(paddingValues), viewModel ,navcontroller )
-        }
-
+                .align(Alignment.Center)
+                .padding(10.dp),
+            viewModel
+            //navcontroller
+        )
     }
-}
-
-
-@Composable
-fun TopBar(navcontroller: NavController)
-{
-    Icon(imageVector = Icons.Default.ArrowBack,
-        contentDescription = "Back",
-        modifier = Modifier
-            .clickable{
-                navcontroller.popBackStack()
-            }
-            .padding(top = 40.dp, start = 10.dp)
-            .size(34.dp)
-    )
 
 }
+
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel, navcontroller : NavController) {
+fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
     val email by viewModel.email.collectAsState()
     val passwordR by viewModel.password.collectAsState()
     val password2 by viewModel.password2.collectAsState()
