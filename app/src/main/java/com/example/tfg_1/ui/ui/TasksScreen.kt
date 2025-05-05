@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.tfg_1.Model.Tarea
+import com.example.tfg_1.model.TasksModel
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.TasksViewModel
 
@@ -125,7 +125,7 @@ data class TabData(val title: String, val icon: ImageVector)
 
 //caja de item
 @Composable
-fun tareaItem(tarea: Tarea, modificarCompletada: (Tarea) -> Unit) {
+fun tareaItem(tarea: TasksModel, modificarCompletada: (TasksModel) -> Unit) {
     // Contenedor de la tarea con padding y márgenes
     Row(
         modifier = Modifier

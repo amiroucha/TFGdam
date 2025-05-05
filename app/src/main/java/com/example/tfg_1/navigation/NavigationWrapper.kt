@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -15,18 +16,25 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tfg_1.R
 import com.example.tfg_1.ui.ui.LoginScreen
 import com.example.tfg_1.ui.ui.RegisterScreen
 import com.example.tfg_1.ui.ui.TasksScreen
+import com.example.tfg_1.viewModel.HomeViewModel
 import com.example.tfg_1.viewModel.LoginViewModel
 import com.example.tfg_1.viewModel.RegisterViewModel
 import com.example.tfg_1.viewModel.TasksViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationWrapper() {
+fun NavigationWrapper(
+    homeViewModel: HomeViewModel,
+) {
     val navController = rememberNavController()
+    val uiState by homeViewModel.uiState.collectAsState()
+
+
     val currentBackStack by navController.currentBackStackEntryAsState() //me recoge donde me ubico
     val currentRoute = currentBackStack?.destination?.route //ruta completa de la pantalla donde estoy
 

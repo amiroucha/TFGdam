@@ -1,6 +1,6 @@
-package com.example.tfg_1.Model
+package com.example.tfg_1.model
 
-data class Tarea (
+data class TasksModel (
     val id: Int,
     val titulo: String,
     val fecha: String,
