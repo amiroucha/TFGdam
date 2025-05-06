@@ -18,8 +18,25 @@ import androidx.compose.ui.unit.sp
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.HomeViewModel
 
+@Preview(showBackground = true)
 @Composable
-fun HomeSetupContent(
+fun HomeScreenPreview() {
+    HomeBody(
+        name            = "",
+        address         = "",
+        code            = "",
+        onNameChange    = {},
+        onAddressChange = {},
+        onCodeChange    = {},
+        onCreate        = {},
+        onJoin          = {},
+        modifier        = Modifier.fillMaxSize()
+    )
+}
+
+
+@Composable
+fun HomeBody(
     name: String,
     address: String,
     code: String,
@@ -97,7 +114,7 @@ fun HomeScreen(
     val code    by viewModel.code.collectAsState()
 
     // 2.2. Llamamos al composable puro con lambdas que invocan al ViewModel
-    HomeSetupContent(
+    HomeBody(
         name           = name,
         address        = address,
         code           = code,
@@ -110,19 +127,3 @@ fun HomeScreen(
     )
 }
 
-// 3) Preview: usa el composable puro con datos y lambdas vacías
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeSetupContent(
-        name            = "",
-        address         = "",
-        code            = "",
-        onNameChange    = {},
-        onAddressChange = {},
-        onCodeChange    = {},
-        onCreate        = {},
-        onJoin          = {},
-        modifier        = Modifier.fillMaxSize()
-    )
-}
