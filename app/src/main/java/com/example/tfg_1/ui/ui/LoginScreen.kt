@@ -344,7 +344,6 @@ fun ForgotPassword(modifier: Modifier, viewModel: LoginViewModel) {
 fun LoginButton(email: String, password: String, viewModel: LoginViewModel) {
     Button(
         onClick = {
-
             viewModel.login(email, password)
         },
         modifier = Modifier

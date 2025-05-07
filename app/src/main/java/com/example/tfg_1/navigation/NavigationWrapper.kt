@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -18,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tfg_1.R
+import com.example.tfg_1.ui.ui.HomeScreen
 import com.example.tfg_1.ui.ui.LoginScreen
 import com.example.tfg_1.ui.ui.RegisterScreen
 import com.example.tfg_1.ui.ui.TasksScreen
@@ -34,13 +36,30 @@ fun NavigationWrapper(
     val navController = rememberNavController()
     val uiState by homeViewModel.uiState.collectAsState()
 
-
     val currentBackStack by navController.currentBackStackEntryAsState() //me recoge donde me ubico
     val currentRoute = currentBackStack?.destination?.route //ruta completa de la pantalla donde estoy
 
-    //para que pantalla se va a ver cada cosa
+    //para que pantalla se va a ver cada barra
     val showTopBar = currentRoute == Screens.Register.route || currentRoute == Screens.Tasks.route
     val showBottomBar = currentRoute == Screens.Tasks.route
+
+    LaunchedEffect(uiState){
+        when(uiState){
+            is HomeViewModel.UiState.NotHome->{
+                navController.navigate(Screens.Home.route){
+                    popUpTo(Screens.Login.route)
+                    {inclusive = true}
+                }
+            }
+            is HomeViewModel.UiState.HasHome->{
+                navController.navigate(Screens.Tasks.route){
+                    popUpTo(Screens.Login.route) {inclusive = true}
+                }
+            }
+            else -> {}
+        }
+    }
+
 
     Scaffold(
         topBar = {
@@ -49,7 +68,7 @@ fun NavigationWrapper(
                     title = {
                         Text(
                             text = when (currentRoute) { //texto del titulo de la pagina
-                                Screens.Register.route -> stringResource(R.string.vacio)
+                                Screens.Register.route -> ""
                                 Screens.Tasks.route -> stringResource(R.string.tasks)
                                 else -> ""
                             }
@@ -83,16 +102,16 @@ fun NavigationWrapper(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screens.Login.route) {
-                val viewModel = LoginViewModel(navController)
-                LoginScreen(viewModel = viewModel, navController)
+                LoginScreen(viewModel = LoginViewModel(navController), navController)
             }
             composable(Screens.Register.route) {
-                val viewModel = RegisterViewModel(navController)
-                RegisterScreen(viewModel = viewModel)
+                RegisterScreen(viewModel = RegisterViewModel(navController))
             }
             composable(Screens.Tasks.route) {
-                val viewModel = TasksViewModel()
-                TasksScreen(viewModel, navController) // Esta la tienes que crear tú
+                TasksScreen(viewModel = TasksViewModel(), navController)
+            }
+            composable(Screens.Home.route) {
+                HomeScreen(viewModel= HomeViewModel())
             }
         }
     }

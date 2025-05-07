@@ -154,11 +154,6 @@ class HomeViewModel : ViewModel(){
             }
     }
 
-
-
-
-
-
     sealed class UiState {
         data object Loading: UiState()  //comprobar usuario y home
         data object NotLogged: UiState()  // no logueado

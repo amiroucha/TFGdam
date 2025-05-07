@@ -2,21 +2,21 @@ package com.example.tfg_1.ui.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.HomeViewModel
+
 
 @Preview(showBackground = true)
 @Composable
@@ -33,7 +33,6 @@ fun HomeScreenPreview() {
         modifier        = Modifier.fillMaxSize()
     )
 }
-
 
 @Composable
 fun HomeBody(
@@ -58,29 +57,42 @@ fun HomeBody(
             text = "¡¡Bienvenido!! \nAntes de seguir, configura tu hogar.",
             modifier = Modifier.align(Alignment.CenterHorizontally),
             fontSize = 25.sp,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.bodyLarge
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            label = { Text("Nombre del hogar") },
+            label = { Text(text ="Nombre del hogar",
+                fontSize = 18.sp) },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = address,
             onValueChange = onAddressChange,
-            label = { Text("Dirección (opcional)") },
+            label = { Text(text="Dirección (opcional)",
+                fontSize = 18.sp) },
             modifier = Modifier.fillMaxWidth()
         )
 
         Button(
             onClick = onCreate,
             enabled = name.isNotBlank(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                colorResource(id = R.color.black) ,
+                colorResource(id = R.color.black),
+                colorResource(id = R.color.blue), //color de fondo
+                colorResource(id = R.color.black)//color del texto
+            ),
         ) {
-            Text("Crear hogar nuevo")
+            Text(text = "Crear hogar nuevo",
+                fontSize = 18.sp)
         }
 
         Spacer(Modifier.height(24.dp))
@@ -88,16 +100,24 @@ fun HomeBody(
         OutlinedTextField(
             value = code,
             onValueChange = onCodeChange,
-            label = { Text("Código de hogar existente") },
+            label = { Text(text = "Código de hogar existente",
+                fontSize = 18.sp) },
             modifier = Modifier.fillMaxWidth()
         )
 
         Button(
             onClick = onJoin,
             enabled = code.isNotBlank(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                colorResource(id = R.color.black) ,
+                colorResource(id = R.color.black),
+                colorResource(id = R.color.green), //color de fondo
+                colorResource(id = R.color.black)//color del texto
+            ),
         ) {
-            Text("Unirme a hogar")
+            Text(text = "Unirme a hogar",
+                fontSize = 18.sp)
         }
     }
 }
