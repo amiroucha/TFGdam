@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.tfg_1.R
+import com.example.tfg_1.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -18,6 +19,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
     private val _navController = navController
     private lateinit var auth: FirebaseAuth
     //val context = LocalContext.current
+    //----------------------------------------------------------------------
 
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
@@ -28,13 +30,16 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
     private val _password2 = MutableStateFlow("")
     val password2: StateFlow<String> = _password2.asStateFlow()
 
-
     private val _date = MutableStateFlow("")
     val date: StateFlow<String> = _date.asStateFlow()
 
     private val _showDatePicker = MutableStateFlow(false)
     val showDatePicker: StateFlow<Boolean> = _showDatePicker
+    //----------------------------------------------------------------------
+    private val _name = MutableStateFlow("")
+    val name: StateFlow<String> = _name.asStateFlow()
 
+    //----------------------------------------------------------------------
 
     private val _isLoadingR = MutableStateFlow(false)
     val isLoadingR: StateFlow<Boolean> = _isLoadingR.asStateFlow()
@@ -58,7 +63,9 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
     private val _dateError = MutableStateFlow("")
     val dateError: StateFlow<String> = _dateError.asStateFlow()
 
-   // private val _isFormValid = MutableStateFlow<Boolean>(false)
+    private val _nameError = MutableStateFlow("")
+    val nameError: StateFlow<String> = _nameError.asStateFlow()
+
     //FUNCIONES------------------------------------------------------------------------
 
     //validar el correo y contraseñas -----------------------------------
@@ -67,11 +74,12 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
     private fun passwordsSame(password: String, password2: String): Boolean = password == password2
 
 
-    fun onLoginChanges(email: String, password: String, password2: String) {
+    fun onLoginChanges(email: String, password: String, password2: String,name: String) {
         _email.value = email
         _password.value = password
         _password2.value = password2
-        _registerEnable.value = (validEmail(email) && validPassword(password)) and (passwordsSame(password, password2))
+        _name.value = name
+        _registerEnable.value = (validEmail(email) && validPassword(password)) and (passwordsSame(password, password2) && name.isNotEmpty())
     }
 
     fun dateSeleccionada(anio: Int, mes: Int, dia: Int) {
@@ -88,6 +96,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
         val password = _password.value
         val password2 = _password2.value
         val date = _date.value
+        val name = _name.value
 
         _emailError.value = when {
             email.isEmpty() -> "El correo no puede estar vacío"
@@ -109,6 +118,12 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
             !passwordsSame(password, password2) -> "Las contraseñas deben ser iguales"
             else -> ""
         }
+
+        _nameError.value = when {
+            _name.value.isEmpty() -> "El nombre no puede estar vacío"
+            else -> ""
+        }
+
         // Validación de la fecha de nacimiento
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val dateMini = dateFormat.parse("01/01/1900")
@@ -127,11 +142,13 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
                 }
             }
         }
+
         return _emailError.value.isEmpty() &&
                 _passwordError.value.isEmpty() &&
                 _passwordError2.value.isEmpty() &&
                 _passwordsame.value.isEmpty() &&
-                _dateError.value.isEmpty()
+                _dateError.value.isEmpty() &&
+                _nameError.value.isEmpty()
     }
     fun botonRegistro(context: Context){
         if (!validateOnSubmit()) return //si hay un dato incorrecto se sale
@@ -144,20 +161,21 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
                 _isLoadingR.value = false
                 if (task.isSuccessful) {
                     val userUid = auth.currentUser?.uid
-                    val user  = hashMapOf(
-                        context.getString(R.string.emailBD) to _email.value,
-                        context.getString(R.string.fechaNacimientoBD) to date.value,
-                        context.getString(R.string.hogarIdBD) to "",
-                    )
 
                     userUid?.let { id -> // si el id no es null
+                        val userModel = UserModel(
+                            id = id,
+                            name = _name.value,
+                            email = _email.value,
+                            homeId = null
+                        )
                         FirebaseFirestore.getInstance()
                             .collection("usuarios")
                             .document(id)
-                            .set(user)
+                            .set(userModel)
                             .addOnSuccessListener {
                                 _navController.navigate("tasks") {
-                                    popUpTo("register") { inclusive = true }//que no pueda volver al registro una vez entrado a la app
+                                    popUpTo("register") { inclusive = true }
                                     popUpTo("login") { inclusive = true }
                                 }
                             }.addOnFailureListener { e ->
