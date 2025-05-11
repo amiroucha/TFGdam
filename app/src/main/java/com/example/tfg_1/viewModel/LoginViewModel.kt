@@ -16,16 +16,15 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 
-class LoginViewModel(navController: NavController) : ViewModel() {
-    private val _navController = navController
+class LoginViewModel : ViewModel() {
+    //private val _navController = navController
     private lateinit var credentialManager: androidx.credentials.CredentialManager
 
     private val _email = MutableStateFlow("")
@@ -42,10 +41,6 @@ class LoginViewModel(navController: NavController) : ViewModel() {
 
     private val _passwordError = MutableStateFlow<String?>(null)
     val passwordError: StateFlow<String?> = _passwordError
-
-    //para desactivar el boton login
-    /*private val _loginEnable = MutableStateFlow(false)
-    val loginEnable: StateFlow<Boolean> = _loginEnable.asStateFlow()*/
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -118,7 +113,9 @@ class LoginViewModel(navController: NavController) : ViewModel() {
         _passwordResetMessage.value = message
     }
 
-    fun login(email: String, password: String) {
+    fun login(navController: NavController) {
+        val email = _email.value
+        val password = _password.value
         if (validateOnSubmit()) {
             _isLoading.value = true
             _authState.value = AuthState.Loading
@@ -128,8 +125,26 @@ class LoginViewModel(navController: NavController) : ViewModel() {
                     _isLoading.value = false
                     if (task.isSuccessful) {
                         _authState.value = AuthState.Authenticated
-                        _navController.navigate(Screens.Tasks.route){
-                            popUpTo("login") { inclusive = true }
+
+                        val currentUser = auth.currentUser
+                        if (currentUser != null) {
+                            // Llamada asíncrona para obtener el homeId
+                            viewModelScope.launch {
+                                val homeId = getHomeId(currentUser)
+
+                                // Después de obtener el homeId, realizar la navegación
+                                if (homeId != null) {
+                                    // Si tiene un homeId, ir a Tasks
+                                    navController.navigate(Screens.Tasks.route) {
+                                        popUpTo(Screens.Login.route) { inclusive = true }
+                                    }
+                                } else {
+                                    // Si no tiene homeId, ir a Home
+                                    navController.navigate(Screens.Home.route) {
+                                        popUpTo(Screens.Login.route) { inclusive = true }
+                                    }
+                                }
+                            }
                         }
                     } else {
                         val errorMsg = task.exception?.message ?: "ERROR. Algo fue mal"
@@ -142,7 +157,26 @@ class LoginViewModel(navController: NavController) : ViewModel() {
     }
 
 
-    fun loginGoogle(context: Context) {
+
+    private suspend fun getHomeId(user: FirebaseUser?): String? {
+        return try {
+            val db = FirebaseFirestore.getInstance()
+            val userDocRef = db.collection("usuarios").document(user?.uid ?: "")
+            val documentSnapshot = userDocRef.get().await()
+
+            // Si existe el documento, intenta obtener el homeId
+            if (documentSnapshot.exists()) {
+                return documentSnapshot.getString("hogarId")
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+
+    fun loginGoogle(context: Context, navController: NavController) {
         val auth = FirebaseAuth.getInstance() // inicializar FirebaseAuth
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
@@ -175,7 +209,7 @@ class LoginViewModel(navController: NavController) : ViewModel() {
 
                 // Si la autenticación es exitosa
                 if (authResult != null) {
-                    //recojo datos
+                    // Recojo datos del usuario
                     val user = auth.currentUser
                     val userUid = user?.uid
                     val userEmail = user?.email
@@ -184,27 +218,49 @@ class LoginViewModel(navController: NavController) : ViewModel() {
                         "uid" to userUid,
                     )
 
-                    // guardo en usuarios BD
+                    // Guardar los datos del usuario en la base de datos
                     userUid?.let {
                         FirebaseFirestore.getInstance()
                             .collection("usuarios")
-                            .document(it) //UID en Firebase =  ID del documento de ese user
+                            .document(it) // UID en Firebase =  ID del documento de ese user
                             .set(userMap)
                             .addOnSuccessListener {
                                 Toast.makeText(context, context.getString(R.string.login_exitoso), Toast.LENGTH_LONG).show()
-                                _navController.navigate(Screens.Tasks.route)
+
+                                // Después de guardar los datos, revisamos si tiene un homeId
+                                // Usamos launch para llamar la función suspendida correctamente
+//                                launch {
+//                                    comprobarHome(userUid, navController, context)
+//                                }
+                                viewModelScope.launch {
+                                    val currentUser = auth.currentUser
+                                    val homeId = getHomeId(currentUser)
+
+                                    // Después de obtener el homeId, realizar la navegación
+                                    if (homeId != null) {
+                                        // Si tiene un homeId, ir a Tasks
+                                        navController.navigate(Screens.Tasks.route) {
+                                            popUpTo(Screens.Login.route) { inclusive = true }
+                                        }
+                                    } else {
+                                        // Si no tiene homeId, ir a Home
+                                        navController.navigate(Screens.Home.route) {
+                                            popUpTo(Screens.Login.route) { inclusive = true }
+                                        }
+                                    }
+                                }
                             }
                             .addOnFailureListener { e ->
-                                // error al guardar
+                                // Error al guardar los datos
                                 Toast.makeText(context, "Error al guardar los datos del usuario: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
                             }
                     }
                 } else {
-                    // error en autenticación
+                    // Error en autenticación
                     Toast.makeText(context, context.getString(R.string.error_login_google), Toast.LENGTH_LONG).show()
                 }
             } catch (e: androidx.credentials.exceptions.GetCredentialException) {
-                // error al obtener las credenciales
+                // Error al obtener las credenciales
                 Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
             }
         }

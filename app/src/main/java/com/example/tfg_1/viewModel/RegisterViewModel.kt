@@ -1,8 +1,6 @@
 package com.example.tfg_1.viewModel
 import android.content.Context
 import android.util.Patterns
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,8 +28,8 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
     private val _password2 = MutableStateFlow("")
     val password2: StateFlow<String> = _password2.asStateFlow()
 
-    private val _date = MutableStateFlow("")
-    val date: StateFlow<String> = _date.asStateFlow()
+    private val _birthdate = MutableStateFlow("")
+    val birthdate: StateFlow<String> = _birthdate.asStateFlow()
 
     private val _showDatePicker = MutableStateFlow(false)
     val showDatePicker: StateFlow<Boolean> = _showDatePicker
@@ -84,7 +82,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
 
     fun dateSeleccionada(anio: Int, mes: Int, dia: Int) {
         val fechaFormateada = String.format("%02d/%02d/%04d", dia, mes + 1, anio)
-        _date.value = fechaFormateada
+        _birthdate.value = fechaFormateada
         _showDatePicker.value = false
     }
 
@@ -95,7 +93,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
         val email = _email.value
         val password = _password.value
         val password2 = _password2.value
-        val date = _date.value
+        val date = _birthdate.value
         val name = _name.value
 
         _emailError.value = when {
@@ -120,7 +118,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
         }
 
         _nameError.value = when {
-            _name.value.isEmpty() -> "El nombre no puede estar vacío"
+            name.isEmpty() -> "El nombre no puede estar vacío"
             else -> ""
         }
 
@@ -167,17 +165,18 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
                             id = id,
                             name = _name.value,
                             email = _email.value,
-                            homeId = null
+                            homeId = null,
+                            birthDate = _birthdate.value
                         )
                         FirebaseFirestore.getInstance()
                             .collection("usuarios")
                             .document(id)
                             .set(userModel)
                             .addOnSuccessListener {
-                                _navController.navigate("tasks") {
+                               /* _navController.navigate("tasks") {
                                     popUpTo("register") { inclusive = true }
                                     popUpTo("login") { inclusive = true }
-                                }
+                                }*/
                             }.addOnFailureListener { e ->
                                 _emailError.value = e.localizedMessage ?: context.getString(R.string.errorGuardarUsuario)
                             }

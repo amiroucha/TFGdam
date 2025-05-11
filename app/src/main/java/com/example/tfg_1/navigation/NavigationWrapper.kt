@@ -30,11 +30,13 @@ import com.example.tfg_1.viewModel.TasksViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationWrapper(
-    homeViewModel: HomeViewModel,
-) {
+fun NavigationWrapper() {
     val navController = rememberNavController()
-    val uiState by homeViewModel.uiState.collectAsState()
+
+    val loginViewModel: LoginViewModel = viewModel()
+    val authState by loginViewModel.authState.collectAsState()
+
+    val homeViewModel: HomeViewModel = viewModel()
 
     val currentBackStack by navController.currentBackStackEntryAsState() //me recoge donde me ubico
     val currentRoute = currentBackStack?.destination?.route //ruta completa de la pantalla donde estoy
@@ -43,22 +45,31 @@ fun NavigationWrapper(
     val showTopBar = currentRoute == Screens.Register.route || currentRoute == Screens.Tasks.route
     val showBottomBar = currentRoute == Screens.Tasks.route
 
-    LaunchedEffect(uiState){
-        when(uiState){
-            is HomeViewModel.UiState.NotHome->{
-                navController.navigate(Screens.Home.route){
-                    popUpTo(Screens.Login.route)
-                    {inclusive = true}
+    LaunchedEffect(authState) {
+        // Cuando el estado de autenticación cambie, verificar el homeId
+        if (authState is LoginViewModel.AuthState.Authenticated) {
+            homeViewModel.loadUser()
+
+            // Aquí observamos el estado del home y navegamos según corresponda
+            when (val state = homeViewModel.uiState.value) {
+                is HomeViewModel.UiState.HasHome -> {
+                    // Si tiene un hogar, redirigir a Tasks
+                    navController.navigate(Screens.Tasks.route) {
+                        // Eliminamos Login de la pila de navegación
+                        popUpTo(Screens.Login.route) { inclusive = true }
+                    }
                 }
-            }
-            is HomeViewModel.UiState.HasHome->{
-                navController.navigate(Screens.Tasks.route){
-                    popUpTo(Screens.Login.route) {inclusive = true}
+                is HomeViewModel.UiState.NotHome -> {
+                    // Si no tiene hogar, redirigir a Home
+                    navController.navigate(Screens.Home.route) {
+                        popUpTo(Screens.Login.route) { inclusive = true }
+                    }
                 }
+                else -> {}
             }
-            else -> {}
         }
     }
+
 
 
     Scaffold(
@@ -102,7 +113,7 @@ fun NavigationWrapper(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screens.Login.route) {
-                LoginScreen(viewModel = LoginViewModel(navController), navController)
+                LoginScreen(viewModel = loginViewModel, navController)
             }
             composable(Screens.Register.route) {
                 RegisterScreen(viewModel = RegisterViewModel(navController))
@@ -111,7 +122,7 @@ fun NavigationWrapper(
                 TasksScreen(viewModel = TasksViewModel(), navController)
             }
             composable(Screens.Home.route) {
-                HomeScreen(viewModel= HomeViewModel())
+                HomeScreen(viewModel = homeViewModel)
             }
         }
     }

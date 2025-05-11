@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -25,7 +24,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.RegisterViewModel
@@ -55,7 +53,6 @@ fun RegisterScreen(viewModel: RegisterViewModel/*, navcontroller : NavController
                 .align(Alignment.Center)
                 .padding(10.dp),
             viewModel
-            //navcontroller
         )
     }
 
@@ -66,10 +63,12 @@ fun RegisterScreen(viewModel: RegisterViewModel/*, navcontroller : NavController
 @Composable
 fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
     val email by viewModel.email.collectAsState()
+    val name by viewModel.name.collectAsState()
     val passwordR by viewModel.password.collectAsState()
     val password2 by viewModel.password2.collectAsState()
     val isLoading by viewModel.isLoadingR.collectAsState()
     val emailError by viewModel.emailError.collectAsState()
+    val nameError by viewModel.nameError.collectAsState()
     val passwordError1 by viewModel.passwordError.collectAsState()
     val passwordError2 by viewModel.passwordError2.collectAsState()
     val passwordSameError by viewModel.passwordsame.collectAsState()
@@ -107,12 +106,12 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
             TituloRegister(Modifier.align(Alignment.CenterHorizontally))
 
             Spacer(modifier = Modifier.padding(5.dp))
-            EmailFieldReg(email, error = emailError) { viewModel.onLoginChanges(it, passwordR, password2) }
+            EmailFieldReg(email, error = emailError) { viewModel.onLoginChanges(it, passwordR, password2, name) }
             Spacer(modifier = Modifier.padding(2.dp))
-            PasswordFieldReg(passwordR, error = passwordError1) { viewModel.onLoginChanges(email, it, password2) }
+            PasswordFieldReg(passwordR, error = passwordError1) { viewModel.onLoginChanges(email, it, password2,name) }
             Spacer(modifier = Modifier.padding(4.dp))
             PasswordFieldReg2(password2, error = passwordError2)
-            { viewModel.onLoginChanges(email,passwordR, it) }
+            { viewModel.onLoginChanges(email,passwordR, it,name) }
 
             // error de contraseñas diferentes
             if (passwordSameError.isNotEmpty()) {
@@ -296,7 +295,7 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
 
 @Composable
 fun FechaNacimientoField(viewModel: RegisterViewModel) {
-    val fecha by viewModel.date.collectAsState()
+    val fecha by viewModel.birthdate.collectAsState()
     val mostrarDialog by viewModel.showDatePicker.collectAsState()
     val dateError by viewModel.dateError.collectAsState()
 

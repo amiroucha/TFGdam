@@ -1,13 +1,13 @@
 package com.example.tfg_1.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.example.tfg_1.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.viewModelScope
+import com.example.tfg_1.model.UserModel
 import kotlinx.coroutines.launch
 
 
@@ -46,7 +46,7 @@ class HomeViewModel : ViewModel(){
     }
 
     // carga inicial del usuario y ver si tiene un hogar
-    private fun loadUser() {
+    fun loadUser() {
         viewModelScope.launch {
             _uiState.value = UiState.Loading //lo ponemos en carga
 
@@ -87,7 +87,6 @@ class HomeViewModel : ViewModel(){
             "id_hogar"       to newHomeRef.id,
             "nombre_hogar"   to homeName,
             "direccion"      to address.value.trim(),
-            "fecha_creacion" to System.currentTimeMillis()
         )
         newHomeRef.set(data)
             .addOnSuccessListener {
@@ -142,17 +141,19 @@ class HomeViewModel : ViewModel(){
             .addOnSuccessListener { snap ->
                 _members.value = snap.documents.mapNotNull { d ->
                     UserModel(
-                        id     = d.id,
-                        name   = d.getString("nombre").orEmpty(),
-                        email  = d.getString("correo").orEmpty(),
-                        homeId = homeId
+                        id        = d.id,
+                        name      = d.getString("nombre").orEmpty(),
+                        email     = d.getString("correo").orEmpty(),
+                        homeId    = homeId,
+                        birthDate = d.getString("fechaNacimiento").orEmpty()
                     )
                 }
             }
-            .addOnFailureListener {e ->
+            .addOnFailureListener { e ->
                 _uiState.value = UiState.Error("No se han podido cargar los miembros: ${e.localizedMessage}")
             }
     }
+
 
     sealed class UiState {
         data object Loading: UiState()  //comprobar usuario y home

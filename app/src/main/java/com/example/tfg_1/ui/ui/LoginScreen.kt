@@ -37,7 +37,7 @@ import com.example.tfg_1.viewModel.LoginViewModel
 @Composable
 fun LoginScreenPreview() {
     val navController = rememberNavController()
-    val viewModel = LoginViewModel(navController)
+    val viewModel = LoginViewModel()
     LoginScreen(viewModel = viewModel, navController = navController)
 }
 
@@ -161,10 +161,10 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
 
             Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp)) {
 
-                LoginButton(email, password, viewModel)
+                LoginButton(viewModel, navController)
 
                 Spacer(modifier = Modifier.padding(16.dp))
-                GoogleButton(viewModel)
+                GoogleButton(viewModel, navController)
             }
 
             Column(modifier = Modifier.align(Alignment.CenterHorizontally)) {
@@ -341,10 +341,10 @@ fun ForgotPassword(modifier: Modifier, viewModel: LoginViewModel) {
 
 
 @Composable
-fun LoginButton(email: String, password: String, viewModel: LoginViewModel) {
+fun LoginButton(viewModel: LoginViewModel, navController: NavController) {
     Button(
         onClick = {
-            viewModel.login(email, password)
+            viewModel.login(navController)
         },
         modifier = Modifier
             .height(48.dp)
@@ -362,11 +362,11 @@ fun LoginButton(email: String, password: String, viewModel: LoginViewModel) {
 }
 
 @Composable
-fun GoogleButton(viewModel: LoginViewModel) {
+fun GoogleButton(viewModel: LoginViewModel, navController: NavController) {
     val context = LocalContext.current
     Button(
         onClick = {
-            viewModel.loginGoogle(context)
+            viewModel.loginGoogle(context, navController)
         },
         modifier = Modifier
             .height(48.dp)
