@@ -167,7 +167,7 @@ class LoginViewModel : ViewModel() {
 
             // Si existe el documento, intenta obtener el homeId
             if (documentSnapshot.exists()) {
-                return documentSnapshot.getString("hogarId")
+                return documentSnapshot.getString("homeId")
             } else {
                 null
             }
@@ -229,10 +229,7 @@ class LoginViewModel : ViewModel() {
                                 Toast.makeText(context, context.getString(R.string.login_exitoso), Toast.LENGTH_LONG).show()
 
                                 // Después de guardar los datos, revisamos si tiene un homeId
-                                // Usamos launch para llamar la función suspendida correctamente
-//                                launch {
-//                                    comprobarHome(userUid, navController, context)
-//                                }
+
                                 viewModelScope.launch {
                                     val currentUser = auth.currentUser
                                     val homeId = getHomeId(currentUser)

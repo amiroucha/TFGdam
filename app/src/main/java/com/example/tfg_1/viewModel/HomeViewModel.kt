@@ -1,5 +1,6 @@
 package com.example.tfg_1.viewModel
 
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -62,13 +63,13 @@ class HomeViewModel : ViewModel(){
                 .document(firebaseUser.uid)
                 .get()
                 .addOnSuccessListener { doc ->
-                    val homeId = doc.getString("hogarId").orEmpty()
+                    val homeId = doc.getString("homeId").orEmpty()
                     if (homeId.isBlank()) {
                         // si el user no tiene hogar asignado va a la pantalla de settings
                         _uiState.value = UiState.NotHome
                     } else {
                         _uiState.value = UiState.HasHome(homeId) //usuario con casa , va a tareas
-                        listMembers(homeId) //carga lista de usuarios
+                        //listMembers(homeId) //carga lista de usuarios
                     }
                 }
                 .addOnFailureListener { e ->
@@ -84,9 +85,9 @@ class HomeViewModel : ViewModel(){
         //creo un higar en hogares
         val newHomeRef = firestore.collection("hogares").document()
         val data = mapOf(
-            "id_hogar"       to newHomeRef.id,
-            "nombre_hogar"   to homeName,
-            "direccion"      to address.value.trim(),
+            "homeId"       to newHomeRef.id,
+            "homeName"   to homeName,
+            "adress"      to address.value.trim(),
         )
         newHomeRef.set(data)
             .addOnSuccessListener {
@@ -112,6 +113,7 @@ class HomeViewModel : ViewModel(){
                     updateUserHome(codeVal)  //se asocia al usuario
                 } else { //no se encuentra un higar con ese cod
                     _uiState.value = UiState.Error("Código de hogar inválido")
+
                 }
             }
             .addOnFailureListener {
@@ -124,7 +126,7 @@ class HomeViewModel : ViewModel(){
         val uid = auth.currentUser?.uid ?: return
         firestore.collection("usuarios")
             .document(uid)
-            .update("hogarId", homeId)
+            .update("homeId", homeId)
             .addOnSuccessListener {
                 // Vuelve a cargar el usuario para disparar la navegación
                 loadUser()
@@ -135,7 +137,7 @@ class HomeViewModel : ViewModel(){
     }
 
     //lista de miembros de x hogar
-    private fun listMembers(homeId: String) {
+   /* private fun listMembers(homeId: String) {
         firestore.collection("usuarios")
             .whereEqualTo("hogarId", homeId)
             .get()
@@ -153,8 +155,7 @@ class HomeViewModel : ViewModel(){
             .addOnFailureListener { e ->
                 _uiState.value = UiState.Error("No se han podido cargar los miembros: ${e.localizedMessage}")
             }
-    }
-
+    }*/
 
     sealed class UiState {
         data object Loading: UiState()  //comprobar usuario y home
