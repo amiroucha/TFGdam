@@ -46,7 +46,7 @@ fun RegisterScreen(viewModel: RegisterViewModel/*, navcontroller : NavController
         Modifier
             .fillMaxSize()
             //.padding(5.dp)
-            .background( color = colorResource(id = R.color.greyBackground))
+            .background(color = colorResource(id = R.color.greyBackground))
     ) {
         RegisterBody(
             Modifier
@@ -84,8 +84,10 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
                 .verticalScroll(rememberScrollState())
                 .padding(top = 16.dp)
         ) {
-            Box(modifier = Modifier.align(Alignment.CenterHorizontally)
-                .fillMaxWidth().padding(top = 5.dp, bottom= 16.dp, end = 16.dp, start = 16.dp)
+            Box(modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxWidth()
+                .padding(top = 5.dp, bottom = 16.dp, end = 16.dp, start = 16.dp)
             )
             {
                 Row(
@@ -104,6 +106,8 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
                 }
             }
             TituloRegister(Modifier.align(Alignment.CenterHorizontally))
+
+            nameFieldReg(name = name, error = nameError){ viewModel.onLoginChanges(email, passwordR, password2, it) }
 
             Spacer(modifier = Modifier.padding(5.dp))
             EmailFieldReg(email, error = emailError) { viewModel.onLoginChanges(it, passwordR, password2, name) }
@@ -125,7 +129,9 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
 
             FechaNacimientoField(viewModel)
             Spacer(modifier = Modifier.padding(15.dp))
-            Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp))
+            Column(modifier = Modifier
+                .align(Alignment.End)
+                .padding(end = 20.dp))
             {
                 RegisterButtonReg(viewModel)
             }
@@ -160,6 +166,41 @@ fun TituloRegister(modifier:Modifier){
         maxLines = 1, // Solo permite 1 línea
         fontWeight = FontWeight.Bold
     )
+}
+//nombre ----------------------------------------------------------------
+@Composable
+fun nameFieldReg(name: String,error: String?, onTextFieldChanged: (String) -> Unit) {
+    Column (modifier = Modifier.padding(top = 5.dp, bottom=1.dp, end = 20.dp, start = 20.dp )) {
+        TextField(
+            value = name,
+            onValueChange = { onTextFieldChanged(it) },//actualiza rl valor
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(70.dp)
+                .border(2.dp, Color.Black),
+            placeholder = { Text(text = stringResource(R.string.nombre)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            singleLine = true,
+            isError = error != null,
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = colorResource(id = R.color.white),
+                unfocusedTextColor = colorResource(id = R.color.white),
+                focusedContainerColor = colorResource(id = R.color.white),
+                unfocusedContainerColor = colorResource(id = R.color.white),
+                disabledContainerColor = colorResource(id = R.color.white),
+                errorContainerColor = colorResource(id = R.color.white),
+                errorIndicatorColor = colorResource(id = R.color.red)
+            )
+        )
+        error?.let { //si el error!=null -> hay error , entonces:
+            Text(
+                text = it,//it es el valor del error (no null)
+                color = colorResource(id = R.color.red),
+                fontSize = 15.sp,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
+    }
 }
 //email ----------------------------------------------------------------
 @Composable
@@ -365,7 +406,8 @@ fun RegisterButtonReg(viewModel: RegisterViewModel) {
     Button(
         onClick = { viewModel.botonRegistro(context) },
         modifier = Modifier
-            .height(48.dp).width(250.dp),
+            .height(48.dp)
+            .width(250.dp),
         colors = ButtonDefaults.buttonColors(
             colorResource(id= R.color.green),//boton habilitado
             colorResource(id= R.color.white),//boton desabilitado

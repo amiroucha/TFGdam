@@ -31,6 +31,7 @@
     <string name="hogarIdBD">hogarId</string>
     <string name="errorGuardarUsuario">Error al guardar usuario</string>
     <string name="erroRegistrar">Error al registrar</string>
+    <string name="nombre">Nombre de usuario</string>
 
 
     <!--Tareas ................................................................-->
