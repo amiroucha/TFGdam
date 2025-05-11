@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.tfg_1.model.UserModel
 import kotlinx.coroutines.launch
 
@@ -90,8 +91,9 @@ class HomeViewModel : ViewModel(){
         )
         newHomeRef.set(data)
             .addOnSuccessListener {
-                //actuañizo en campo idhome del usuario
+                //actualizo en campo idhome del usuario
                 updateUserHome(newHomeRef.id)
+
             }
             .addOnFailureListener {
                 _uiState.value = UiState.Error("No se pudo crear el hogar")

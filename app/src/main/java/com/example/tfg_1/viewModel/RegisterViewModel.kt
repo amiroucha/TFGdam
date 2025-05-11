@@ -173,10 +173,10 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
                             .document(id)
                             .set(userModel)
                             .addOnSuccessListener {
-                               /* _navController.navigate("tasks") {
+                               _navController.navigate("home") {
                                     popUpTo("register") { inclusive = true }
                                     popUpTo("login") { inclusive = true }
-                                }*/
+                                }
                             }.addOnFailureListener { e ->
                                 _emailError.value = e.localizedMessage ?: context.getString(R.string.errorGuardarUsuario)
                             }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -14,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.HomeViewModel
 
@@ -33,7 +35,39 @@ fun HomeScreenPreview() {
         modifier        = Modifier.fillMaxSize()
     )
 }
+@Composable
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
+    // estados
+    val name    by viewModel.name.collectAsState()
+    val address by viewModel.address.collectAsState()
+    val code    by viewModel.code.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
+    // Navegación cuando tenga hogar
+    LaunchedEffect(uiState) {
+        if (uiState is HomeViewModel.UiState.HasHome) {
+            navController.navigate("tasks") {
+                popUpTo("home") { inclusive = true }
+            }
+        }
+    }
+    //llamads ViewModel
+    HomeBody(
+        name           = name,
+        address        = address,
+        code           = code,
+        onNameChange   = viewModel::changeName,
+        onAddressChange= viewModel::changeAdress,
+        onCodeChange   = viewModel::actCode,
+        onCreate       = viewModel::createHome,
+        onJoin         = viewModel::joinHome,
+        modifier       = modifier
+    )
+}
 @Composable
 fun HomeBody(
     name: String,
@@ -79,7 +113,7 @@ fun HomeBody(
                 fontSize = 18.sp) },
             modifier = Modifier.fillMaxWidth()
         )
-
+        //boton de crear
         Button(
             onClick = onCreate,
             enabled = name.isNotBlank(),
@@ -122,28 +156,4 @@ fun HomeBody(
     }
 }
 
-// 2) Wrapper que conecta el ViewModel con la UI
-@Composable
-fun HomeScreen(
-    viewModel: HomeViewModel,
-    modifier: Modifier = Modifier
-) {
-    // 2.1. Recogemos los estados
-    val name    by viewModel.name.collectAsState()
-    val address by viewModel.address.collectAsState()
-    val code    by viewModel.code.collectAsState()
-
-    // 2.2. Llamamos al composable puro con lambdas que invocan al ViewModel
-    HomeBody(
-        name           = name,
-        address        = address,
-        code           = code,
-        onNameChange   = viewModel::changeName,
-        onAddressChange= viewModel::changeAdress,
-        onCodeChange   = viewModel::actCode,
-        onCreate       = viewModel::createHome,
-        onJoin         = viewModel::joinHome,
-        modifier       = modifier
-    )
-}
 

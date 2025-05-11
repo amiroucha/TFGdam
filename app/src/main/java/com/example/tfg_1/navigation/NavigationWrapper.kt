@@ -122,7 +122,7 @@ fun NavigationWrapper() {
                 TasksScreen(viewModel = TasksViewModel(), navController)
             }
             composable(Screens.Home.route) {
-                HomeScreen(viewModel = homeViewModel)
+                HomeScreen(viewModel = homeViewModel, navController)
             }
         }
     }
