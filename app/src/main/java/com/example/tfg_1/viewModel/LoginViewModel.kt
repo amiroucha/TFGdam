@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -223,7 +224,7 @@ class LoginViewModel : ViewModel() {
                         FirebaseFirestore.getInstance()
                             .collection("usuarios")
                             .document(it) // UID en Firebase =  ID del documento de ese user
-                            .set(userMap)
+                            .set(userMap, SetOptions.merge()) //para que se acople pero nome sobreescriba
                             .addOnSuccessListener {
                                 Toast.makeText(context, context.getString(R.string.login_exitoso), Toast.LENGTH_LONG).show()
 

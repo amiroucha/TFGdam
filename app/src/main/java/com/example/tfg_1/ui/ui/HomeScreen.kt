@@ -85,7 +85,7 @@ fun HomeBody(
             enabled = name.isNotBlank(),
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                colorResource(id = R.color.black) ,
+                colorResource(id = R.color.blue),
                 colorResource(id = R.color.black),
                 colorResource(id = R.color.blue), //color de fondo
                 colorResource(id = R.color.black)//color del texto
