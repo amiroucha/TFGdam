@@ -76,7 +76,6 @@ class HomeViewModel : ViewModel(){
                 }
         }
     }
-
     //crear hogar en base datos y asignarlo al usuario
     fun createHome() {
         val homeName = name.value.trim()
