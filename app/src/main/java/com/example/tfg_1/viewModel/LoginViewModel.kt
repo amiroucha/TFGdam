@@ -234,8 +234,10 @@ class LoginViewModel : ViewModel() {
                                     val currentUser = auth.currentUser
                                     val homeId = getHomeId(currentUser)
 
+
                                     // Después de obtener el homeId, realizar la navegación
                                     if (homeId != null) {
+                                        //Toast.makeText(context, homeId, Toast.LENGTH_LONG).show()
                                         // Si tiene un homeId, ir a Tasks
                                         navController.navigate(Screens.Tasks.route) {
                                             popUpTo(Screens.Login.route) { inclusive = true }

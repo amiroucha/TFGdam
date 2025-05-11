@@ -159,15 +159,13 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
             }
             //--------------------------------------------------
 
-            Column(modifier = Modifier.align(Alignment.End).padding(end = 20.dp)) {
 
+
+            Column(modifier = Modifier.align(Alignment.CenterHorizontally)) {
                 LoginButton(viewModel, navController)
 
                 Spacer(modifier = Modifier.padding(16.dp))
                 GoogleButton(viewModel, navController)
-            }
-
-            Column(modifier = Modifier.align(Alignment.CenterHorizontally)) {
                 Spacer(modifier = Modifier.padding(16.dp))
                 Text(
                     text = "¿ No tienes cuenta ?",
