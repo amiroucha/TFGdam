@@ -240,7 +240,38 @@ fun NuevaTareaFormulario(
     )
 }
 
+@Composable
+fun pendientes(viewModel: TasksViewModel) {
+    val tareasPendientes by remember {
+        derivedStateOf { viewModel.tareasPendientes() }
+    }
 
+    LazyColumn {
+        items(tareasPendientes) { tarea ->
+            tareaItem(tarea = tarea) {
+                viewModel.comprobarEstadoTarea(tarea)
+            }
+        }
+    }
+}
+
+
+@Composable
+fun completadas(viewModel: TasksViewModel) {
+    val tareasCompletadas by remember {
+        derivedStateOf { viewModel.tareasCompletadas() }
+    }
+
+    LazyColumn {
+        items(tareasCompletadas) { tarea ->
+            tareaItem(tarea = tarea) {
+                viewModel.comprobarEstadoTarea(tarea)
+            }
+        }
+    }
+}
+
+/*
 @Composable
 fun pendientes(viewModel: TasksViewModel) {
     val tareasPendientes = remember { viewModel.tareasPendientes() }
@@ -265,7 +296,7 @@ fun completadas(viewModel: TasksViewModel) {
             }
         }
     }
-}
+}*/
 @Composable
 fun TasksScreenEntry(navController: NavController) {
     val context = LocalContext.current

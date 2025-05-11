@@ -69,7 +69,7 @@ class TasksViewModel(private val homeId: String): ViewModel()
     fun comprobarEstadoTarea(tarea: TasksModel) {
         val nuevaTarea = tarea.copy(completada = !tarea.completada)
         FirebaseFirestore.getInstance().collection("tareas")
-            .document(tarea.id.toString())
+            .document(tarea.id)
             .set(nuevaTarea)
     }
 
