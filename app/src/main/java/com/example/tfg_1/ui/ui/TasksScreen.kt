@@ -29,22 +29,22 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.model.TasksModel
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.TasksViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Preview(showBackground = true)
 @Composable
 fun TasksScreenPreview() {
     val navController = rememberNavController()
-    val viewModel = TasksViewModel()
+    val viewModel = TasksViewModel("id-prueba-preview")
     TasksScreen(viewModel = viewModel, navController)
 }
 
 @Composable
 fun TasksScreen(viewModel: TasksViewModel, navcontroller : NavController) {
-
     Box(
         Modifier
             .fillMaxSize()
-            //.verticalScroll(rememberScrollState()) da problems con el lazy
             .background(color = colorResource(id = R.color.greyBackground))
     ) {
         TasksBody(Modifier.align(Alignment.Center).padding(10.dp), viewModel ,navcontroller )
@@ -266,4 +266,32 @@ fun completadas(viewModel: TasksViewModel) {
         }
     }
 }
+@Composable
+fun TasksScreenEntry(navController: NavController) {
+    val context = LocalContext.current
+    var viewModel by remember { mutableStateOf<TasksViewModel?>(null) }
 
+    LaunchedEffect(Unit) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            FirebaseFirestore.getInstance().collection("usuarios")
+                .document(currentUser.uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    val homeId = document.getString("homeId")
+                    if (!homeId.isNullOrEmpty()) {
+                        viewModel = TasksViewModel(homeId)
+                    }
+                }
+        }
+    }
+
+    viewModel?.let {
+        TasksScreen(viewModel = it, navcontroller = navController)
+    } ?: run {
+        // puedes mostrar un loader o mensaje de error
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    }
+}

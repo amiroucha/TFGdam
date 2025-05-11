@@ -9,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,6 +56,8 @@ fun HomeScreen(
             }
         }
     }
+    // Obtener el contexto
+    val context = LocalContext.current
     //llamads ViewModel
     HomeBody(
         name           = name,
@@ -64,7 +67,7 @@ fun HomeScreen(
         onAddressChange= viewModel::changeAdress,
         onCodeChange   = viewModel::actCode,
         onCreate       = viewModel::createHome,
-        onJoin         = viewModel::joinHome,
+        onJoin         = { viewModel.joinHome(context) },
         modifier       = modifier
     )
 }

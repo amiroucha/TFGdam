@@ -1,5 +1,6 @@
 package com.example.tfg_1.viewModel
 
+import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -101,7 +102,7 @@ class HomeViewModel : ViewModel(){
     }
 
     // unir a un hogar existente por un codigo
-    fun joinHome() {
+    fun joinHome(context: Context) {
         val codeVal = code.value.trim()
         if (codeVal.isEmpty()) return //si esta en blanco no me sirve
 
@@ -113,7 +114,7 @@ class HomeViewModel : ViewModel(){
                     updateUserHome(codeVal)  //se asocia al usuario
                 } else { //no se encuentra un higar con ese cod
                     _uiState.value = UiState.Error("Código de hogar inválido")
-
+                    Toast.makeText(context, "Código de hogar inválido", Toast.LENGTH_LONG).show()
                 }
             }
             .addOnFailureListener {
