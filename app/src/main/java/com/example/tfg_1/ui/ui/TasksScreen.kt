@@ -66,7 +66,8 @@ fun TasksScreen(viewModel: TasksViewModel, navcontroller : NavController) {
                 save = {titulo, fecha, asignadoA ->
                     viewModel.agregarTarea(titulo, fecha, asignadoA)
                     showDialog = false
-                }
+                },
+                usuarios = viewModel.usuarios
             )
 
 
@@ -179,13 +180,102 @@ fun tareaItem(tarea: TasksModel, modificarCompletada: (TasksModel) -> Unit) {
 //le paso 2 funciones: cuando se cancela - para los datos
 @Composable
 fun NuevaTareaFormulario(
+    dismiss: () -> Unit,
+    save: (String, String, String) -> Unit,
+    usuarios: List<String>
+) {
+    val context = LocalContext.current
+    var titulo by remember { mutableStateOf("") }
+    var fecha by remember { mutableStateOf("") }
+    var asignadoA by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = { dismiss() },
+        title = { Text(stringResource(R.string.nuevaTarea)) },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = titulo,
+                    onValueChange = { titulo = it },
+                    label = { Text(stringResource(R.string.titulo)) },
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = fecha,
+                    onValueChange = { fecha = it },
+                    label = { Text(stringResource(R.string.fechaMax)) },
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = asignadoA,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(stringResource(R.string.asignadoA_)) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier.menuAnchor()
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        usuarios.forEach { usuario ->
+                            DropdownMenuItem(
+                                text = { Text(usuario) },
+                                onClick = {
+                                    asignadoA = usuario
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (titulo.isNotBlank() && fecha.isNotBlank() && asignadoA.isNotBlank()) {
+                        save(titulo, fecha, asignadoA)
+                    } else {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.completaTodosCampos),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            ) {
+                Text(stringResource(R.string.guardar))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { dismiss() }) {
+                Text(stringResource(R.string.cancelar))
+            }
+        }
+    )
+}
+
+/*@Composable
+fun NuevaTareaFormulario(
     dismiss: ()-> Unit,
     save: (String, String, String) -> Unit,
+    usuarios: List<String>
 ){
     val context = LocalContext.current
     var titulo by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
     var asignadoA by remember { mutableStateOf("")}
+    var expanded by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = { dismiss() },
@@ -239,7 +329,7 @@ fun NuevaTareaFormulario(
         }
     )
 }
-
+*/
 @Composable
 fun pendientes(viewModel: TasksViewModel) {
     val tareasPendientes by remember {

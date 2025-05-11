@@ -14,9 +14,13 @@ class TasksViewModel(private val homeId: String): ViewModel()
     private val _tareasList = mutableStateListOf<TasksModel>()
     val tareasList: List<TasksModel> = _tareasList
 
+    private val _usuarios = mutableStateListOf<String>()
+    val usuarios: List<String> get() = _usuarios
 
     init {
         cargarTareasDesdeFirebase()
+        cargarUsuariosDesdeFirebase()
+
     }
 
     private fun cargarTareasDesdeFirebase() {
@@ -49,6 +53,26 @@ class TasksViewModel(private val homeId: String): ViewModel()
             }
     }
 
+    private fun cargarUsuariosDesdeFirebase() {
+        FirebaseFirestore.getInstance().collection("usuarios")
+            .whereEqualTo("homeId", homeId) //usuarios de ese = hogar
+            .addSnapshotListener { snapshot, exception ->
+                if (exception != null) {
+                    Log.e("TasksViewModel", "Error al cargar usuarios: ${exception.message}")
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    _usuarios.clear()
+                    for (doc in snapshot.documents) {
+                        val nombreUsuario = doc.getString("name")
+                        if (!nombreUsuario.isNullOrBlank()) {
+                            _usuarios.add(nombreUsuario)
+                        }
+                    }
+                }
+            }
+    }
 
     fun agregarTarea(titulo: String, fecha: String, asignadoA: String) {
         val nuevaTarea = TasksModel(
@@ -78,42 +102,4 @@ class TasksViewModel(private val homeId: String): ViewModel()
 
     fun tareasCompletadas(): List<TasksModel> =
         tareasList.filter { it.completada }
-
-    //funcion para añadir la tarea en la lista
-    /*  fun agregarTarea(titulo: String, fecha: String, asignadoA: String) {
-           val nuevaTarea = TasksModel(
-               id = if (_tareasList.isEmpty()) 1 else _tareasList.maxOf { it.id } + 1,
-               titulo = titulo,
-               fecha = fecha,
-               asignadoA = asignadoA,
-               completada = false,
-               homeId = homeId  //se usa para filtrar y cargar tareas
-          )
-          _tareasList.add(nuevaTarea)
-
-      }*/
-
-    /*
-    //cambiar el valor de hecho o no
-    fun comprobarEstadoTarea(tarea: TasksModel) {
-        val index = _tareasList.indexOfFirst { it.id == tarea.id }
-        if (index != -1) {
-            _tareasList[index] = tarea.copy(completada = !tarea.completada)
-        }
-    }
-    //crea una lista que cumplan con x condicion
-    fun tareasPendientes(): List<TasksModel> {
-        val tareas = tareasList.filter { !it.completada && it.homeId == homeIdActual}
-        if (tareas.isEmpty()) {
-            Log.d("TasksViewModel", "No hay tareas pendientes")
-        }
-        return tareas
-    }
-    fun tareasCompletadas(): List<TasksModel> {
-        val tareas = tareasList.filter { it.completada && it.homeId == homeIdActual }
-        if (tareas.isEmpty()) {
-            Log.d("TasksViewModel", "No hay tareas completadas")
-        }
-        return tareas
-    }*/
 }

@@ -214,9 +214,13 @@ class LoginViewModel : ViewModel() {
                     val user = auth.currentUser
                     val userUid = user?.uid
                     val userEmail = user?.email
+                    val userName = user?.displayName//extraigo el nombre del usuario
+
+
                     val userMap = hashMapOf(
                         "email" to (userEmail ?: ""),
                         "uid" to userUid,
+                        "name" to (userName ?: "")
                     )
 
                     // Guardar los datos del usuario en la base de datos
