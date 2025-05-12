@@ -1,14 +1,15 @@
 package com.example.tfg_1.navigation
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.navigation.NavHostController
@@ -17,6 +18,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tfg_1.R
 import com.example.tfg_1.ui.ui.*
@@ -24,6 +27,9 @@ import com.example.tfg_1.viewModel.HomeViewModel
 import com.example.tfg_1.viewModel.LoginViewModel
 import com.example.tfg_1.viewModel.RegisterViewModel
 import com.example.tfg_1.viewModel.TasksViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,60 +73,84 @@ fun NavigationWrapper() {
         }
     }
 
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = { DrawerContent(homeViewModel) }
+    ) {
+        Scaffold(
+            topBar = {
+                if (showTopBar) {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = when (currentRoute) { //texto del titulo de la pagina
+                                    Screens.Register.route -> ""
+                                    Screens.Tasks.route -> stringResource(R.string.tasks)
+                                    else -> ""
+                                }
+                            )
+                        },
+                        navigationIcon = {
+                            if (currentRoute == Screens.Register.route) { //en el registro debe aparecer la flecha hacia atras
+                                IconButton(onClick = { navController.popBackStack() }) {
+                                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.atras))
+                                }
+                            }else if (currentRoute == Screens.Tasks.route) {
+                                IconButton(onClick = {
+                                    scope.launch { drawerState.open() }
+                                }) {
+                                    Icon(Icons.Default.Menu, contentDescription = "Menu")
+                                }
+                            }
+                        },actions = {
+                            if (currentRoute == Screens.Tasks.route) {
+                                IconButton(onClick = {
+                                    //loginViewModel.logout()
+                                    navController.navigate(Screens.Login.route) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
+                                }) {
+                                    Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
+                                }
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = colorResource(id = R.color.greyBackground),
+                            titleContentColor = colorResource(id = R.color.black),
+                            navigationIconContentColor = colorResource(id = R.color.black),
+                            actionIconContentColor = colorResource(id = R.color.white)
+                        ),
+                    )
+                }
+            },
+            bottomBar = {
+                if (showBottomBar) {
+                    BottomBar(navController)
+                }
+            },
 
-    Scaffold(
-        topBar = {
-            if (showTopBar) {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = when (currentRoute) { //texto del titulo de la pagina
-                                Screens.Register.route -> ""
-                                Screens.Tasks.route -> stringResource(R.string.tasks)
-                                else -> ""
-                            }
-                        )
-                    },
-                    navigationIcon = {
-                        if (currentRoute == Screens.Register.route) { //en el registro debe aparecer la flecha hacia atras
-                            IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.atras))
-                            }
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorResource(id = R.color.greyBackground),
-                        titleContentColor = colorResource(id = R.color.black),
-                        navigationIconContentColor = colorResource(id = R.color.black),
-                        actionIconContentColor = colorResource(id = R.color.white)
-                    ),
-                )
-            }
-        },
-        bottomBar = {
-            if (showBottomBar) {
-                BottomBar(navController)
-            }
-        }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screens.Login.route,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(Screens.Login.route) {
-                LoginScreen(viewModel = loginViewModel, navController)
-            }
-            composable(Screens.Register.route) {
-                RegisterScreen(viewModel = RegisterViewModel(navController))
-            }
-            composable(Screens.Tasks.route) {
-                //TasksScreen(viewModel = TasksViewModel(), navController)
-                TasksScreenEntry(navController)
-            }
-            composable(Screens.Home.route) {
-                HomeScreen(viewModel = homeViewModel, navController)
+            ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = Screens.Login.route,
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                composable(Screens.Login.route) {
+                    LoginScreen(viewModel = loginViewModel, navController)
+                }
+                composable(Screens.Register.route) {
+                    RegisterScreen(viewModel = RegisterViewModel(navController))
+                }
+                composable(Screens.Tasks.route) {
+                    //TasksScreen(viewModel = TasksViewModel(), navController)
+                    TasksScreenEntry(navController)
+                }
+                composable(Screens.Home.route) {
+                    HomeScreen(viewModel = homeViewModel, navController)
+                }
             }
         }
     }
@@ -137,6 +167,43 @@ fun BottomBar(navController: NavHostController) {
         )
     }
 }
+@Composable
+fun DrawerContent(homeViewModel: HomeViewModel) {
+    var userName by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            FirebaseFirestore.getInstance()
+                .collection("usuarios")
+                .document(uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    userName = document.getString("name") ?: ""
+                }
+        }
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(30.dp))
+        // Encabezado con el nombre del usuario
+        Text(
+            text = "Hola, $userName",
+            fontSize = 30.sp,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        // Lista de secciones
+        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+
+        }
+    }
+}
+
 /*
 @Composable
 fun TopBar(navcontroller: NavController)
