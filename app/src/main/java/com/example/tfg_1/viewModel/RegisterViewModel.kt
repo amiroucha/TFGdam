@@ -176,7 +176,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
                                _navController.navigate("home") {
                                     popUpTo("register") { inclusive = true }
                                     popUpTo("login") { inclusive = true }
-                                }
+                               }
                             }.addOnFailureListener { e ->
                                 _emailError.value = e.localizedMessage ?: context.getString(R.string.errorGuardarUsuario)
                             }

@@ -11,6 +11,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -48,6 +50,12 @@ fun NavigationWrapper() {
     val showTopBar = currentRoute == Screens.Register.route || currentRoute == Screens.Tasks.route
     val showBottomBar = currentRoute == Screens.Tasks.route
 
+    //drawer
+    //pantallas en las que no quiero que se vea el drawer
+    val drawerEnabled = currentRoute != Screens.Login.route ||  currentRoute != Screens.Register.route || currentRoute != Screens.Home.route// Puedes agregar más rutas aquí
+
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
     LaunchedEffect(authState) {
         // Cuando el estado de autenticación cambie, verificar el homeId
         if (authState is LoginViewModel.AuthState.Authenticated) {
@@ -73,13 +81,7 @@ fun NavigationWrapper() {
         }
     }
 
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = { DrawerContent(homeViewModel) }
-    ) {
+    val contentScaffold: @Composable () -> Unit = {
         Scaffold(
             topBar = {
                 if (showTopBar) {
@@ -154,6 +156,21 @@ fun NavigationWrapper() {
             }
         }
     }
+
+    if (drawerEnabled) {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = { DrawerContent(homeViewModel) },
+            scrimColor = colorResource(id = R.color.blue), // Fondo del Drawer
+            gesturesEnabled = false // swipe desde el borde
+
+        ) {
+            contentScaffold()
+        }
+    }else
+    {
+        contentScaffold()
+    }
 }
 
 @Composable
@@ -170,6 +187,9 @@ fun BottomBar(navController: NavHostController) {
 @Composable
 fun DrawerContent(homeViewModel: HomeViewModel) {
     var userName by remember { mutableStateOf("") }
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val drawerWidth = screenWidth * 0.8f
 
     LaunchedEffect(Unit) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -185,6 +205,7 @@ fun DrawerContent(homeViewModel: HomeViewModel) {
     }
     Column(
         modifier = Modifier
+            .width(drawerWidth) // ocupa solo el 80 ancho de pantalla
             .fillMaxSize()
             .padding(16.dp)
     ) {
