@@ -1,7 +1,9 @@
 package com.example.tfg_1.navigation
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
@@ -11,9 +13,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -62,7 +66,7 @@ fun NavigationWrapper() {
             homeViewModel.loadUser()
 
             // Aquí observamos el estado del home y navegamos según corresponda
-            when (val state = homeViewModel.uiState.value) {
+            when (homeViewModel.uiState.value) {
                 is HomeViewModel.UiState.HasHome -> {
                     // Si tiene un hogar, redirigir a Tasks
                     navController.navigate(Screens.Tasks.route) {
@@ -89,7 +93,7 @@ fun NavigationWrapper() {
                         title = {
                             Text(
                                 text = when (currentRoute) { //texto del titulo de la pagina
-                                    Screens.Register.route -> ""
+                                    Screens.Register.route , Screens.Login.route -> stringResource(R.string.app)
                                     Screens.Tasks.route -> stringResource(R.string.tasks)
                                     else -> ""
                                 }
@@ -98,7 +102,8 @@ fun NavigationWrapper() {
                         navigationIcon = {
                             if (currentRoute == Screens.Register.route) { //en el registro debe aparecer la flecha hacia atras
                                 IconButton(onClick = { navController.popBackStack() }) {
-                                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.atras))
+                                    Icon(Icons.Default.ArrowBack,
+                                        contentDescription = stringResource(R.string.atras))
                                 }
                             }else if (currentRoute == Screens.Tasks.route) {
                                 IconButton(onClick = {
@@ -108,6 +113,17 @@ fun NavigationWrapper() {
                                 }
                             }
                         },actions = {
+                            if (currentRoute == Screens.Register.route || currentRoute == Screens.Login.route) { //texto del titulo de la pagina
+                                Image(
+                                    painter = painterResource(id= R.drawable.logotfg),
+                                    contentDescription = "Hogar",
+                                    modifier = Modifier
+                                        .padding(5.dp)
+                                        .size(40.dp)
+                                        .clip(CircleShape)
+                                    // .border(7.dp, color = Color.Black)
+                                )
+                            }
                             if (currentRoute == Screens.Tasks.route) {
                                 IconButton(onClick = {
                                     //loginViewModel.logout()

@@ -45,5 +45,6 @@
     <string name="asignadoA.">Asignado a...</string>
     <string name="completaTodosCampos">Por favor, completa todos los campos.</string>
     <string name="cancelar">Cancelar</string>
+    <string name="inicio_de_sesion">Inicio de sesión</string>
 
 </resources>

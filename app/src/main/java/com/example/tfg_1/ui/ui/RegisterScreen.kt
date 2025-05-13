@@ -78,13 +78,14 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
             CircularProgressIndicator(Modifier.align(Alignment.Center))
         }
     }else{
+        val scrollState = rememberScrollState()
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .padding(top = 16.dp)
         ) {
-            Box(modifier = Modifier
+            /*Box(modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .fillMaxWidth()
                 .padding(top = 5.dp, bottom = 16.dp, end = 16.dp, start = 16.dp)
@@ -104,7 +105,7 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
 
                     LogoHeaderReg(Modifier) // Ajusta el tamaño del logo según sea necesario
                 }
-            }
+            }*/
             TituloRegister(Modifier.align(Alignment.CenterHorizontally))
 
             nameFieldReg(name = name, error = nameError){ viewModel.onLoginChanges(email, passwordR, password2, it) }
