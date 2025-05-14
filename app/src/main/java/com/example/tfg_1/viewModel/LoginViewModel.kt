@@ -269,6 +269,12 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
+    fun logout() {
+        auth.signOut() // cierra sesión en Firebase
+        _email.value = ""
+        _password.value = ""
+        _authState.value = AuthState.Unauthenticated
+    }
 
 
     sealed class AuthState {

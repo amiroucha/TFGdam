@@ -1,7 +1,6 @@
 package com.example.tfg_1.navigation
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -14,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -27,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.tfg_1.R
 import com.example.tfg_1.ui.ui.*
 import com.example.tfg_1.viewModel.HomeViewModel
@@ -51,7 +50,7 @@ fun NavigationWrapper() {
     val currentRoute = currentBackStack?.destination?.route //ruta completa de la pantalla donde estoy
 
     //para que pantalla se va a ver cada barra
-    val showTopBar = currentRoute == Screens.Register.route || currentRoute == Screens.Tasks.route
+    val showTopBar = currentRoute != Screens.Home.route //|| currentRoute == Screens.Tasks.route
     val showBottomBar = currentRoute == Screens.Tasks.route
 
     //drawer
@@ -60,6 +59,7 @@ fun NavigationWrapper() {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    //para cuando se elija opcion en home
     LaunchedEffect(authState) {
         // Cuando el estado de autenticación cambie, verificar el homeId
         if (authState is LoginViewModel.AuthState.Authenticated) {
@@ -93,7 +93,7 @@ fun NavigationWrapper() {
                         title = {
                             Text(
                                 text = when (currentRoute) { //texto del titulo de la pagina
-                                    Screens.Register.route , Screens.Login.route -> stringResource(R.string.app)
+                                    //Screens.Register.route , Screens.Login.route -> stringResource(R.string.app)
                                     Screens.Tasks.route -> stringResource(R.string.tasks)
                                     else -> ""
                                 }
@@ -113,20 +113,22 @@ fun NavigationWrapper() {
                                 }
                             }
                         },actions = {
+                            //logo de mi app
                             if (currentRoute == Screens.Register.route || currentRoute == Screens.Login.route) { //texto del titulo de la pagina
                                 Image(
                                     painter = painterResource(id= R.drawable.logotfg),
                                     contentDescription = "Hogar",
                                     modifier = Modifier
                                         .padding(5.dp)
-                                        .size(40.dp)
+                                        .size(50.dp)
                                         .clip(CircleShape)
                                     // .border(7.dp, color = Color.Black)
                                 )
                             }
+                            //para mostrar cerrar sesion
                             if (currentRoute == Screens.Tasks.route) {
                                 IconButton(onClick = {
-                                    //loginViewModel.logout()
+                                    loginViewModel.logout()
                                     navController.navigate(Screens.Login.route) {
                                         popUpTo(0) { inclusive = true }
                                     }
@@ -153,9 +155,12 @@ fun NavigationWrapper() {
             ) { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = Screens.Login.route,
+                startDestination = Screens.Splash.route,
                 modifier = Modifier.padding(innerPadding)
             ) {
+                composable(Screens.Splash.route) {
+                    SplashScreen(navController = navController, loginViewModel = loginViewModel)
+                }
                 composable(Screens.Login.route) {
                     LoginScreen(viewModel = loginViewModel, navController)
                 }
@@ -176,7 +181,7 @@ fun NavigationWrapper() {
     if (drawerEnabled) {
         ModalNavigationDrawer(
             drawerState = drawerState,
-            drawerContent = { DrawerContent(homeViewModel) },
+            drawerContent = { DrawerContent() },
             scrimColor = colorResource(id = R.color.blue), // Fondo del Drawer
             gesturesEnabled = false // swipe desde el borde
 
@@ -188,6 +193,28 @@ fun NavigationWrapper() {
         contentScaffold()
     }
 }
+//mantener la sesion inciada
+@Composable
+fun SplashScreen(navController: NavController, loginViewModel: LoginViewModel) {
+    val authState by loginViewModel.authState.collectAsState()
+
+    LaunchedEffect(authState) {//escucha el estado de usuario
+        when (authState) {
+            is LoginViewModel.AuthState.Authenticated -> {
+                navController.navigate(Screens.Tasks.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+            is LoginViewModel.AuthState.Unauthenticated -> {
+                navController.navigate(Screens.Login.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+            else -> {}
+        }
+    }
+}
+
 
 @Composable
 fun BottomBar(navController: NavHostController) {
@@ -201,7 +228,7 @@ fun BottomBar(navController: NavHostController) {
     }
 }
 @Composable
-fun DrawerContent(homeViewModel: HomeViewModel) {
+fun DrawerContent() {
     var userName by remember { mutableStateOf("") }
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -240,19 +267,3 @@ fun DrawerContent(homeViewModel: HomeViewModel) {
         }
     }
 }
-
-/*
-@Composable
-fun TopBar(navcontroller: NavController)
-{
-    Icon(imageVector = Icons.Default.ArrowBack,
-        contentDescription = "Back",
-        modifier = Modifier
-            .clickable{
-                navcontroller.popBackStack()
-            }
-            .padding(top = 40.dp, start = 10.dp)
-            .size(34.dp)
-    )
-
-}*/

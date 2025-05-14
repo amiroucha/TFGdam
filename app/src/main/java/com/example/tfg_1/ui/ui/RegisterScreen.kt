@@ -82,13 +82,14 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
         Column(
             modifier = modifier
                 .fillMaxSize()
+
                 .verticalScroll(scrollState)
                 .padding(top = 16.dp)
         ) {
-            /*Box(modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .fillMaxWidth()
-                .padding(top = 5.dp, bottom = 16.dp, end = 16.dp, start = 16.dp)
+            Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 5.dp, bottom = 16.dp, end = 16.dp, start = 16.dp),
+                contentAlignment = Alignment.Center
             )
             {
                 Row(
@@ -97,15 +98,15 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
                 ) {
                     Text(
                         text = stringResource(R.string.app),
-                        modifier = Modifier.padding(start = 8.dp, end = 15.dp), // Espaciado a la izquierda
+                        modifier = Modifier.align(Alignment.CenterVertically), // Espaciado a la izquierda
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1
                     )
 
-                    LogoHeaderReg(Modifier) // Ajusta el tamaño del logo según sea necesario
+                   // LogoHeaderReg(Modifier) // Ajusta el tamaño del logo según sea necesario
                 }
-            }*/
+            }
             TituloRegister(Modifier.align(Alignment.CenterHorizontally))
 
             nameFieldReg(name = name, error = nameError){ viewModel.onLoginChanges(email, passwordR, password2, it) }

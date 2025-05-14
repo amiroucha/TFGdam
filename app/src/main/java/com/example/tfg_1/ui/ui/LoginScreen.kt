@@ -79,26 +79,26 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
                 .padding(top = 50.dp)
         ) {
 
-            /*Box(
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = stringResource(R.string.app),
-                        modifier = Modifier.padding(start = 8.dp, end = 15.dp),
+                       // modifier = Modifier.padding(start = 8.dp, end = 15.dp),
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1
                     )
-                    LogoHeader(Modifier)
+                   // LogoHeader(Modifier)
                 }
-            }*/
+            }
 
             TituloLogin(Modifier.align(Alignment.CenterHorizontally))
 
