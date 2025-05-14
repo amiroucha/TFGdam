@@ -1,5 +1,7 @@
 package com.example.tfg_1.navigation
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -8,11 +10,12 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -31,7 +34,6 @@ import com.example.tfg_1.ui.ui.*
 import com.example.tfg_1.viewModel.HomeViewModel
 import com.example.tfg_1.viewModel.LoginViewModel
 import com.example.tfg_1.viewModel.RegisterViewModel
-import com.example.tfg_1.viewModel.TasksViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -55,7 +57,7 @@ fun NavigationWrapper() {
 
     //drawer
     //pantallas en las que no quiero que se vea el drawer
-    val drawerEnabled = currentRoute != Screens.Login.route ||  currentRoute != Screens.Register.route || currentRoute != Screens.Home.route// Puedes agregar más rutas aquí
+    val drawerEnabled = currentRoute != Screens.Login.route &&  currentRoute != Screens.Register.route && currentRoute != Screens.Home.route// Puedes agregar más rutas aquí
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -105,7 +107,7 @@ fun NavigationWrapper() {
                                     Icon(Icons.Default.ArrowBack,
                                         contentDescription = stringResource(R.string.atras))
                                 }
-                            }else if (currentRoute == Screens.Tasks.route) {
+                            }else if (currentRoute != Screens.Home.route && currentRoute != Screens.Login.route && currentRoute != Screens.Register.route) {
                                 IconButton(onClick = {
                                     scope.launch { drawerState.open() }
                                 }) {
@@ -177,14 +179,13 @@ fun NavigationWrapper() {
             }
         }
     }
-
+//Veo que paginas van a ver el drawer
     if (drawerEnabled) {
         ModalNavigationDrawer(
             drawerState = drawerState,
-            drawerContent = { DrawerContent() },
+            drawerContent = { DrawerContent(navController) },
             scrimColor = colorResource(id = R.color.blue), // Fondo del Drawer
-            gesturesEnabled = false // swipe desde el borde
-
+            gesturesEnabled = true // swipe desde el borde
         ) {
             contentScaffold()
         }
@@ -228,11 +229,11 @@ fun BottomBar(navController: NavHostController) {
     }
 }
 @Composable
-fun DrawerContent() {
+fun DrawerContent(navController: NavController) {
     var userName by remember { mutableStateOf("") }
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    val drawerWidth = screenWidth * 0.8f
+    val drawerWidth = screenWidth * 0.7f
 
     LaunchedEffect(Unit) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -248,22 +249,65 @@ fun DrawerContent() {
     }
     Column(
         modifier = Modifier
-            .width(drawerWidth) // ocupa solo el 80 ancho de pantalla
+            .width(drawerWidth) //ocupa solo el 80 ancho de pantalla
             .fillMaxSize()
             .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.height(30.dp))
         // Encabezado con el nombre del usuario
         Text(
-            text = "Hola, $userName",
+            text = userName,
             fontSize = 30.sp,
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp, top = 20.dp)
+        )
+        //cambiar por avatar
+        Image(
+            painter = painterResource(id= R.drawable.logotfg),
+            contentDescription = "Hogar",
+            modifier = Modifier
+                .padding(5.dp)
+                .size(50.dp)
+                .clip(CircleShape)
         )
 
-        // Lista de secciones
-        Column(modifier = Modifier.padding(vertical = 8.dp)) {
-
+        Canvas(modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)) {
+            drawLine(
+                color = Color.Black,
+                start = Offset(0f, 0f),
+                end = Offset(size.width, 0f),
+                strokeWidth = 1f
+            )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text("Section 1", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
+        NavigationDrawerItem(
+            label = { Text("Settings") },
+            selected = false,
+            icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+            //badge = { Text("Settings") }, // Placeholder
+            onClick = {
+                navController.navigate(Screens.Tasks.route) {
+                    // Eliminamos Login de la pila de navegación
+                    popUpTo(Screens.Login.route) { inclusive = true }
+                }
+            }
+        )
+        Spacer(Modifier.height(12.dp))
+        NavigationDrawerItem(
+            label = { Text("LogOut") },
+            selected = false,
+            icon = {Icon(Icons.Default.ExitToApp, contentDescription = "Logout")},
+            onClick = { navController.navigate(Screens.Tasks.route) {
+                // Eliminamos Login de la pila de navegación
+                popUpTo(Screens.Login.route) { inclusive = true }
+            } },
+        )
+        Spacer(Modifier.height(12.dp))
     }
 }
+
