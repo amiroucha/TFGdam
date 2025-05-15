@@ -128,7 +128,7 @@ fun NavigationWrapper() {
                                 )
                             }
                             //para mostrar cerrar sesion
-                            if (currentRoute == Screens.Tasks.route) {
+                            /*if (currentRoute == Screens.Tasks.route) {
                                 IconButton(onClick = {
                                     loginViewModel.logout()
                                     navController.navigate(Screens.Login.route) {
@@ -137,7 +137,7 @@ fun NavigationWrapper() {
                                 }) {
                                     Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
                                 }
-                            }
+                            }*/
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
                             containerColor = colorResource(id = R.color.greyBackground),
