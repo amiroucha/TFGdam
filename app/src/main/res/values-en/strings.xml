@@ -53,7 +53,7 @@
     <string name="codigoHogarExistente">Existing home code</string>
     <string name="unirmehogar">Join home</string>
     <string name="errorlogin">Login error</string>
-    <string name="no_tienes_cuenta">Don't have an account?</string>
+    <string name="no_tienes_cuenta">Dont have an account?</string>
     <string name="iniciarSesion">Log in</string>
     <string name="olvidasteContraseña">Forgot your password?</string>
     <string name="recuperarContra">Recover password</string>
