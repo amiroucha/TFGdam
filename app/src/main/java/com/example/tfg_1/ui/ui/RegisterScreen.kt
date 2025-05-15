@@ -3,7 +3,6 @@ package com.example.tfg_1.ui.ui
 import android.annotation.SuppressLint
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -12,11 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -34,7 +31,7 @@ import androidx.compose.ui.res.stringResource
 
 @Preview(showBackground = true)
 @Composable
-fun registerScreenPreview() {
+fun RegisterScreenPreview() {
     val navController = rememberNavController()
     val viewModel = RegisterViewModel(navController)
     RegisterScreen(viewModel = viewModel/*, navController*/)
@@ -109,7 +106,7 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
             }
             TituloRegister(Modifier.align(Alignment.CenterHorizontally))
 
-            nameFieldReg(name = name, error = nameError){ viewModel.onLoginChanges(email, passwordR, password2, it) }
+            NameFieldReg(name = name, error = nameError){ viewModel.onLoginChanges(email, passwordR, password2, it) }
 
             Spacer(modifier = Modifier.padding(5.dp))
             EmailFieldReg(email, error = emailError) { viewModel.onLoginChanges(it, passwordR, password2, name) }
@@ -144,7 +141,7 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
     }
 }
 //Imagen Logo------------------------------------------------
-@Composable
+/*@Composable
 fun LogoHeaderReg(modifier:Modifier)
 {
         Image(
@@ -157,7 +154,7 @@ fun LogoHeaderReg(modifier:Modifier)
             // .border(7.dp, color = Color.Black)
         )
 
-}
+}*/
 
 //Titulo---------------------------------------------
 @Composable
@@ -171,7 +168,7 @@ fun TituloRegister(modifier:Modifier){
 }
 //nombre ----------------------------------------------------------------
 @Composable
-fun nameFieldReg(name: String,error: String?, onTextFieldChanged: (String) -> Unit) {
+fun NameFieldReg(name: String, error: String?, onTextFieldChanged: (String) -> Unit) {
     Column (modifier = Modifier.padding(top = 5.dp, bottom=1.dp, end = 20.dp, start = 20.dp )) {
         TextField(
             value = name,

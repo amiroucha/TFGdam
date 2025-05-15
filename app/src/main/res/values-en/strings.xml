@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">tfg_1</string>
+    <string name="app">FLOWHOME</string>
+    <string name="vacio"> </string>
+    <string name="aceptar">Accept</string>
+    <string name="guardar">Save</string>
+    <!--Login ................................................................-->
+    <string name="login_exitoso">…Login successful…</string>
+    <string name="error_login_google">Error logging in with Google</string>
+    <string name="RecuperaContrasenia">Password recovery</string>
+    <!--Google................................................................-->
+    <string name="idWeb">
+        725600754180-7311aaq26n083lavdnoti4b5ccl6bvl0.apps.googleusercontent.com
+    </string>
+
+    <!--Registro ................................................................-->
+    <string name="camposIncompletos">Please fill in all fields</string>
+    <string name="hogar">Home</string>
+    <string name="registro">REGISTER</string>
+    <string name="email">Email</string>
+    <string name="contraseña">Password</string>
+    <string name="mostrarContraseña">Show password</string>
+    <string name="repetirContraseña">Repeat your password</string>
+    <string name="fechanacimiento">Date of birth</string>
+    <string name="seleccionaFecha">Select date</string>
+    <string name="registrarseBtn">Register</string>
+    <!--Base de datos Registro .........-->
+    <!--<string name="emailBD">email</string>
+    <string name="fechaNacimientoBD">dateOfBirth</string>
+    <string name="hogarIdBD">homeId</string>-->
+    <string name="errorGuardarUsuario">Error saving user</string>
+    <string name="erroRegistrar">Error registering</string>
+    <string name="nombre">Username</string>
+
+    <!--Tareas ................................................................-->
+    <string name="tasks">Tasks</string>
+    <string name="atras">Back</string>
+    <string name="pendientes">Pending</string>
+    <string name="completadas">Completed</string>
+    <string name="nuevaTarea">New task</string>
+    <string name="titulo">Title</string>
+    <string name="fechaMax">Deadline (dd/mm/yyyy)</string>
+    <string name="asignadoA.">Assigned to…</string>
+    <string name="completaTodosCampos">Please complete all fields.</string>
+    <string name="cancelar">Cancel</string>
+    <string name="inicio_de_sesion">Login</string>
+
+    <!--Settings................................................................-->
+    <string name="settings">Settings</string>
+    <string name="cerrarSesion">LogOut</string>
+</resources>

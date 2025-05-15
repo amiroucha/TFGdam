@@ -26,9 +26,9 @@
     <string name="seleccionaFecha">Seleccionar fecha</string>
     <string name="registrarseBtn">Registrarse</string>
     <!--Base de datos Registro .........-->
-    <string name="emailBD">email</string>
+    <!--<string name="emailBD">email</string>
     <string name="fechaNacimientoBD">fechaNacimiento</string>
-    <string name="hogarIdBD">hogarId</string>
+    <string name="hogarIdBD">hogarId</string>-->
     <string name="errorGuardarUsuario">Error al guardar usuario</string>
     <string name="erroRegistrar">Error al registrar</string>
     <string name="nombre">Nombre de usuario</string>
@@ -42,7 +42,7 @@
     <string name="nuevaTarea">Nueva tarea</string>
     <string name="titulo">Título</string>
     <string name="fechaMax">Fecha límite (dd/mm/aaaa)</string>
-    <string name="asignadoA.">Asignado a...</string>
+    <string name="asignadoA.">Asignado a…</string>
     <string name="completaTodosCampos">Por favor, completa todos los campos.</string>
     <string name="cancelar">Cancelar</string>
     <string name="inicio_de_sesion">Inicio de sesión</string>
@@ -50,4 +50,14 @@
 
     <!--Settings................................................................-->
     <string name="settings">Configuración</string>
+
+
+
+
+    <!--navigation................................................................-->
+    <string name="cerrarSesion">Cerrar Sesión</string>
+
+
+
+
 </resources>

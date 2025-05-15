@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.tfg_1.R
-import com.example.tfg_1.navigation.Screens
 import com.example.tfg_1.viewModel.SettingsViewModel
 
 @Composable

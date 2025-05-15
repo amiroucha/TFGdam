@@ -120,7 +120,7 @@ fun NavigationWrapper() {
                             }
                         },actions = {
                             //logo de mi app
-                            if (currentRoute == Screens.Register.route || currentRoute == Screens.Login.route) { //texto del titulo de la pagina
+                            //if (currentRoute == Screens.Register.route || currentRoute == Screens.Login.route) { //texto del titulo de la pagina
                                 Image(
                                     painter = painterResource(id= R.drawable.logotfg),
                                     contentDescription = "Hogar",
@@ -130,18 +130,7 @@ fun NavigationWrapper() {
                                         .clip(CircleShape)
                                     // .border(7.dp, color = Color.Black)
                                 )
-                            }
-                            //para mostrar cerrar sesion
-                            /*if (currentRoute == Screens.Tasks.route) {
-                                IconButton(onClick = {
-                                    loginViewModel.logout()
-                                    navController.navigate(Screens.Login.route) {
-                                        popUpTo(0) { inclusive = true }
-                                    }
-                                }) {
-                                    Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
-                                }
-                            }*/
+                            //}
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
                             containerColor = colorResource(id = R.color.greyBackground),
@@ -276,7 +265,7 @@ fun DrawerContent(navController: NavController,
         //cambiar por avatar
         Image(
             painter = painterResource(id= R.drawable.logotfg),
-            contentDescription = "Hogar",
+            contentDescription = stringResource(id = R.string.hogar),
             modifier = Modifier
                 .padding(5.dp)
                 .size(50.dp)
@@ -296,11 +285,11 @@ fun DrawerContent(navController: NavController,
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("HOMEFLOW", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(id = R.string.app), modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
         NavigationDrawerItem(
-            label = { Text("Home") },
+            label = { Text(stringResource(id = R.string.hogar)) },
             selected = false,
-            icon = { Icon(Icons.Outlined.Home, contentDescription = "Home") },
+            icon = { Icon(Icons.Outlined.Home, contentDescription = stringResource(id = R.string.hogar)) },
             onClick = {
                 scope.launch {
                     navController.navigate(Screens.Tasks.route)
@@ -311,9 +300,9 @@ fun DrawerContent(navController: NavController,
         )
         Spacer(Modifier.height(12.dp))
         NavigationDrawerItem(
-            label = { Text("Settings") },
+            label = { Text(stringResource(id = R.string.settings)) },
             selected = false,
-            icon = { Icon(Icons.Outlined.Settings, contentDescription = "Settings") },
+            icon = { Icon(Icons.Outlined.Settings, contentDescription = stringResource(id = R.string.settings)) },
             onClick = {
                 scope.launch {
                     navController.navigate(Screens.Settings.route)
@@ -324,10 +313,10 @@ fun DrawerContent(navController: NavController,
         )
         Spacer(Modifier.height(12.dp))
         NavigationDrawerItem(
-            label = { Text("LogOut") },
+            label = { Text(stringResource(id = R.string.cerrarSesion)) },
             selected = false,
             icon = {
-                Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
+                Icon(Icons.Default.ExitToApp, contentDescription = stringResource(id = R.string.cerrarSesion))
             },
             onClick = {
                 loginViewModel.logout()
