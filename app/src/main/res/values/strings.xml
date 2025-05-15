@@ -81,6 +81,23 @@
     <string name="perderHogar">Perderás el acceso a tu hogar actual. ¿Estás seguro?</string>
     <string name="fechaTarea">Fecha: %1$s</string>
     <string name="asignado_a">Asignado a: %1$s</string>
+    <string name="no_se_pudo_crear_el_hogar">No se pudo crear el hogar</string>
+    <string name="codigo_de_hogar_invaldo">Código de hogar inválido</string>
+    <string name="error_al_buscar_el_hogar">Error al buscar el hogar</string>
+    <string name="no_se_pudo_unir_al_hogar">No se pudo unir al hogar</string>
+    <string name="correoNoPuedeVacio">El correo no puede estar vacío</string>
+    <string name="correo_incorrecto">Correo incorrecto</string>
+    <string name="la_contrase_a_debe_tener_m_s_longitud">La contraseña debe tener más longitud</string>
+    <string name="la_contrase_a_no_puede_estar_vac_a">La contraseña no puede estar vacía</string>
+    <string name="correoReestablecerContra">Se ha enviado un correo para restablecer tu contraseña.</string>
+    <string name="no_se_pudo_enviar_el_correo_verifica_el_email">No se pudo enviar el correo. Verifica el email.</string>
+    <string name="error_algo_fue_mal">ERROR. Algo fue mal</string>
+    <string name="error_guardarDatos">Error al guardar los datos del usuario</string>
+    <string name="las_contrase_as_deben_ser_iguales">Las contraseñas deben ser iguales</string>
+    <string name="el_nombre_no_puede_estar_vac_o">El nombre no puede estar vacío</string>
+    <string name="fecha_no_puede_estar_vac">La fecha no puede estar vacía</string>
+    <string name="fecha_fuera_de_rango">Fecha fuera de rango</string>
+    <string name="formatoFechaInvalido">Formato de fecha inválido</string>
 
 
 </resources>

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.example.tfg_1.R
 import com.example.tfg_1.model.UserModel
 import kotlinx.coroutines.launch
 
@@ -79,7 +80,7 @@ class HomeViewModel : ViewModel(){
         }
     }
     //crear hogar en base datos y asignarlo al usuario
-    fun createHome() {
+    fun createHome(context: Context) {
         val homeName = name.value.trim()
         if (homeName.isEmpty()) return
 
@@ -93,11 +94,11 @@ class HomeViewModel : ViewModel(){
         newHomeRef.set(data)
             .addOnSuccessListener {
                 //actualizo en campo idhome del usuario
-                updateUserHome(newHomeRef.id)
+                updateUserHome(newHomeRef.id,context)
 
             }
             .addOnFailureListener {
-                _uiState.value = UiState.Error("No se pudo crear el hogar")
+                _uiState.value = UiState.Error(context.getString(R.string.no_se_pudo_crear_el_hogar))
             }
     }
 
@@ -111,19 +112,19 @@ class HomeViewModel : ViewModel(){
             .get()
             .addOnSuccessListener { doc ->
                 if (doc.exists()) { //si existe ese codigo asociadno a un hogar
-                    updateUserHome(codeVal)  //se asocia al usuario
+                    updateUserHome(codeVal,context)  //se asocia al usuario
                 } else { //no se encuentra un higar con ese cod
-                    _uiState.value = UiState.Error("Código de hogar inválido")
-                    Toast.makeText(context, "Código de hogar inválido", Toast.LENGTH_LONG).show()
+                    _uiState.value = UiState.Error(context.getString(R.string.codigo_de_hogar_invaldo))
+                    Toast.makeText(context, context.getString(R.string.codigo_de_hogar_invaldo), Toast.LENGTH_LONG).show()
                 }
             }
             .addOnFailureListener {
-                _uiState.value = UiState.Error("Error al buscar el hogar")
+                _uiState.value = UiState.Error(context.getString(R.string.error_al_buscar_el_hogar))
             }
     }
 
     //actualiza el campo hogarId del usuario
-    private fun updateUserHome(homeId: String) {
+    private fun updateUserHome(homeId: String, context: Context) {
         val uid = auth.currentUser?.uid ?: return
         firestore.collection("usuarios")
             .document(uid)
@@ -133,30 +134,9 @@ class HomeViewModel : ViewModel(){
                 loadUser()
             }
             .addOnFailureListener {
-                _uiState.value = UiState.Error("No se pudo unir al hogar")
+                _uiState.value = UiState.Error(context.getString(R.string.no_se_pudo_unir_al_hogar))
             }
     }
-
-    //lista de miembros de x hogar
-   /* private fun listMembers(homeId: String) {
-        firestore.collection("usuarios")
-            .whereEqualTo("hogarId", homeId)
-            .get()
-            .addOnSuccessListener { snap ->
-                _members.value = snap.documents.mapNotNull { d ->
-                    UserModel(
-                        id        = d.id,
-                        name      = d.getString("nombre").orEmpty(),
-                        email     = d.getString("correo").orEmpty(),
-                        homeId    = homeId,
-                        birthDate = d.getString("fechaNacimiento").orEmpty()
-                    )
-                }
-            }
-            .addOnFailureListener { e ->
-                _uiState.value = UiState.Error("No se han podido cargar los miembros: ${e.localizedMessage}")
-            }
-    }*/
 
     sealed class UiState {
         data object Loading: UiState()  //comprobar usuario y home

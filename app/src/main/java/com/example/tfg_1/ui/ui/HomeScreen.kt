@@ -67,7 +67,7 @@ fun HomeScreen(
         onNameChange   = viewModel::changeName,
         onAddressChange= viewModel::changeAdress,
         onCodeChange   = viewModel::actCode,
-        onCreate       = viewModel::createHome,
+        onCreate       = { viewModel.createHome(context) },
         onJoin         = { viewModel.joinHome(context) },
         modifier       = modifier
     )

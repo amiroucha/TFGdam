@@ -74,19 +74,19 @@ class LoginViewModel : ViewModel() {
     }
 
 
-    private fun validateOnSubmit(): Boolean {
+    private fun validateOnSubmit(context: Context): Boolean {
         val email = _email.value
         val password = _password.value
 
         _emailError.value = when {
-            email.isEmpty() -> "El correo no puede estar vacío"
-            !validEmail(email) -> "Correo incorrecto"
+            email.isEmpty() -> context.getString(R.string.correoNoPuedeVacio)
+            !validEmail(email) -> context.getString(R.string.correo_incorrecto)
             else -> null
         }
 
         _passwordError.value = when {
-            password.isEmpty() -> "La contraseña no puede estar vacía"
-            !validPassword(password) -> "La contraseña debe tener más longitud"
+            password.isEmpty() -> context.getString(R.string.la_contrase_a_no_puede_estar_vac_a)
+            !validPassword(password) -> context.getString(R.string.la_contrase_a_debe_tener_m_s_longitud)
             else -> null
         }
 
@@ -97,13 +97,14 @@ class LoginViewModel : ViewModel() {
         _authState.value = if (auth.currentUser != null) AuthState.Authenticated else AuthState.Unauthenticated
     }
 
-    fun sendResetPassword(email: String) {
+    fun sendResetPassword(email: String, context: Context) {
         FirebaseAuth.getInstance().sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    _passwordResetMessage.value = "Se ha enviado un correo para restablecer tu contraseña."
+                    _passwordResetMessage.value =context.getString(R.string.correoReestablecerContra)
                 } else {
-                    _passwordResetMessage.value = "No se pudo enviar el correo. Verifica el email."
+                    _passwordResetMessage.value =
+                        context.getString(R.string.no_se_pudo_enviar_el_correo_verifica_el_email)
                 }
             }
     }
@@ -114,10 +115,10 @@ class LoginViewModel : ViewModel() {
         _passwordResetMessage.value = message
     }
 
-    fun login(navController: NavController) {
+    fun login(navController: NavController, context: Context) {
         val email = _email.value
         val password = _password.value
-        if (validateOnSubmit()) {
+        if (validateOnSubmit(context = context)) {
             _isLoading.value = true
             _authState.value = AuthState.Loading
 
@@ -148,7 +149,7 @@ class LoginViewModel : ViewModel() {
                             }
                         }
                     } else {
-                        val errorMsg = task.exception?.message ?: "ERROR. Algo fue mal"
+                        val errorMsg = task.exception?.message ?: context.getString(R.string.error_algo_fue_mal)
                         _authState.value = AuthState.Error(errorMsg)
                     }
                 }
@@ -256,7 +257,7 @@ class LoginViewModel : ViewModel() {
                             }
                             .addOnFailureListener { e ->
                                 // Error al guardar los datos
-                                Toast.makeText(context, "Error al guardar los datos del usuario: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, context.getString(R.string.error_guardarDatos, e.localizedMessage), Toast.LENGTH_LONG).show()
                             }
                     }
                 } else {

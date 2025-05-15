@@ -164,7 +164,7 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
             //--------------------------------------------------
 
             Column(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                LoginButton(viewModel, navController)
+                LoginButton(viewModel, navController, context)
 
                 Spacer(modifier = Modifier.padding(16.dp))
                 GoogleButton(viewModel, navController)
@@ -312,7 +312,7 @@ fun ForgotPassword(modifier: Modifier, viewModel: LoginViewModel, context: Conte
                         // mensaje de error si lo quieres mostrar
                         viewModel.setPasswordResetError(context.getString(R.string.por_favor_introduce_un_email_valido))
                     } else {
-                        viewModel.sendResetPassword(emailInput)
+                        viewModel.sendResetPassword(emailInput,context)
                         showDialog = false
                     }
                 }) {
@@ -330,10 +330,10 @@ fun ForgotPassword(modifier: Modifier, viewModel: LoginViewModel, context: Conte
 
 
 @Composable
-fun LoginButton(viewModel: LoginViewModel, navController: NavController) {
+fun LoginButton(viewModel: LoginViewModel, navController: NavController,context: Context) {
     Button(
         onClick = {
-            viewModel.login(navController)
+            viewModel.login(navController, context)
         },
         modifier = Modifier
             .height(48.dp)

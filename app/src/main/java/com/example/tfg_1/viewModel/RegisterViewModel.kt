@@ -86,7 +86,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
     fun showMenuDate() {
         _showDatePicker.value = true
     }
-    private fun validateOnSubmit(): Boolean {
+    private fun validateOnSubmit(context: Context): Boolean {
         val email = _email.value
         val password = _password.value
         val password2 = _password2.value
@@ -94,28 +94,28 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
         val name = _name.value
 
         _emailError.value = when {
-            email.isEmpty() -> "El correo no puede estar vacío"
-            !validEmail(email) -> "Correo incorrecto"
+            email.isEmpty() -> context.getString(R.string.correoNoPuedeVacio)
+            !validEmail(email) -> context.getString(R.string.correo_incorrecto)
             else -> ""
         }
 
         _passwordError.value = when {
-            password.isEmpty() -> "La contraseña no puede estar vacía"
-            !validPassword(password) -> "La contraseña debe tener más longitud"
+            password.isEmpty() -> context.getString(R.string.la_contrase_a_no_puede_estar_vac_a)
+            !validPassword(password) -> context.getString(R.string.la_contrase_a_debe_tener_m_s_longitud)
             else -> ""
         }
         _passwordError2.value = when {
-            password2.isEmpty() -> "La contraseña no puede estar vacía"
-            !validPassword(password2) -> "La contraseña debe tener más longitud"
+            password2.isEmpty() -> context.getString(R.string.la_contrase_a_no_puede_estar_vac_a)
+            !validPassword(password2) -> context.getString(R.string.la_contrase_a_debe_tener_m_s_longitud)
             else -> ""
         }
         _passwordsame.value = when {
-            !passwordsSame(password, password2) -> "Las contraseñas deben ser iguales"
+            !passwordsSame(password, password2) -> context.getString(R.string.las_contrase_as_deben_ser_iguales)
             else -> ""
         }
 
         _nameError.value = when {
-            name.isEmpty() -> "El nombre no puede estar vacío"
+            name.isEmpty() -> context.getString(R.string.el_nombre_no_puede_estar_vac_o)
             else -> ""
         }
 
@@ -125,15 +125,15 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
         val dateMaxi = Calendar.getInstance().time
 
         _dateError.value = when {
-            date.isEmpty() -> "La fecha no puede estar vacía"
+            date.isEmpty() -> context.getString(R.string.fecha_no_puede_estar_vac)
             else -> {
                 try {
                     val selectedDate = dateFormat.parse(date)
                     if (selectedDate!!.before(dateMini) || selectedDate.after(dateMaxi)) {
-                        "Fecha fuera de rango"
+                        context.getString(R.string.fecha_fuera_de_rango)
                     } else ""
                 } catch (e: Exception) {
-                    "Formato de fecha inválido"
+                    context.getString(R.string.formatoFechaInvalido)
                 }
             }
         }
@@ -146,7 +146,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
                 _nameError.value.isEmpty()
     }
     fun botonRegistro(context: Context){
-        if (!validateOnSubmit()) return //si hay un dato incorrecto se sale
+        if (!validateOnSubmit(context)) return //si hay un dato incorrecto se sale
 
         _isLoadingR.value = true
         auth = FirebaseAuth.getInstance()
