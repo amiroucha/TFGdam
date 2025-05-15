@@ -79,8 +79,8 @@
     <string name="compartir_en_whatsapp">Compartir en WhatsApp</string>
     <string name="cambiar_de_hogar">Cambiar de hogar</string>
     <string name="perderHogar">Perderás el acceso a tu hogar actual. ¿Estás seguro?</string>
-    <string name="fechaTarea">Fecha: %1$s</string>
-    <string name="asignado_a">Asignado a: %1$s</string>
+    <string name="fechaTarea">Fecha: </string>
+    <string name="asignado_a">Asignado a: </string>
     <string name="no_se_pudo_crear_el_hogar">No se pudo crear el hogar</string>
     <string name="codigo_de_hogar_invaldo">Código de hogar inválido</string>
     <string name="error_al_buscar_el_hogar">Error al buscar el hogar</string>
