@@ -47,4 +47,7 @@
     <string name="cancelar">Cancelar</string>
     <string name="inicio_de_sesion">Inicio de sesión</string>
 
+
+    <!--Settings................................................................-->
+    <string name="settings">Configuración</string>
 </resources>

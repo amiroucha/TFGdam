@@ -5,5 +5,6 @@ sealed class Screens(val route: String) {
     object Register : Screens("register")
     object Tasks : Screens("tasks")
     object Home : Screens("home")
-    object Splash : Screens("splash")
+    object Splash : Screens("splash") //mantener sesion logueada
+    object Settings : Screens("settings")
 }

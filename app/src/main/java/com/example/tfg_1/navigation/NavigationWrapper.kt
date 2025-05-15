@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -36,6 +37,8 @@ import com.example.tfg_1.viewModel.LoginViewModel
 import com.example.tfg_1.viewModel.RegisterViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,6 +100,7 @@ fun NavigationWrapper() {
                                 text = when (currentRoute) { //texto del titulo de la pagina
                                     //Screens.Register.route , Screens.Login.route -> stringResource(R.string.app)
                                     Screens.Tasks.route -> stringResource(R.string.tasks)
+                                    Screens.Settings.route -> stringResource(id = R.string.settings)
                                     else -> ""
                                 }
                             )
@@ -176,6 +180,9 @@ fun NavigationWrapper() {
                 composable(Screens.Home.route) {
                     HomeScreen(viewModel = homeViewModel, navController)
                 }
+                composable(Screens.Settings.route){
+                    SettingsScreen(navController = navController)
+                }
             }
         }
     }
@@ -183,7 +190,7 @@ fun NavigationWrapper() {
     if (drawerEnabled) {
         ModalNavigationDrawer(
             drawerState = drawerState,
-            drawerContent = { DrawerContent(navController, loginViewModel) },
+            drawerContent = { DrawerContent(navController, loginViewModel,drawerState, scope) },
             scrimColor = colorResource(id = R.color.blue), // Fondo del Drawer
             gesturesEnabled = true // swipe desde el borde
         ) {
@@ -229,7 +236,11 @@ fun BottomBar(navController: NavHostController) {
     }
 }
 @Composable
-fun DrawerContent(navController: NavController, loginViewModel: LoginViewModel) {
+fun DrawerContent(navController: NavController,
+                  loginViewModel: LoginViewModel,
+                  drawerState: DrawerState,
+                  scope: CoroutineScope
+) {
     var userName by remember { mutableStateOf("") }
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -271,7 +282,7 @@ fun DrawerContent(navController: NavController, loginViewModel: LoginViewModel) 
                 .size(50.dp)
                 .clip(CircleShape)
         )
-
+        //dibujar linea
         Canvas(modifier = Modifier
             .fillMaxWidth()
             .height(1.dp)) {
@@ -285,15 +296,29 @@ fun DrawerContent(navController: NavController, loginViewModel: LoginViewModel) 
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Section 1", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
+        Text("HOMEFLOW", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
+        NavigationDrawerItem(
+            label = { Text("Home") },
+            selected = false,
+            icon = { Icon(Icons.Outlined.Home, contentDescription = "Home") },
+            onClick = {
+                scope.launch {
+                    navController.navigate(Screens.Tasks.route)
+                    delay(500)
+                    drawerState.close()
+                }
+            }
+        )
+        Spacer(Modifier.height(12.dp))
         NavigationDrawerItem(
             label = { Text("Settings") },
             selected = false,
-            icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+            icon = { Icon(Icons.Outlined.Settings, contentDescription = "Settings") },
             onClick = {
-                navController.navigate(Screens.Tasks.route) {
-                    // Eliminamos Login de la pila de navegación
-                    popUpTo(Screens.Login.route) { inclusive = true }
+                scope.launch {
+                    navController.navigate(Screens.Settings.route)
+                    delay(500)
+                    drawerState.close()
                 }
             }
         )

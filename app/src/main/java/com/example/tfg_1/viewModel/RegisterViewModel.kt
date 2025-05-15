@@ -42,9 +42,6 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
     private val _isLoadingR = MutableStateFlow(false)
     val isLoadingR: StateFlow<Boolean> = _isLoadingR.asStateFlow()
 
-    private val _registerEnable = MutableStateFlow(false)
-    val registerEnable: StateFlow<Boolean> = _registerEnable.asStateFlow()
-
     //para almacenar los errores-------------------------------
     private val _emailError = MutableStateFlow("")
     val emailError: StateFlow<String> = _emailError.asStateFlow()
@@ -77,7 +74,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
         _password.value = password
         _password2.value = password2
         _name.value = name
-        _registerEnable.value = (validEmail(email) && validPassword(password)) and (passwordsSame(password, password2) && name.isNotEmpty())
+        //_registerEnable.value = (validEmail(email) && validPassword(password)) and (passwordsSame(password, password2) && name.isNotEmpty())
     }
 
     fun dateSeleccionada(anio: Int, mes: Int, dia: Int) {
@@ -132,7 +129,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
             else -> {
                 try {
                     val selectedDate = dateFormat.parse(date)
-                    if (selectedDate.before(dateMini) || selectedDate.after(dateMaxi)) {
+                    if (selectedDate!!.before(dateMini) || selectedDate.after(dateMaxi)) {
                         "Fecha fuera de rango"
                     } else ""
                 } catch (e: Exception) {
