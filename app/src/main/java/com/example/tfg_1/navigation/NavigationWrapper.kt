@@ -183,7 +183,7 @@ fun NavigationWrapper() {
     if (drawerEnabled) {
         ModalNavigationDrawer(
             drawerState = drawerState,
-            drawerContent = { DrawerContent(navController) },
+            drawerContent = { DrawerContent(navController, loginViewModel) },
             scrimColor = colorResource(id = R.color.blue), // Fondo del Drawer
             gesturesEnabled = true // swipe desde el borde
         ) {
@@ -229,11 +229,11 @@ fun BottomBar(navController: NavHostController) {
     }
 }
 @Composable
-fun DrawerContent(navController: NavController) {
+fun DrawerContent(navController: NavController, loginViewModel: LoginViewModel) {
     var userName by remember { mutableStateOf("") }
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    val drawerWidth = screenWidth * 0.7f
+    val drawerWidth = screenWidth * 0.955f
 
     LaunchedEffect(Unit) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -261,6 +261,7 @@ fun DrawerContent(navController: NavController) {
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 16.dp, top = 20.dp)
         )
+
         //cambiar por avatar
         Image(
             painter = painterResource(id= R.drawable.logotfg),
@@ -289,7 +290,6 @@ fun DrawerContent(navController: NavController) {
             label = { Text("Settings") },
             selected = false,
             icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-            //badge = { Text("Settings") }, // Placeholder
             onClick = {
                 navController.navigate(Screens.Tasks.route) {
                     // Eliminamos Login de la pila de navegación
@@ -301,11 +301,15 @@ fun DrawerContent(navController: NavController) {
         NavigationDrawerItem(
             label = { Text("LogOut") },
             selected = false,
-            icon = {Icon(Icons.Default.ExitToApp, contentDescription = "Logout")},
-            onClick = { navController.navigate(Screens.Tasks.route) {
-                // Eliminamos Login de la pila de navegación
-                popUpTo(Screens.Login.route) { inclusive = true }
-            } },
+            icon = {
+                Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
+            },
+            onClick = {
+                loginViewModel.logout()
+                navController.navigate(Screens.Login.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
         )
         Spacer(Modifier.height(12.dp))
     }
