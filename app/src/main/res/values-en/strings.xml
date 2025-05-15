@@ -25,9 +25,6 @@
     <string name="seleccionaFecha">Select date</string>
     <string name="registrarseBtn">Register</string>
     <!--Base de datos Registro .........-->
-    <!--<string name="emailBD">email</string>
-    <string name="fechaNacimientoBD">dateOfBirth</string>
-    <string name="hogarIdBD">homeId</string>-->
     <string name="errorGuardarUsuario">Error saving user</string>
     <string name="erroRegistrar">Error registering</string>
     <string name="nombre">Username</string>
@@ -35,7 +32,7 @@
     <!--Tareas ................................................................-->
     <string name="tasks">Tasks</string>
     <string name="atras">Back</string>
-    <string name="pendientes">Pending</string>
+    <string name="pendientes">Tasks To Do</string>
     <string name="completadas">Completed</string>
     <string name="nuevaTarea">New task</string>
     <string name="titulo">Title</string>
@@ -47,5 +44,6 @@
 
     <!--Settings................................................................-->
     <string name="settings">Settings</string>
-    <string name="cerrarSesion">LogOut</string>
+    <string name="cerrarSesion">Log Out</string>
+    <string name="bienvenidaHome">¡¡Wellcome!! \nAntes de seguir, configura tu hogar.</string>
 </resources>

@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -44,14 +45,14 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxSize()
 
         ) {
-            Text(text = "Modo oscuro", modifier = Modifier.weight(1f))
+            Text(text = stringResource(R.string.modo_oscuro), modifier = Modifier.weight(1f))
             Switch(checked = darkMode, onCheckedChange = {darkMode = it})
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         //cambio de idioma------------------------------------------
-        Text(text = "Idioma")
+        Text(text = stringResource(R.string.idioma))
         MenuIdioma(
             selectedLanguage = language,
             onLanguageSelected = { language = it }
@@ -59,7 +60,7 @@ fun SettingsScreen(
         
         
         //miembros del hogar ------------------------------------------
-        Text(text = "Miembros de casa", style = MaterialTheme.typography.titleMedium)
+        Text(text = stringResource(R.string.miembrosHogar), style = MaterialTheme.typography.titleMedium)
         memebers.forEach{
             Text(text = "\n-- ${it.name} - (${it.email})" )
         }
@@ -68,13 +69,13 @@ fun SettingsScreen(
 
         //hogar--------------------------------------------------------
         //añadir usuario
-        Text(text = "Añade a nuevos miembros: $homeId")
+        Text(text = stringResource(R.string.aniadeMiembros) + homeId)
         Row {
             Button(onClick = { copyHomeId(context =context , code = homeId ) }) {
-                Text(text = "Copiar código")
+                Text(text = stringResource(R.string.copiar_codigo))
             }
             Button(onClick = { shareWhatsApp(context =context , code = homeId ) }) {
-                Text(text = "Compartir en WhatsApp")
+                Text(text = stringResource(R.string.compartir_en_whatsapp))
             }
         }
 
@@ -87,14 +88,14 @@ fun SettingsScreen(
             )
         )
         {
-            Text(text = "Cambiar de hogar", color = colorResource(id = R.color.white))
+            Text(text = stringResource(R.string.cambiar_de_hogar), color = colorResource(id = R.color.white))
         }
 
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false }, 
-                title = {Text(text = "Cambiar hogar")},
-                text = { Text(text = "Perderás el acceso a tu hogar actual. ¿Estás seguro?")},
+                title = {Text(text = stringResource(R.string.cambiar_de_hogar))},
+                text = { Text(text = stringResource(R.string.perderHogar))},
                 confirmButton = {
                     TextButton(
                         onClick = { showDialog = false

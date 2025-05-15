@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -91,7 +92,7 @@ fun HomeBody(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "¡¡Bienvenido!! \nAntes de seguir, configura tu hogar.",
+            text = stringResource(R.string.bienvenidaHome),
             modifier = Modifier.align(Alignment.CenterHorizontally),
             fontSize = 25.sp,
             textAlign = TextAlign.Center,
@@ -104,7 +105,7 @@ fun HomeBody(
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            label = { Text(text ="Nombre del hogar",
+            label = { Text(text = stringResource(R.string.nombreHogar),
                 fontSize = 18.sp) },
             modifier = Modifier.fillMaxWidth()
         )
@@ -112,7 +113,7 @@ fun HomeBody(
         OutlinedTextField(
             value = address,
             onValueChange = onAddressChange,
-            label = { Text(text="Dirección (opcional)",
+            label = { Text(text= stringResource(R.string.direccion),
                 fontSize = 18.sp) },
             modifier = Modifier.fillMaxWidth()
         )
@@ -128,7 +129,7 @@ fun HomeBody(
                 colorResource(id = R.color.black)//color del texto
             ),
         ) {
-            Text(text = "Crear hogar nuevo",
+            Text(text = stringResource(R.string.crearHogar),
                 fontSize = 18.sp)
         }
 
@@ -137,7 +138,7 @@ fun HomeBody(
         OutlinedTextField(
             value = code,
             onValueChange = onCodeChange,
-            label = { Text(text = "Código de hogar existente",
+            label = { Text(text = stringResource(R.string.codigoHogarExistente),
                 fontSize = 18.sp) },
             modifier = Modifier.fillMaxWidth()
         )
@@ -147,13 +148,13 @@ fun HomeBody(
             enabled = code.isNotBlank(),
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                colorResource(id = R.color.black) ,
-                colorResource(id = R.color.black),
-                colorResource(id = R.color.green), //color de fondo
-                colorResource(id = R.color.black)//color del texto
+                containerColor = colorResource(id = R.color.green) ,
+                contentColor =  colorResource(id = R.color.black),
+                disabledContentColor = colorResource(id = R.color.green), //color de fondo
+                disabledContainerColor = colorResource(id = R.color.black)//color del texto
             ),
         ) {
-            Text(text = "Unirme a hogar",
+            Text(text = stringResource(R.string.unirmehogar),
                 fontSize = 18.sp)
         }
     }

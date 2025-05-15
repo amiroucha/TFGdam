@@ -1,8 +1,8 @@
 package com.example.tfg_1.ui.ui
 
+import android.content.Context
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -11,7 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -65,10 +64,15 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
     val authState by viewModel.authState.collectAsState()
     val passwordResetMessage by viewModel.passwordResetMessage.collectAsState()
 
+    val context = LocalContext.current
 
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
-            CircularProgressIndicator(Modifier.size(48.dp).align(Alignment.Center))
+            CircularProgressIndicator(
+                Modifier
+                    .size(48.dp)
+                    .align(Alignment.Center)
+            )
         }
     } else {
         val scrollState = rememberScrollState()
@@ -91,12 +95,12 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
                 ) {
                     Text(
                         text = stringResource(R.string.app),
-                       // modifier = Modifier.padding(start = 8.dp, end = 15.dp),
+                        // modifier = Modifier.padding(start = 8.dp, end = 15.dp),
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1
                     )
-                   // LogoHeader(Modifier)
+                    // LogoHeader(Modifier)
                 }
             }
 
@@ -114,7 +118,7 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
                 viewModel.onLoginChanges(email, it)
             }
 
-            ForgotPassword(Modifier.align(Alignment.End), viewModel)
+            ForgotPassword(Modifier.align(Alignment.End), viewModel,context)
 
 
             if (passwordResetMessage != null) {
@@ -146,13 +150,13 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
             if (showDialog) {
                 AlertDialog(
                     onDismissRequest = { showDialog = false },
-                    title = { Text(text = "Error de inicio de sesión") },
+                    title = { Text(text = stringResource(R.string.errorlogin)) },
                     text = { Text(text = errorMessage) },
                     confirmButton = {
                         Button(
                             onClick = { showDialog = false }
                         ) {
-                            Text("Aceptar")
+                            Text(stringResource(R.string.aceptar))
                         }
                     }
                 )
@@ -166,10 +170,11 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
                 GoogleButton(viewModel, navController)
                 Spacer(modifier = Modifier.padding(16.dp))
                 Text(
-                    text = "¿ No tienes cuenta ?",
+                    text = stringResource(R.string.no_tienes_cuenta),
                     fontSize = 20.sp,
                     color = colorResource(id = R.color.black),
-                    modifier = Modifier.padding(10.dp)
+                    modifier = Modifier
+                        .padding(10.dp)
                         .align(Alignment.CenterHorizontally)
                 )
                 RegisterButton(navController)
@@ -178,233 +183,221 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
     }
 }
 
-// Imagen Logo
-@Composable
-fun LogoHeader(modifier: Modifier) {
-Image(
-painter = painterResource(id = R.drawable.logotfg),
-contentDescription = "Hogar",
-modifier = modifier
-.padding(10.dp)
-.size(120.dp)
-.clip(CircleShape)
-)
-}
-
 // Título
 @Composable
 fun TituloLogin(modifier: Modifier) {
-Text(
-text = "Iniciar Sesión",
-modifier = modifier.padding(10.dp),
-fontSize = 40.sp,
-maxLines = 1,
-fontWeight = FontWeight.Bold
-)
+    Text(
+        text = stringResource(R.string.iniciarSesion),
+        modifier = modifier.padding(10.dp),
+        fontSize = 40.sp,
+        maxLines = 1,
+        fontWeight = FontWeight.Bold
+    )
 }
 
 // EmailField con error
 @Composable
 fun EmailField(email: String, error: String?, onTextFieldChanged: (String) -> Unit) {
-Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-TextField(
-value = email,
-onValueChange = { onTextFieldChanged(it) },//actualiza rl valor
-modifier = Modifier
-    .fillMaxWidth()
-    .height(70.dp)
-    .border(2.dp, Color.Black),
-placeholder = { Text(text = "Email") },
-keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-singleLine = true,
-isError = error != null,
-colors = TextFieldDefaults.colors(
-    focusedTextColor = colorResource(id = R.color.white),
-    focusedContainerColor = colorResource(id = R.color.black),
-    unfocusedTextColor = colorResource(id = R.color.black),
-    unfocusedContainerColor = colorResource(id = R.color.white),
-    errorIndicatorColor = colorResource(id = R.color.red)
-)
-)
-error?.let { //si el error!=null -> hay error , entonces:
-Text(
-    text = it,//it es el valor del error (no null)
-    color = colorResource(id = R.color.red),
-    fontSize = 14.sp,
-    modifier = Modifier.padding(start = 4.dp)
-)
-}
-}
+    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+        TextField(
+            value = email,
+            onValueChange = { onTextFieldChanged(it) },//actualiza rl valor
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(70.dp)
+                .border(2.dp, Color.Black),
+            placeholder = { Text(text = stringResource(R.string.email)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            singleLine = true,
+            isError = error != null,
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = colorResource(id = R.color.white),
+                focusedContainerColor = colorResource(id = R.color.black),
+                unfocusedTextColor = colorResource(id = R.color.black),
+                unfocusedContainerColor = colorResource(id = R.color.white),
+                errorIndicatorColor = colorResource(id = R.color.red)
+            )
+        )
+        error?.let { //si el error!=null -> hay error , entonces:
+            Text(
+                text = it,//it es el valor del error (no null)
+                color = colorResource(id = R.color.red),
+                fontSize = 14.sp,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
+    }
 }
 
 // PasswordField con error
 @Composable
 fun PasswordField(password: String, error: String?, onTextFieldChanged: (String) -> Unit) {
-var passwordVisible by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
 
-Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-TextField(
-value = password,
-onValueChange = { onTextFieldChanged(it) },
-modifier = Modifier
-    .fillMaxWidth()
-    .height(70.dp)
-    .border(2.dp, Color.Black),
-placeholder = { Text("Contraseña") },
-singleLine = true,
-isError = error != null,
-visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-trailingIcon = {
-    val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-        Icon(imageVector = image, contentDescription = "Mostrar contraseña")
+    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+        TextField(
+            value = password,
+            onValueChange = { onTextFieldChanged(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(70.dp)
+                .border(2.dp, Color.Black),
+            placeholder = { Text(stringResource(R.string.contraseña)) },
+            singleLine = true,
+            isError = error != null,
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            trailingIcon = {
+                val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, contentDescription = stringResource(R.string.mostrarContraseña))
+                }
+            },
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = colorResource(id = R.color.white),
+                unfocusedTextColor = colorResource(id = R.color.black),
+                focusedContainerColor = colorResource(id = R.color.black),
+                unfocusedContainerColor = colorResource(id = R.color.white),
+                errorIndicatorColor = colorResource(id = R.color.red)
+            )
+        )
+        error?.let {
+            Text(
+                text = it,
+                color = colorResource(id = R.color.red),
+                fontSize = 14.sp,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
     }
-},
-colors = TextFieldDefaults.colors(
-    focusedTextColor = colorResource(id = R.color.white),
-    unfocusedTextColor = colorResource(id = R.color.black),
-    focusedContainerColor = colorResource(id = R.color.black),
-    unfocusedContainerColor = colorResource(id = R.color.white),
-    errorIndicatorColor = colorResource(id = R.color.red)
-)
-)
-error?.let {
-Text(
-    text = it,
-    color = colorResource(id = R.color.red),
-    fontSize = 14.sp,
-    modifier = Modifier.padding(start = 4.dp)
-)
-}
-}
 }
 
 @Composable
-fun ForgotPassword(modifier: Modifier, viewModel: LoginViewModel) {
-var showDialog by remember { mutableStateOf(false) }
-var emailInput by remember { mutableStateOf("") }
+fun ForgotPassword(modifier: Modifier, viewModel: LoginViewModel, context: Context) {
+    var showDialog by remember { mutableStateOf(false) }
+    var emailInput by remember { mutableStateOf("") }
 
-Text(
-text = "¿Olvidaste la contraseña?",
-modifier = modifier
-.clickable { showDialog = true }
-.padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 16.dp),
-fontSize = 18.sp,
-fontWeight = FontWeight.Bold,
-color = colorResource(id = R.color.black),
-textDecoration = TextDecoration.Underline
-)
 
-if (showDialog) {
-AlertDialog(
-onDismissRequest = { showDialog = false },
-title = { Text("Recuperar contraseña") },
-text = {
-    Column {
-        Text("Introduce tu correo para recuperar tu contraseña:")
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = emailInput,
-            onValueChange = { emailInput = it },
-            placeholder = { Text("Email") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+    Text(
+        text = stringResource(R.string.olvidasteContraseña),
+        modifier = modifier
+            .clickable { showDialog = true }
+            .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 16.dp),
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        color = colorResource(id = R.color.black),
+        textDecoration = TextDecoration.Underline
+    )
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(stringResource(R.string.recuperarContra)) },
+            text = {
+                Column {
+                    Text(stringResource(R.string.introduceCorreoRecuperaContra))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextField(
+                        value = emailInput,
+                        onValueChange = { emailInput = it },
+                        placeholder = { Text(stringResource(R.string.email)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    if (emailInput.isBlank()) {
+                        // mensaje de error si lo quieres mostrar
+                        viewModel.setPasswordResetError(context.getString(R.string.por_favor_introduce_un_email_valido))
+                    } else {
+                        viewModel.sendResetPassword(emailInput)
+                        showDialog = false
+                    }
+                }) {
+                    Text(stringResource(R.string.enviar))
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text(stringResource(R.string.cancelar))
+                }
+            }
         )
     }
-},
-confirmButton = {
-    Button(onClick = {
-        if (emailInput.isBlank()) {
-            // mensaje de error si lo quieres mostrar
-            viewModel.setPasswordResetError("Por favor, introduce un email válido")
-        } else {
-            viewModel.sendResetPassword(emailInput)
-            showDialog = false
-        }
-    }) {
-        Text("Enviar")
-    }
-},
-dismissButton = {
-    Button(onClick = { showDialog = false }) {
-        Text("Cancelar")
-    }
-}
-)
-}
 }
 
 
 @Composable
 fun LoginButton(viewModel: LoginViewModel, navController: NavController) {
-Button(
-onClick = {
-viewModel.login(navController)
-},
-modifier = Modifier
-.height(48.dp)
-.width(250.dp),
-colors = ButtonDefaults.buttonColors(
-colorResource(id = R.color.brown)
-)
-) {
-Text(
-text = "Iniciar sesión",
-fontSize = 20.sp,
-color = colorResource(id = R.color.black)
-)
-}
+    Button(
+        onClick = {
+            viewModel.login(navController)
+        },
+        modifier = Modifier
+            .height(48.dp)
+            .width(250.dp),
+        colors = ButtonDefaults.buttonColors(
+            colorResource(id = R.color.brown)
+        )
+    ) {
+        Text(
+            text = stringResource(R.string.iniciarSesion),
+            fontSize = 20.sp,
+            color = colorResource(id = R.color.black)
+        )
+    }
 }
 
 @Composable
 fun GoogleButton(viewModel: LoginViewModel, navController: NavController) {
-val context = LocalContext.current
-Button(
-onClick = {
-viewModel.loginGoogle(context, navController)
-},
-modifier = Modifier
-.height(48.dp)
-.width(250.dp),
-colors = ButtonDefaults.buttonColors(
-Color(0xFFFF4303),
-Color(0xFFF78058),
-colorResource(id = R.color.blue),
-disabledContentColor = Color.White
-)
-) {
-Text(
-text = "Iniciar con Google",
-fontSize = 20.sp,
-color = colorResource(id = R.color.black)
-)
-Spacer(modifier = Modifier.width(8.dp))
-Icon(
-painter = painterResource(id = R.drawable.ic_google),
-contentDescription = "Google",
-modifier = Modifier.size(24.dp),
-tint = Color.Unspecified
-)
-}
+    val context = LocalContext.current
+    Button(
+        onClick = {
+            viewModel.loginGoogle(context, navController)
+        },
+        modifier = Modifier
+            .height(48.dp)
+            .width(250.dp),
+        colors = ButtonDefaults.buttonColors(
+            Color(0xFFFF4303),
+            Color(0xFFF78058),
+            colorResource(id = R.color.blue),
+            disabledContentColor = Color.White
+        )
+    ) {
+        Text(
+            text = stringResource(R.string.iniciar_con_google),
+            fontSize = 20.sp,
+            color = colorResource(id = R.color.black)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Icon(
+            painter = painterResource(id = R.drawable.ic_google),
+            contentDescription = stringResource(R.string.google),
+            modifier = Modifier.size(24.dp),
+            tint = Color.Unspecified
+        )
+    }
 }
 
 @Composable
 fun RegisterButton(navController: NavController) {
-Button(
-onClick = { navController.navigate(Screens.Register.route) },
-modifier = Modifier
-.height(48.dp)
-.width(250.dp),
-colors = ButtonDefaults.buttonColors(
-colorResource(id = R.color.brownRegister)
-)
-) {
-Spacer(modifier = Modifier.width(8.dp))
-Text(
-text = "Registrate aquí",
-fontSize = 20.sp,
-color = colorResource(id = R.color.black)
-)
-}
+    Button(
+        onClick = { navController.navigate(Screens.Register.route) },
+        modifier = Modifier
+            .height(48.dp)
+            .width(250.dp),
+        colors = ButtonDefaults.buttonColors(
+            colorResource(id = R.color.brownRegister)
+        )
+    ) {
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.registrate_aqu),
+            fontSize = 20.sp,
+            color = colorResource(id = R.color.black)
+        )
+    }
 }

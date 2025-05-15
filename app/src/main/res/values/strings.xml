@@ -26,9 +26,7 @@
     <string name="seleccionaFecha">Seleccionar fecha</string>
     <string name="registrarseBtn">Registrarse</string>
     <!--Base de datos Registro .........-->
-    <!--<string name="emailBD">email</string>
-    <string name="fechaNacimientoBD">fechaNacimiento</string>
-    <string name="hogarIdBD">hogarId</string>-->
+
     <string name="errorGuardarUsuario">Error al guardar usuario</string>
     <string name="erroRegistrar">Error al registrar</string>
     <string name="nombre">Nombre de usuario</string>
@@ -56,8 +54,33 @@
 
     <!--navigation................................................................-->
     <string name="cerrarSesion">Cerrar Sesión</string>
-
-
+    <string name="bienvenidaHome">Welcome!! \nBefore you continue, set up your home.</string>
+    <string name="nombreHogar">Nombre del hogar</string>
+    <string name="direccion">Dirección (opcional)</string>
+    <string name="crearHogar">Crear hogar nuevo</string>
+    <string name="codigoHogarExistente">Código de hogar existente</string>
+    <string name="unirmehogar">Unirme a hogar</string>
+    <string name="errorlogin">Error de inicio de sesión</string>
+    <string name="no_tienes_cuenta">¿ No tienes cuenta ?</string>
+    <string name="iniciarSesion">Iniciar Sesión</string>
+    <string name="olvidasteContraseña">¿Olvidaste la contraseña?</string>
+    <string name="recuperarContra">Recuperar contraseña</string>
+    <string name="introduceCorreoRecuperaContra">Introduce tu correo para recuperar tu contraseña:</string>
+    <string name="enviar">Enviar</string>
+    <string name="iniciar_con_google">Iniciar con Google</string>
+    <string name="google">Google</string>
+    <string name="registrate_aqu">Registrate aquí</string>
+    <string name="por_favor_introduce_un_email_valido">Por favor, introduce un email válido</string>
+    <string name="modo_oscuro">Modo oscuro</string>
+    <string name="idioma">Idioma</string>
+    <string name="miembrosHogar">Miembros del Hogar</string>
+    <string name="aniadeMiembros">Añade a nuevos miembros:</string>
+    <string name="copiar_codigo">Copiar código</string>
+    <string name="compartir_en_whatsapp">Compartir en WhatsApp</string>
+    <string name="cambiar_de_hogar">Cambiar de hogar</string>
+    <string name="perderHogar">Perderás el acceso a tu hogar actual. ¿Estás seguro?</string>
+    <string name="fechaTarea">Fecha: %1$s</string>
+    <string name="asignado_a">Asignado a: %1$s</string>
 
 
 </resources>

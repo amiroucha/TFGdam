@@ -140,21 +140,6 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
 
     }
 }
-//Imagen Logo------------------------------------------------
-/*@Composable
-fun LogoHeaderReg(modifier:Modifier)
-{
-        Image(
-            painter = painterResource(id= R.drawable.logotfg),
-            contentDescription = "Hogar",
-            modifier = modifier
-                .padding(start = 10.dp, end = 10.dp)
-                .size(120.dp)
-                .clip(CircleShape)
-            // .border(7.dp, color = Color.Black)
-        )
-
-}*/
 
 //Titulo---------------------------------------------
 @Composable

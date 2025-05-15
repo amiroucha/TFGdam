@@ -47,7 +47,10 @@ fun TasksScreen(viewModel: TasksViewModel, navcontroller : NavController) {
             .fillMaxSize()
             .background(color = colorResource(id = R.color.greyBackground))
     ) {
-        TasksBody(Modifier.align(Alignment.Center).padding(10.dp), viewModel ,navcontroller )
+        TasksBody(
+            Modifier
+                .align(Alignment.Center)
+                .padding(10.dp), viewModel ,navcontroller )
 
         var showDialog by remember { mutableStateOf(false) }
 
@@ -159,14 +162,14 @@ fun tareaItem(tarea: TasksModel, modificarCompletada: (TasksModel) -> Unit) {
 
             // Fecha de la tarea
             Text(
-                text = "Fecha: ${tarea.fecha}",
+                text = stringResource(R.string.fechaTarea, tarea.fecha),
                 style = MaterialTheme.typography.bodyLarge,
                 color = colorResource(id = R.color.black) ,
                 modifier = Modifier.padding(8.dp)
             )
 
             Text(
-                text = "Asignado a: ${tarea.asignadoA}",
+                text = stringResource(R.string.asignado_a, tarea.asignadoA),
                 style = MaterialTheme.typography.bodyLarge,
                 color = colorResource(id = R.color.black), // Estilo de texto más tenue para el asignado
                 modifier = Modifier.padding(8.dp)
@@ -265,71 +268,6 @@ fun NuevaTareaFormulario(
     )
 }
 
-/*@Composable
-fun NuevaTareaFormulario(
-    dismiss: ()-> Unit,
-    save: (String, String, String) -> Unit,
-    usuarios: List<String>
-){
-    val context = LocalContext.current
-    var titulo by remember { mutableStateOf("") }
-    var fecha by remember { mutableStateOf("") }
-    var asignadoA by remember { mutableStateOf("")}
-    var expanded by remember { mutableStateOf(false) }
-
-    AlertDialog(
-        onDismissRequest = { dismiss() },
-        title = { Text(stringResource(R.string.nuevaTarea)) },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = titulo,
-                    onValueChange = { titulo = it },
-                    label = { Text(stringResource(R.string.titulo)) },
-                    singleLine = true
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = fecha,
-                    onValueChange = { fecha = it },
-                    label = { Text(stringResource(R.string.fechaMax)) },
-                    singleLine = true
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = asignadoA,
-                    onValueChange = { asignadoA = it },
-                    label = { Text(stringResource(R.string.asignadoA_)) },
-                    singleLine = true
-                )
-            }
-
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    if (titulo.isNotBlank() && fecha.isNotBlank() && asignadoA.isNotBlank()) {
-                        save(titulo, fecha, asignadoA)
-                    } else {
-                        //si falta algún camppo
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.completaTodosCampos),
-                            Toast.LENGTH_SHORT).show()
-                    }
-                }
-            ) {
-                Text(stringResource(R.string.guardar))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = { dismiss() }) {
-                Text(stringResource(R.string.cancelar))
-            }
-        }
-    )
-}
-*/
 @Composable
 fun pendientes(viewModel: TasksViewModel) {
     val tareasPendientes by remember {
@@ -361,35 +299,8 @@ fun completadas(viewModel: TasksViewModel) {
     }
 }
 
-/*
-@Composable
-fun pendientes(viewModel: TasksViewModel) {
-    val tareasPendientes = remember { viewModel.tareasPendientes() }
-
-    LazyColumn {
-        items(tareasPendientes) { tarea ->
-            tareaItem(tarea = tarea) { tarea ->
-                viewModel.comprobarEstadoTarea(tarea)
-            }
-        }
-    }
-}
-
-@Composable
-fun completadas(viewModel: TasksViewModel) {
-    val tareasCompletadas = remember { viewModel.tareasCompletadas() }
-
-    LazyColumn {
-        items(tareasCompletadas) { tarea ->
-            tareaItem(tarea = tarea) { tarea ->
-                viewModel.comprobarEstadoTarea(tarea)
-            }
-        }
-    }
-}*/
 @Composable
 fun TasksScreenEntry(navController: NavController) {
-    val context = LocalContext.current
     var viewModel by remember { mutableStateOf<TasksViewModel?>(null) }
 
     LaunchedEffect(Unit) {
