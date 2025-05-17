@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Home
@@ -182,7 +183,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable(Screens.Splash.route) {
-                    SplashScreen(navController = navController, loginViewModel = loginViewModel)
+                    ScreenInitialize(navController = navController, loginViewModel = loginViewModel)
                 }
                 composable(Screens.Login.route) {
                     LoginScreen(viewModel = loginViewModel, navController)
@@ -208,7 +209,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = { DrawerContent(navController, loginViewModel,drawerState, scope) },
-            scrimColor = colorResource(id = R.color.blue), // Fondo del Drawer
+            scrimColor = MaterialTheme.colorScheme.surface, // Fondo del Drawer
             gesturesEnabled = true // swipe desde el borde
         ) {
             contentScaffold()
@@ -221,7 +222,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
 
 //mantener la sesion inciada
 @Composable
-fun SplashScreen(navController: NavController, loginViewModel: LoginViewModel) {
+fun ScreenInitialize(navController: NavController, loginViewModel: LoginViewModel) {
     val authState by loginViewModel.authState.collectAsState()
 
     LaunchedEffect(authState) {//escucha el estado de usuario
@@ -292,7 +293,6 @@ fun DrawerContent(navController: NavController,
             modifier = Modifier.padding(bottom = 16.dp, top = 20.dp)
         )
 
-        //cambiar por avatar
         Image(
             painter = painterResource(id= R.drawable.logotfg),
             contentDescription = stringResource(id = R.string.hogar),
@@ -301,61 +301,86 @@ fun DrawerContent(navController: NavController,
                 .size(50.dp)
                 .clip(CircleShape)
         )
-        //dibujar linea
-        Canvas(modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)) {
-            drawLine(
-                color = Color.Black,
-                start = Offset(0f, 0f),
-                end = Offset(size.width, 0f),
-                strokeWidth = 1f
-            )
-        }
+        lineaSeparacion()
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(stringResource(id = R.string.app), modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
-        NavigationDrawerItem(
-            label = { Text(stringResource(id = R.string.hogar)) },
-            selected = false,
-            icon = { Icon(Icons.Outlined.Home, contentDescription = stringResource(id = R.string.hogar)) },
-            onClick = {
-                scope.launch {
-                    navController.navigate(Screens.Tasks.route)
-                    delay(500)
-                    drawerState.close()
-                }
+
+        // caja que envuelve los items
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            elevation = CardDefaults.cardElevation(8.dp),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
+                NavigationDrawerItem(
+                    label = { Text(stringResource(id = R.string.hogar)) },
+                    selected = false,
+                    icon = { Icon(Icons.Outlined.Home, contentDescription = stringResource(id = R.string.hogar)) },
+                    onClick = {
+                        scope.launch {
+                            navController.navigate(Screens.Tasks.route)
+                            delay(500)
+                            drawerState.close()
+                        }
+                    }
+                )
+                Spacer(Modifier.height(30.dp))
+                NavigationDrawerItem(
+                    label = { Text(stringResource(id = R.string.settings)) },
+                    selected = false,
+                    icon = { Icon(Icons.Outlined.Settings, contentDescription = stringResource(id = R.string.settings)) },
+                    onClick = {
+                        scope.launch {
+                            navController.navigate(Screens.Settings.route)
+                            delay(500)
+                            drawerState.close()
+                        }
+                    }
+                )
+                Spacer(Modifier.height(60.dp))
+                lineaSeparacion()
+                Spacer(Modifier.height(50.dp))
+                NavigationDrawerItem(
+                    label = { Text(stringResource(id = R.string.cerrarSesion)) },
+                    selected = false,
+                    icon = {
+                        Icon(Icons.Default.ExitToApp, contentDescription = stringResource(id = R.string.cerrarSesion))
+                    },
+                    onClick = {
+                        loginViewModel.logout()
+                        navController.navigate(Screens.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
             }
-        )
+        }
+
         Spacer(Modifier.height(12.dp))
-        NavigationDrawerItem(
-            label = { Text(stringResource(id = R.string.settings)) },
-            selected = false,
-            icon = { Icon(Icons.Outlined.Settings, contentDescription = stringResource(id = R.string.settings)) },
-            onClick = {
-                scope.launch {
-                    navController.navigate(Screens.Settings.route)
-                    delay(500)
-                    drawerState.close()
-                }
-            }
+    }
+}
+
+@Composable
+private fun lineaSeparacion() {
+    val lineColor = MaterialTheme.colorScheme.onSurface
+    // línea
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)
+    ) {
+        drawLine(
+            color = lineColor,
+            start = Offset(0f, 0f),
+            end = Offset(size.width, 0f),
+            strokeWidth = 1f
         )
-        Spacer(Modifier.height(12.dp))
-        NavigationDrawerItem(
-            label = { Text(stringResource(id = R.string.cerrarSesion)) },
-            selected = false,
-            icon = {
-                Icon(Icons.Default.ExitToApp, contentDescription = stringResource(id = R.string.cerrarSesion))
-            },
-            onClick = {
-                loginViewModel.logout()
-                navController.navigate(Screens.Login.route) {
-                    popUpTo(0) { inclusive = true }
-                }
-            }
-        )
-        Spacer(Modifier.height(12.dp))
     }
 }
 

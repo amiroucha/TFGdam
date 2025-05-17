@@ -28,7 +28,7 @@ private val DarkColorScheme = darkColorScheme(
     onSecondary = Color.White,
     onTertiary = Color.White,
     onBackground = Color.White,
-    onSurface = Color.White
+    onSurface = Color.Black
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -36,18 +36,21 @@ private val LightColorScheme = lightColorScheme(
     secondary = PurpleGrey40,
     tertiary = Pink40,
 
-    background = Color(0xFF8A8585),
-    surface    = Color(0xFF8A8585),
+    background = Color.LightGray,
+    surface = Color.LightGray,
 
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onTertiary = Color.Black,
     onBackground = Color.Black,
-    onSurface    = Color.Black,
+    onSurface = Color.Black
 )
 
 @Composable
 fun Tfg_1Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
