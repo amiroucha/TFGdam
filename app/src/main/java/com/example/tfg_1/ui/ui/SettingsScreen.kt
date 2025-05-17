@@ -52,14 +52,6 @@ fun SettingsScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        //cambio de idioma------------------------------------------
-        Text(text = stringResource(R.string.idioma))
-        MenuIdioma(
-            selectedLanguage = language,
-            onLanguageSelected = { language = it }
-        )
-        
         
         //miembros del hogar ------------------------------------------
         Text(text = stringResource(R.string.miembrosHogar), style = MaterialTheme.typography.titleMedium)
@@ -122,33 +114,6 @@ fun SettingsScreen(
 
 }
 
-@Composable
-fun MenuIdioma(
-    selectedLanguage: String,
-    onLanguageSelected: (String) -> Unit
-) {
-    val expanded = remember { mutableStateOf(false) }
-    val languages = listOf("es", "en")
-    Box {
-        Button(onClick = { expanded.value = true }) {
-            Text("Idioma: $selectedLanguage")
-        }
-        DropdownMenu(
-            expanded = expanded.value,
-            onDismissRequest = { expanded.value = false }
-        ) {
-            languages.forEach { lang ->
-                DropdownMenuItem(
-                    text = { Text(lang.uppercase()) },
-                    onClick = {
-                        onLanguageSelected(lang)
-                        expanded.value = false
-                    }
-                )
-            }
-        }
-    }
-}
 
 fun copyHomeId(context: Context, code: String) {
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
