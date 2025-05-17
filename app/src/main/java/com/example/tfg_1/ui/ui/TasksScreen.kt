@@ -18,6 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -208,7 +209,7 @@ fun NuevaTareaFormulario(
             context,
             { _, year, month, dayOfMonth ->
                 calendar.set(year, month, dayOfMonth)
-                fecha = dateFormatter.format(calendar.time)
+                fecha = dateFormatter.format(calendar.time)//asigno fecha a la variable
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -250,6 +251,11 @@ fun NuevaTareaFormulario(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            disabledTextColor = Color.Black
+                        )
                     )
                 }
 
@@ -262,10 +268,16 @@ fun NuevaTareaFormulario(
                     OutlinedTextField(
                         value = asignadoA,
                         onValueChange = {},
+
                         readOnly = true,
                         label = { Text(stringResource(R.string.asignadoA_)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor()
+                        modifier = Modifier.menuAnchor(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            disabledTextColor = Color.Black
+                    )
                     )
 
                     ExposedDropdownMenu(
@@ -309,6 +321,7 @@ fun NuevaTareaFormulario(
         }
     )
 }
+
 
 @Composable
 fun pendientes(viewModel: TasksViewModel) {

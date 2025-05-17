@@ -71,8 +71,8 @@
     <string name="compartir_en_whatsapp">Share on WhatsApp</string>
     <string name="cambiar_de_hogar">Change home</string>
     <string name="perderHogar">You will lose access to your current home. Are you sure?</string>
-    <string name="fechaTarea">Date: </string>
-    <string name="asignado_a">Assigned to: </string>
+    <string name="fechaTarea">Date: %1$s</string>
+    <string name="asignado_a">Assigned to: %1$s</string>
     <string name="no_se_pudo_crear_el_hogar">Could not create the home</string>
     <string name="codigo_de_hogar_invaldo">Invalid home code</string>
     <string name="error_al_buscar_el_hogar">Error searching for home</string>
