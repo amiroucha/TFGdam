@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
@@ -31,6 +32,8 @@ import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.TasksViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Preview(showBackground = true)
 @Composable
@@ -70,7 +73,8 @@ fun TasksScreen(viewModel: TasksViewModel, navcontroller : NavController) {
                     viewModel.agregarTarea(titulo, fecha, asignadoA)
                     showDialog = false
                 },
-                usuarios = viewModel.usuarios
+                usuarios = viewModel.usuarios,
+                viewModel = viewModel,
             )
 
 
@@ -158,7 +162,8 @@ fun tareaItem(tarea: TasksModel, modificarCompletada: (TasksModel) -> Unit) {
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1, // Limitar a una línea,
                 modifier = Modifier.padding(8.dp),
-                overflow = TextOverflow.Ellipsis // si es muy largo ...
+                overflow = TextOverflow.Ellipsis, // si es muy largo ...
+                color = colorResource(id = R.color.black)
             )
 
             // Fecha de la tarea
@@ -186,7 +191,8 @@ fun tareaItem(tarea: TasksModel, modificarCompletada: (TasksModel) -> Unit) {
 fun NuevaTareaFormulario(
     dismiss: () -> Unit,
     save: (String, String, String) -> Unit,
-    usuarios: List<String>
+    usuarios: List<String>,
+    viewModel: TasksViewModel
 ) {
     val context = LocalContext.current
     var titulo by remember { mutableStateOf("") }
@@ -194,6 +200,22 @@ fun NuevaTareaFormulario(
     var asignadoA by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
 
+    val calendar = remember { Calendar.getInstance() }
+    val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+
+    val datePickerDialog = remember {
+        android.app.DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                calendar.set(year, month, dayOfMonth)
+                fecha = dateFormatter.format(calendar.time)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+    }
+    //la alerta
     AlertDialog(
         onDismissRequest = { dismiss() },
         title = { Text(stringResource(R.string.nuevaTarea)) },
@@ -206,12 +228,31 @@ fun NuevaTareaFormulario(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = fecha,
-                    onValueChange = { fecha = it },
-                    label = { Text(stringResource(R.string.fechaMax)) },
-                    singleLine = true
-                )
+                //fecha
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { datePickerDialog.show() }
+                ) {
+                    OutlinedTextField(
+                        value = fecha,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(stringResource(R.string.fechaMax)) },
+                        trailingIcon = {
+                            IconButton(onClick = { datePickerDialog.show() }) {
+                                Icon(
+                                    imageVector = Icons.Filled.CalendarToday,
+                                    contentDescription = stringResource(R.string.seleccionaFecha)
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = true,
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
 
                 ExposedDropdownMenuBox(
