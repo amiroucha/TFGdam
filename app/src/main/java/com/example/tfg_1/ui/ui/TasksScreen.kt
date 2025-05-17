@@ -85,8 +85,7 @@ fun TasksBody (modifier: Modifier, viewModel: TasksViewModel, navcontroller : Na
 
     Column{
         TabsPag(viewModel) // Componente para las pestañas
-        Spacer(modifier = Modifier.height(10.dp))
-        //nuevaTarea(viewModel)
+        Spacer(modifier = modifier.height(10.dp))
     }
 
 }
@@ -110,7 +109,9 @@ fun TabsPag(viewModel: TasksViewModel) {
                     icon = { Icon(
                         imageVector = tab.icon,
                         contentDescription = null // Provide a content description if needed
-                    )}
+                    )},
+                    //unselectedContentColor = MaterialTheme.colorScheme.background
+
                 )
             }
         }

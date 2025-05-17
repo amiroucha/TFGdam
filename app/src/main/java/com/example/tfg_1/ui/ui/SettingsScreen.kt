@@ -18,10 +18,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.SettingsViewModel
+import com.example.tfg_1.viewModel.ThemeViewModel
 
 @Composable
 fun SettingsScreen(
     navController: NavController,
+    themeViewModel: ThemeViewModel
 ) {
     val context = LocalContext.current
     val viewModel: SettingsViewModel = viewModel()
@@ -29,7 +31,7 @@ fun SettingsScreen(
     val homeId by viewModel.homeId.collectAsState()
     val memebers by viewModel.members.collectAsState()
 
-    var darkMode by rememberSaveable { mutableStateOf(false) }
+    val darkMode by themeViewModel.isDarkTheme.collectAsState()
     var language by rememberSaveable { mutableStateOf("es") }
 
     var showDialog by remember { mutableStateOf(false) }
@@ -46,7 +48,7 @@ fun SettingsScreen(
 
         ) {
             Text(text = stringResource(R.string.modo_oscuro), modifier = Modifier.weight(1f))
-            Switch(checked = darkMode, onCheckedChange = {darkMode = it})
+            Switch(checked = darkMode, onCheckedChange = {themeViewModel.toggleTheme(it) })
         }
 
         Spacer(modifier = Modifier.height(16.dp))

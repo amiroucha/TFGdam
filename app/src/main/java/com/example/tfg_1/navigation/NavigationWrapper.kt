@@ -35,6 +35,7 @@ import com.example.tfg_1.ui.ui.*
 import com.example.tfg_1.viewModel.HomeViewModel
 import com.example.tfg_1.viewModel.LoginViewModel
 import com.example.tfg_1.viewModel.RegisterViewModel
+import com.example.tfg_1.viewModel.ThemeViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +44,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationWrapper() {
+fun NavigationWrapper(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
 
     val loginViewModel: LoginViewModel = viewModel()
@@ -98,7 +99,6 @@ fun NavigationWrapper() {
                         title = {
                             Text(
                                 text = when (currentRoute) { //texto del titulo de la pagina
-                                    //Screens.Register.route , Screens.Login.route -> stringResource(R.string.app)
                                     Screens.Tasks.route -> stringResource(R.string.tasks)
                                     Screens.Settings.route -> stringResource(id = R.string.settings)
                                     else -> ""
@@ -134,9 +134,9 @@ fun NavigationWrapper() {
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
                             containerColor = colorResource(id = R.color.greyBackground),
-                            titleContentColor = colorResource(id = R.color.black),
-                            navigationIconContentColor = colorResource(id = R.color.black),
-                            actionIconContentColor = colorResource(id = R.color.white)
+                            titleContentColor = MaterialTheme.colorScheme.onSurface,
+                            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                            actionIconContentColor = MaterialTheme.colorScheme.onSurface
                         ),
                     )
                 }
@@ -170,7 +170,7 @@ fun NavigationWrapper() {
                     HomeScreen(viewModel = homeViewModel, navController)
                 }
                 composable(Screens.Settings.route){
-                    SettingsScreen(navController = navController)
+                    SettingsScreen(navController = navController, themeViewModel)
                 }
             }
         }
@@ -217,10 +217,11 @@ fun SplashScreen(navController: NavController, loginViewModel: LoginViewModel) {
 fun BottomBar(navController: NavHostController) {
     NavigationBar {
         NavigationBarItem(
-            icon = { Icon(Icons.Default.List, contentDescription = stringResource(R.string.tasks)) },
+            icon = { Icon(Icons.Default.List,
+                contentDescription = stringResource(R.string.tasks)) },
             label = { Text(stringResource(R.string.tasks)) },
             selected = false, // Lo mejoramos luego
-            onClick = { navController.navigate(Screens.Tasks.route) }
+            onClick = { navController.navigate(Screens.Tasks.route) },
         )
     }
 }
