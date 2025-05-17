@@ -40,7 +40,7 @@ import java.util.*
 @Composable
 fun TasksScreenPreview() {
     val navController = rememberNavController()
-    val viewModel = TasksViewModel("id-prueba-preview")
+    val viewModel = TasksViewModel()
     TasksScreen(viewModel = viewModel, navController)
 }
 
@@ -353,7 +353,7 @@ fun completadas(viewModel: TasksViewModel) {
         }
     }
 }
-
+/*
 @Composable
 fun TasksScreenEntry(navController: NavController) {
     var viewModel by remember { mutableStateOf<TasksViewModel?>(null) }
@@ -381,4 +381,4 @@ fun TasksScreenEntry(navController: NavController) {
             CircularProgressIndicator()
         }
     }
-}
+}*/

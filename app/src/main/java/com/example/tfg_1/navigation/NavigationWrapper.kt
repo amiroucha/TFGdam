@@ -2,14 +2,12 @@ package com.example.tfg_1.navigation
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.geometry.Offset
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
@@ -28,14 +26,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.tfg_1.R
 import com.example.tfg_1.ui.ui.*
-import com.example.tfg_1.viewModel.HomeViewModel
-import com.example.tfg_1.viewModel.LoginViewModel
-import com.example.tfg_1.viewModel.RegisterViewModel
-import com.example.tfg_1.viewModel.ThemeViewModel
+import com.example.tfg_1.viewModel.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
@@ -58,6 +52,9 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
     //para que pantalla se va a ver cada barra
     val showTopBar = currentRoute != Screens.Home.route //|| currentRoute == Screens.Tasks.route
     val showBottomBar = currentRoute == Screens.Tasks.route
+
+    //filtro de tareas por s¡usesr
+    var tasksViewModel by remember { mutableStateOf<TasksViewModel?>(null) }
 
     //drawer
     //pantallas en las que no quiero que se vea el drawer
@@ -119,6 +116,37 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                 }
                             }
                         },actions = {
+                            if (currentRoute == Screens.Tasks.route && tasksViewModel != null) {
+                                var expanded by remember { mutableStateOf(false) }
+                                val viewModel = tasksViewModel!!
+                                Box {
+                                    IconButton(onClick = { expanded = true }) {
+                                        Icon(Icons.Default.FilterList, contentDescription = "Filtrar por usuario")
+                                    }
+
+                                    DropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false }
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = { Text("Todos") },
+                                            onClick = {
+                                                viewModel.modificaUsuarioFiltrado(null)
+                                                expanded = false
+                                            }
+                                        )
+                                        viewModel.usuarios.forEach { usuario ->
+                                            DropdownMenuItem(
+                                                text = { Text(usuario) },
+                                                onClick = {
+                                                    viewModel.modificaUsuarioFiltrado(usuario)
+                                                    expanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                             //logo de mi app
                             //if (currentRoute == Screens.Register.route || currentRoute == Screens.Login.route) { //texto del titulo de la pagina
                                 Image(
@@ -162,9 +190,9 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                 composable(Screens.Register.route) {
                     RegisterScreen(viewModel = RegisterViewModel(navController))
                 }
-                composable(Screens.Tasks.route) {
-                    //TasksScreen(viewModel = TasksViewModel(), navController)
-                    TasksScreenEntry(navController)
+                composable(Screens.Tasks.route) { backStackEntry ->
+                    tasksViewModel = viewModel(backStackEntry)
+                    TasksScreen(viewModel = tasksViewModel!!, navController)
                 }
                 composable(Screens.Home.route) {
                     HomeScreen(viewModel = homeViewModel, navController)
@@ -190,6 +218,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
         contentScaffold()
     }
 }
+
 //mantener la sesion inciada
 @Composable
 fun SplashScreen(navController: NavController, loginViewModel: LoginViewModel) {
