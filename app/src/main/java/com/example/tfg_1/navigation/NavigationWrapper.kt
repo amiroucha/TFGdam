@@ -223,7 +223,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                     TasksScreen(viewModel = tasksViewModel!!, navController)
                 }
                 composable(Screens.Home.route) {
-                    HomeScreen(viewModel = homeViewModel, navController)
+                    HomeScreen(viewModel = homeViewModel)
                 }
                 composable(Screens.Settings.route){
                     SettingsScreen(navController,themeViewModel)

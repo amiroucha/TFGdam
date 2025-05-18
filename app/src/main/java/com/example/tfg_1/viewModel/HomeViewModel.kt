@@ -3,18 +3,14 @@ package com.example.tfg_1.viewModel
 import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import com.example.tfg_1.R
 import com.example.tfg_1.model.UserModel
 import com.example.tfg_1.repositories.UserRepository
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 
 class HomeViewModel(
@@ -37,7 +33,6 @@ class HomeViewModel(
 
     // Lista de miembros del hogar
     private val _members = MutableStateFlow<List<UserModel>>(emptyList())
-    val members: StateFlow<List<UserModel>> = _members.asStateFlow()
 
     // Actualizar datos locales
     fun changeName(at: String) { _name.value = at }
@@ -115,9 +110,9 @@ class HomeViewModel(
     }
 
     sealed class UiState {
-        object Loading : UiState()       // comprobando usuario y hogar
-        object NotLogged : UiState()     // no está logueado
-        object NotHome : UiState()       // sin hogar y logueado
+        data object Loading : UiState()       // comprobando usuario y hogar
+        data object NotLogged : UiState()     // no está logueado
+        data object NotHome : UiState()       // sin hogar y logueado
         data class HasHome(val homeId: String) : UiState() // si tiene hogar
         data class Error(val message: String?) : UiState() // error
     }

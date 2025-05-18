@@ -11,7 +11,7 @@ class UserRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
-    suspend fun getCurrentUser(): FirebaseUser? {
+    fun getCurrentUser(): FirebaseUser? {
         return auth.currentUser
     }
 

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -17,7 +16,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.HomeViewModel
 
@@ -40,14 +38,12 @@ fun HomeScreenPreview() {
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     // estados
     val name    by viewModel.name.collectAsState()
     val address by viewModel.address.collectAsState()
     val code    by viewModel.code.collectAsState()
-    val uiState by viewModel.uiState.collectAsState()
 
     // Obtener el contexto
     val context = LocalContext.current

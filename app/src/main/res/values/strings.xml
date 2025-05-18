@@ -54,7 +54,7 @@
 
     <!--navigation................................................................-->
     <string name="cerrarSesion">Cerrar Sesión</string>
-    <string name="bienvenidaHome">Welcome!! \nBefore you continue, set up your home.</string>
+    <string name="bienvenidaHome">Bienvenido!!\nAntes de continuar configura tu hogar.</string>
     <string name="nombreHogar">Nombre del hogar</string>
     <string name="direccion">Dirección (opcional)</string>
     <string name="crearHogar">Crear hogar nuevo</string>
