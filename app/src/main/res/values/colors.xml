@@ -10,4 +10,6 @@
     <color name="brownRegister">#db9c51</color>
     <color name="red">#ff4646</color>
     <color name="green">#8bff7f</color>
+    <color name="purple_500">#9C4EFD</color>
+
 </resources>

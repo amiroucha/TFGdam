@@ -91,4 +91,8 @@
     <string name="fecha_fuera_de_rango">Date out of range</string>
     <string name="formatoFechaInvalido">Invalid date format</string>
     <string name="todos">All</string>
+    <string name="unirse_a_un_hogar">Join a new home</string>
+    <string name="codigo_copiado">Code copied to clipboard</string>
+    <string name="whatsapp_no_instalado">WhatsApp is not installed</string>
+    <string name="unete_hogar">Join my home on the app with this code: %1$s</string>
 </resources>

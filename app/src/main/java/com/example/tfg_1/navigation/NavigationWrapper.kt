@@ -301,7 +301,7 @@ fun DrawerContent(navController: NavController,
                 Text(
                     text = userName,
                     fontSize = 30.sp,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 16.dp, top = 20.dp)
                 )
 
