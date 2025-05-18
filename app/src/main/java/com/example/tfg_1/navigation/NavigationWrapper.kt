@@ -15,7 +15,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -130,7 +129,10 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                         onDismissRequest = { expanded = false }
                                     ) {
                                         DropdownMenuItem(
-                                            text = { Text("Todos") },
+                                            text = { Text(
+                                                text= stringResource(R.string.todos),
+                                                color= MaterialTheme.colorScheme.onBackground
+                                                ) },
                                             onClick = {
                                                 viewModel.modificaUsuarioFiltrado(null)
                                                 expanded = false
@@ -138,7 +140,8 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                         )
                                         viewModel.usuarios.forEach { usuario ->
                                             DropdownMenuItem(
-                                                text = { Text(usuario) },
+                                                text = { Text(text = usuario,
+                                                    color= MaterialTheme.colorScheme.onBackground) },
                                                 onClick = {
                                                     viewModel.modificaUsuarioFiltrado(usuario)
                                                     expanded = false
@@ -149,7 +152,6 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                 }
                             }
                             //logo de mi app
-                            //if (currentRoute == Screens.Register.route || currentRoute == Screens.Login.route) { //texto del titulo de la pagina
                                 Image(
                                     painter = painterResource(id= R.drawable.logotfg),
                                     contentDescription = "Hogar",
@@ -159,7 +161,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                         .clip(CircleShape)
                                     // .border(7.dp, color = Color.Black)
                                 )
-                            //}
+
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
                             containerColor = colorResource(id = R.color.greyBackground),
@@ -285,27 +287,37 @@ fun DrawerContent(navController: NavController,
             .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.height(30.dp))
-        // Encabezado con el nombre del usuario
-        Text(
-            text = userName,
-            fontSize = 30.sp,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 16.dp, top = 20.dp)
-        )
-
-        Image(
-            painter = painterResource(id= R.drawable.logotfg),
-            contentDescription = stringResource(id = R.string.hogar),
+        Card(
             modifier = Modifier
-                .padding(5.dp)
-                .size(50.dp)
-                .clip(CircleShape)
-        )
-        lineaSeparacion()
+                .fillMaxWidth()
+                .padding(8.dp),
+            elevation = CardDefaults.cardElevation(8.dp),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
+                // Encabezado con el nombre del usuario
+                Text(
+                    text = userName,
+                    fontSize = 30.sp,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(bottom = 16.dp, top = 20.dp)
+                )
+
+                Image(
+                    painter = painterResource(id= R.drawable.logotfg),
+                    contentDescription = stringResource(id = R.string.hogar),
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .size(50.dp)
+                        .clip(CircleShape)
+                )
+
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        Text(stringResource(id = R.string.app), modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
 
         // caja que envuelve los items
         Card(
@@ -318,6 +330,13 @@ fun DrawerContent(navController: NavController,
             Column(
                 modifier = Modifier.padding(8.dp)
             ) {
+                Text(stringResource(id = R.string.app),
+                    modifier = Modifier.padding(16.dp),
+                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.titleMedium)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 NavigationDrawerItem(
                     label = { Text(stringResource(id = R.string.hogar)) },
                     selected = false,
@@ -344,7 +363,7 @@ fun DrawerContent(navController: NavController,
                     }
                 )
                 Spacer(Modifier.height(60.dp))
-                lineaSeparacion()
+                LineaSeparacion()
                 Spacer(Modifier.height(50.dp))
                 NavigationDrawerItem(
                     label = { Text(stringResource(id = R.string.cerrarSesion)) },
@@ -367,7 +386,7 @@ fun DrawerContent(navController: NavController,
 }
 
 @Composable
-private fun lineaSeparacion() {
+private fun LineaSeparacion() {
     val lineColor = MaterialTheme.colorScheme.onSurface
     // línea
     Canvas(

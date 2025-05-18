@@ -98,6 +98,7 @@
     <string name="fecha_no_puede_estar_vac">La fecha no puede estar vacía</string>
     <string name="fecha_fuera_de_rango">Fecha fuera de rango</string>
     <string name="formatoFechaInvalido">Formato de fecha inválido</string>
+    <string name="todos">Todos</string>
 
 
 </resources>
