@@ -255,9 +255,9 @@ class LoginViewModel : ViewModel() {
                                     }
                                 }
                             }
-                            .addOnFailureListener { e ->
+                            .addOnFailureListener { _ ->
                                 // Error al guardar los datos
-                                Toast.makeText(context, context.getString(R.string.error_guardarDatos, e.localizedMessage), Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, context.getString(R.string.error_guardarDatos), Toast.LENGTH_LONG).show()
                             }
                     }
                 } else {

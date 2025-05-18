@@ -49,14 +49,6 @@ fun HomeScreen(
     val code    by viewModel.code.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
 
-    // Navegación cuando tenga hogar
-    LaunchedEffect(uiState) {
-        if (uiState is HomeViewModel.UiState.HasHome) {
-            navController.navigate("tasks") {
-                popUpTo("home") { inclusive = true }
-            }
-        }
-    }
     // Obtener el contexto
     val context = LocalContext.current
     //llamads ViewModel

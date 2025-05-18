@@ -45,6 +45,10 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
     val authState by loginViewModel.authState.collectAsState()
 
     val homeViewModel: HomeViewModel = viewModel()
+    val homeUiState by homeViewModel.uiState.collectAsState()
+
+    val settingsViewModel: SettingsViewModel = viewModel()
+    val settingsUiState by settingsViewModel.uiState.collectAsState()
 
     val currentBackStack by navController.currentBackStackEntryAsState() //me recoge donde me ubico
     val currentRoute = currentBackStack?.destination?.route //ruta completa de la pantalla donde estoy
@@ -62,31 +66,52 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    //para cuando se elija opcion en home
-    LaunchedEffect(authState) {
-        // Cuando el estado de autenticación cambie, verificar el homeId
-        if (authState is LoginViewModel.AuthState.Authenticated) {
-            homeViewModel.loadUser()
 
-            // Aquí observamos el estado del home y navegamos según corresponda
-            when (homeViewModel.uiState.value) {
-                is HomeViewModel.UiState.HasHome -> {
-                    // Si tiene un hogar, redirigir a Tasks
-                    navController.navigate(Screens.Tasks.route) {
-                        // Eliminamos Login de la pila de navegación
-                        popUpTo(Screens.Login.route) { inclusive = true }
-                    }
-                }
-                is HomeViewModel.UiState.NotHome -> {
-                    // Si no tiene hogar, redirigir a Home
-                    navController.navigate(Screens.Home.route) {
-                        popUpTo(Screens.Login.route) { inclusive = true }
-                    }
-                }
-                else -> {}
+
+
+    // Observa los cambios en authState para manejo de navegación
+    LaunchedEffect(authState) {
+        if (authState is LoginViewModel.AuthState.Unauthenticated) {
+            navController.navigate(Screens.Login.route) {
+                popUpTo(0) { inclusive = true }
             }
         }
     }
+
+    LaunchedEffect(homeUiState, settingsUiState) {
+        when (homeUiState) {
+            is HomeViewModel.UiState.HasHome -> {
+               //navega solo cuando ha cambiado ya de hogar
+                if (settingsUiState !is SettingsViewModel.SettingsUiState.LeftHome &&
+                    settingsUiState !is SettingsViewModel.SettingsUiState.Loading) {
+
+                    navController.navigate(Screens.Tasks.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            }
+            is HomeViewModel.UiState.NotHome -> {
+                navController.navigate(Screens.Home.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+            else -> {}
+        }
+    }
+
+    // Observa cambios en settingsUiState para sincronizar con HomeViewModel
+    LaunchedEffect(settingsUiState) {
+        if (settingsUiState is SettingsViewModel.SettingsUiState.LeftHome) {
+            //refresca HomeViewModel
+            homeViewModel.loadUser()
+
+            // pantalla Home
+            navController.navigate(Screens.Home.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
+
 
     val contentScaffold: @Composable () -> Unit = {
         Scaffold(
@@ -201,7 +226,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                     HomeScreen(viewModel = homeViewModel, navController)
                 }
                 composable(Screens.Settings.route){
-                    SettingsScreen(navController = navController, themeViewModel)
+                    SettingsScreen(navController,themeViewModel)
                 }
             }
         }
@@ -227,19 +252,13 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
 fun ScreenInitialize(navController: NavController, loginViewModel: LoginViewModel) {
     val authState by loginViewModel.authState.collectAsState()
 
-    LaunchedEffect(authState) {//escucha el estado de usuario
-        when (authState) {
-            is LoginViewModel.AuthState.Authenticated -> {
-                navController.navigate(Screens.Tasks.route) {
-                    popUpTo(0) { inclusive = true }
-                }
+    // No navegamos aquí: NavigationWrapper lo hará.
+    if (authState is LoginViewModel.AuthState.Unauthenticated) {
+        // Usuario no logueado → ir a Login
+        LaunchedEffect(Unit) {
+            navController.navigate(Screens.Login.route) {
+                popUpTo(0) { inclusive = true }
             }
-            is LoginViewModel.AuthState.Unauthenticated -> {
-                navController.navigate(Screens.Login.route) {
-                    popUpTo(0) { inclusive = true }
-                }
-            }
-            else -> {}
         }
     }
 }

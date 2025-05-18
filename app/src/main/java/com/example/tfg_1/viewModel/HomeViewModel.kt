@@ -12,137 +12,113 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.tfg_1.R
 import com.example.tfg_1.model.UserModel
+import com.example.tfg_1.repositories.UserRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 
-class HomeViewModel : ViewModel(){
-    //firebase
-    private val auth = FirebaseAuth.getInstance()
-    private val firestore = FirebaseFirestore.getInstance()
+class HomeViewModel(
+    private val repository: UserRepository = UserRepository()
+) : ViewModel() {
 
-    //estado de navegacion
+    // Estado de navegación
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    //variables de tipo home
+    // Variables de tipo home
     private val _name = MutableStateFlow("")
     val name: StateFlow<String> = _name.asStateFlow()
 
-    private val _address  = MutableStateFlow("")
-    val address : StateFlow<String> = _address.asStateFlow()
+    private val _address = MutableStateFlow("")
+    val address: StateFlow<String> = _address.asStateFlow()
 
-    private val _code  = MutableStateFlow("")
-    val code : StateFlow<String> = _code.asStateFlow()
+    private val _code = MutableStateFlow("")
+    val code: StateFlow<String> = _code.asStateFlow()
 
-    //lista de miembros del hogar
+    // Lista de miembros del hogar
     private val _members = MutableStateFlow<List<UserModel>>(emptyList())
-    val members : StateFlow<List<UserModel>> = _members.asStateFlow()
+    val members: StateFlow<List<UserModel>> = _members.asStateFlow()
 
+    // Actualizar datos locales
+    fun changeName(at: String) { _name.value = at }
+    fun changeAdress(at: String) { _address.value = at }
+    fun actCode(at: String) { _code.value = at }
 
-    //act informacion al momento
-    fun changeName(at:String){ _name.value = at}
-    fun changeAdress(at:String){ _address.value = at}
-    fun actCode(at:String){ _code.value = at}
-
-    //al crear gome se lanza la carga 1
     init {
         loadUser()
     }
 
-    // carga inicial del usuario y ver si tiene un hogar
+    // Carga inicial del usuario y ver si tiene un hogar
     fun loadUser() {
         viewModelScope.launch {
-            _uiState.value = UiState.Loading //lo ponemos en carga
+            _uiState.value = UiState.Loading
 
-            val firebaseUser = auth.currentUser
-            //primero compruebo si esta logueado
+            val firebaseUser = repository.getCurrentUser()
             if (firebaseUser == null) {
-                _uiState.value = UiState.NotLogged  //no esta logueado
-                return@launch //se sale
+                _uiState.value = UiState.NotLogged
+                return@launch
             }
 
-            firestore.collection("usuarios") //accedo a la coleccion de usuarios
-                .document(firebaseUser.uid)
-                .get()
-                .addOnSuccessListener { doc ->
-                    val homeId = doc.getString("homeId").orEmpty()
-                    if (homeId.isBlank()) {
-                        // si el user no tiene hogar asignado va a la pantalla de settings
-                        _uiState.value = UiState.NotHome
-                    } else {
-                        _uiState.value = UiState.HasHome(homeId) //usuario con casa , va a tareas
-                        //listMembers(homeId) //carga lista de usuarios
-                    }
+            try {
+                val doc = repository.getUserDoc(firebaseUser.uid)
+                val homeId = doc.getString("homeId").orEmpty()
+
+                if (homeId.isBlank()) {
+                    _uiState.value = UiState.NotHome
+                    _members.value = emptyList()
+                } else {
+                    _uiState.value = UiState.HasHome(homeId)
+                    _members.value = repository.getMembersByHomeId(homeId)
                 }
-                .addOnFailureListener { e ->
-                    _uiState.value = UiState.Error(e.localizedMessage)
-                }
+            } catch (e: Exception) {
+                _uiState.value = UiState.Error(e.localizedMessage)
+            }
         }
     }
-    //crear hogar en base datos y asignarlo al usuario
+
+    // Crear hogar en base datos y asignarlo al usuario
     fun createHome(context: Context) {
-        val homeName = name.value.trim()
-        if (homeName.isEmpty()) return
+        viewModelScope.launch {
+            val homeName = name.value.trim()
+            val addressValue = address.value.trim()
+            if (homeName.isEmpty()) return@launch
 
-        //creo un higar en hogares
-        val newHomeRef = firestore.collection("hogares").document()
-        val data = mapOf(
-            "homeId"       to newHomeRef.id,
-            "homeName"   to homeName,
-            "adress"      to address.value.trim(),
-        )
-        newHomeRef.set(data)
-            .addOnSuccessListener {
-                //actualizo en campo idhome del usuario
-                updateUserHome(newHomeRef.id,context)
-
-            }
-            .addOnFailureListener {
+            try {
+                val newHomeId = repository.createHome(homeName, addressValue)
+                repository.updateUserHomeId(repository.getCurrentUser()?.uid ?: "", newHomeId)
+                loadUser() // recarga usuario para actualizar estado
+            } catch (e: Exception) {
                 _uiState.value = UiState.Error(context.getString(R.string.no_se_pudo_crear_el_hogar))
             }
+        }
     }
 
-    // unir a un hogar existente por un codigo
+    // Unir a un hogar existente por un código
     fun joinHome(context: Context) {
-        val codeVal = code.value.trim()
-        if (codeVal.isEmpty()) return //si esta en blanco no me sirve
+        viewModelScope.launch {
+            val codeVal = code.value.trim()
+            if (codeVal.isEmpty()) return@launch
 
-        firestore.collection("hogares")
-            .document(codeVal)
-            .get()
-            .addOnSuccessListener { doc ->
-                if (doc.exists()) { //si existe ese codigo asociadno a un hogar
-                    updateUserHome(codeVal,context)  //se asocia al usuario
-                } else { //no se encuentra un higar con ese cod
+            try {
+                val homeDoc = repository.getHomeById(codeVal)
+                if (homeDoc.exists()) {
+                    repository.updateUserHomeId(repository.getCurrentUser()?.uid ?: "", codeVal)
+                    loadUser() // recarga usuario para actualizar estado
+                } else {
                     _uiState.value = UiState.Error(context.getString(R.string.codigo_de_hogar_invaldo))
                     Toast.makeText(context, context.getString(R.string.codigo_de_hogar_invaldo), Toast.LENGTH_LONG).show()
                 }
-            }
-            .addOnFailureListener {
+            } catch (e: Exception) {
                 _uiState.value = UiState.Error(context.getString(R.string.error_al_buscar_el_hogar))
             }
-    }
-
-    //actualiza el campo hogarId del usuario
-    private fun updateUserHome(homeId: String, context: Context) {
-        val uid = auth.currentUser?.uid ?: return
-        firestore.collection("usuarios")
-            .document(uid)
-            .update("homeId", homeId)
-            .addOnSuccessListener {
-                // Vuelve a cargar el usuario para disparar la navegación
-                loadUser()
-            }
-            .addOnFailureListener {
-                _uiState.value = UiState.Error(context.getString(R.string.no_se_pudo_unir_al_hogar))
-            }
+        }
     }
 
     sealed class UiState {
-        data object Loading: UiState()  //comprobar usuario y home
-        data object NotLogged: UiState()  // no logueado
-        data object NotHome: UiState()  //sin casa y logueado
-        data class HasHome(val homeId: String): UiState() //si tiene casa
-        data class Error(val message: String?): UiState()  //error
+        object Loading : UiState()       // comprobando usuario y hogar
+        object NotLogged : UiState()     // no está logueado
+        object NotHome : UiState()       // sin hogar y logueado
+        data class HasHome(val homeId: String) : UiState() // si tiene hogar
+        data class Error(val message: String?) : UiState() // error
     }
 }

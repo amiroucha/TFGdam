@@ -10,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -19,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.tfg_1.R
+import com.example.tfg_1.navigation.Screens
 import com.example.tfg_1.viewModel.SettingsViewModel
 import com.example.tfg_1.viewModel.ThemeViewModel
 
@@ -34,8 +34,28 @@ fun SettingsScreen(
     val members  by viewModel.members.collectAsState()
     val darkMode by themeViewModel.isDarkTheme.collectAsState()
 
+    val uiState by viewModel.uiState.collectAsState()
+
     var showDialog by remember { mutableStateOf(false) }
     val cardShape = RoundedCornerShape(16.dp)
+
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            SettingsViewModel.SettingsUiState.LeftHome,
+            SettingsViewModel.SettingsUiState.NoHome -> {
+                // el usuario ya no tiene hogar → llévalo a Home
+                navController.navigate(Screens.Home.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+            is SettingsViewModel.SettingsUiState.Error -> {
+                val msg = (uiState as SettingsViewModel.SettingsUiState.Error).msg
+                Toast.makeText(context, msg ?: "Error", Toast.LENGTH_LONG).show()
+            }
+            else -> Unit
+        }
+    }
+
 
     Column(
         modifier = Modifier
@@ -181,9 +201,13 @@ fun SettingsScreen(
                 TextButton(
                     onClick = {
                         showDialog = false
+                        //borrar idhome
+                        viewModel.clearCurrentHome()
+
+                       /*
                         navController.navigate("home") {
                             popUpTo(0) { inclusive = true }
-                        }
+                        }*/
                     }
                 ) { Text("Sí") }
             },
