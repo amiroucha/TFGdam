@@ -58,10 +58,14 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
+
+    //-------------material 3--------------
     implementation("androidx.compose.material3:material3")
-    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     implementation("com.google.android.material:material:1.12.0")
-    //implementation("androidx.compose.material3:material3-android:1.3.2")
+
+
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("androidx.media3:media3-common-ktx:1.7.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
@@ -73,7 +77,7 @@ dependencies {
 
     // Para LiveData y ViewModel en Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-    // No necesitas la dependencia de runtime-livedata
+    // --------------------------------------------
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
     implementation("androidx.compose.material:material-icons-extended")
 
@@ -96,5 +100,10 @@ dependencies {
 
 
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    //grafico
+    //implementation ("com.github.tehras:charts:0.2.4")
+    //vico para graficos
+    //implementation("com.patrykandpatrick.vico:core:1.13.4")
+//    implementation("com.patrykandpatrick.vico:compose-m3:1.13.4")
 
 }

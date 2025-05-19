@@ -103,6 +103,13 @@
     <string name="codigo_copiado">Código copiado al portapapeles</string>
     <string name="whatsapp_no_instalado">WhatsApp no está instalado</string>
     <string name="unete_hogar">Únete a mi hogar en la app con este código: %1$s</string>
+    <string name="otra_categoria">Otra categoría</string>
+    <string name="categoria">Categoria</string>
+    <string name="descripcion">Descripción</string>
+    <string name="gastos">Gastos</string>
+    <string name="nuevogastos">Añade un nuevo gasto</string>
+    <string name="selecciona_una_fecha">Selecciona una fecha: </string>
+    <string name="aniadir_gastoBT">Añadir gasto</string>
 
 
 </resources>

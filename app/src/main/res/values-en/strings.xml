@@ -95,4 +95,13 @@
     <string name="codigo_copiado">Code copied to clipboard</string>
     <string name="whatsapp_no_instalado">WhatsApp is not installed</string>
     <string name="unete_hogar">Join my home on the app with this code: %1$s</string>
+    <string name="otra_categoria">Other category</string>
+    <string name="categoria">Category</string>
+    <string name="descripcion">Description</string>
+    <string name="gastos">Expenses €</string>
+    <string name="nuevogastos">Add a new expense</string>
+    <string name="selecciona_una_fecha">Choose a date: </string>
+    <string name="aniadir_gastoBT">new expense</string>
+
+
 </resources>

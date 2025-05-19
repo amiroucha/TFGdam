@@ -162,7 +162,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
                             id = id,
                             name = _name.value,
                             email = _email.value,
-                            homeId = null,
+                            homeId = "",
                             birthDate = _birthdate.value
                         )
                         FirebaseFirestore.getInstance()

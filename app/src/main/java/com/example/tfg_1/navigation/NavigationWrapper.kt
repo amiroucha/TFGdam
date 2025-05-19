@@ -54,8 +54,8 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
     val currentRoute = currentBackStack?.destination?.route //ruta completa de la pantalla donde estoy
 
     //para que pantalla se va a ver cada barra
-    val showTopBar = currentRoute != Screens.Home.route //|| currentRoute == Screens.Tasks.route
-    val showBottomBar = currentRoute == Screens.Tasks.route
+    val showTopBar = currentRoute != Screens.Home.route
+    val showBottomBar = currentRoute == Screens.Tasks.route || currentRoute == Screens.Expenses.route
 
     //filtro de tareas por s¡usesr
     var tasksViewModel by remember { mutableStateOf<TasksViewModel?>(null) }
@@ -123,6 +123,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                 text = when (currentRoute) { //texto del titulo de la pagina
                                     Screens.Tasks.route -> stringResource(R.string.tasks)
                                     Screens.Settings.route -> stringResource(id = R.string.settings)
+                                    Screens.Expenses.route -> stringResource(id = R.string.gastos)
                                     else -> ""
                                 }
                             )
@@ -228,6 +229,9 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                 composable(Screens.Settings.route){
                     SettingsScreen(navController,themeViewModel)
                 }
+                composable(Screens.Expenses.route){
+                    ExpensesScreen()
+                }
             }
         }
     }
@@ -271,10 +275,22 @@ fun BottomBar(navController: NavHostController) {
             icon = { Icon(Icons.Default.List,
                 contentDescription = stringResource(R.string.tasks)) },
             label = { Text(stringResource(R.string.tasks)) },
-            selected = false, // Lo mejoramos luego
+            selected = false, //
             onClick = { navController.navigate(Screens.Tasks.route) },
         )
+
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.AttachMoney,  // o cualquier icono que prefieras para gastos
+                contentDescription = stringResource(R.string.gastos)
+            ) },
+            label = { Text(stringResource(R.string.gastos)) },
+            selected = false,
+            onClick = {
+                navController.navigate(Screens.Expenses.route)
+            },
+        )
     }
+
 }
 @Composable
 fun DrawerContent(navController: NavController,

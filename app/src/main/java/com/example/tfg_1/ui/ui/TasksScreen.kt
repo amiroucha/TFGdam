@@ -31,8 +31,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.model.TasksModel
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.TasksViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
