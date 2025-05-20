@@ -66,6 +66,7 @@ dependencies {
 
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     implementation("androidx.media3:media3-common-ktx:1.7.1")
+    implementation("androidx.room:room-common-jvm:2.7.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

@@ -47,7 +47,7 @@ class ExpensesViewModel : ViewModel() {
         escucharUsuario()
     }
 
-    /** Paso 1: Escuchar cambios en el documento del usuario */
+    //escuchar cambios en el usuario
     private fun escucharUsuario() {
         val uid = auth.currentUser?.uid
         if (uid == null) {
@@ -61,6 +61,7 @@ class ExpensesViewModel : ViewModel() {
             .addSnapshotListener { snapshot, error ->
                 if (error != null || snapshot == null) {
                     loading = false
+
                     Log.e(TAG, "Error leyendo usuario", error)
                     viewModelScope.launch {
                         _uiEvent.emit(UiEvent.Error("Error leyendo usuario: ${error?.message}"))
@@ -81,13 +82,13 @@ class ExpensesViewModel : ViewModel() {
 
                 if (homeIdBD != homeId) {
                     homeIdBD = homeId
-                    Log.d(TAG, "homeIdBD actualizado -> escucharGastos()")
+                    Log.d(TAG, "homeId actualizado, llamo a escucharGastos()")
                     escucharGastos(homeId)
                 }
             }
     }
 
-    /** Paso 2: Escuchar gastos del hogar */
+    // Escuchar gastos del hogar
     private fun escucharGastos(homeId: String) {
         // Cancela listener anterior si lo hubiera
         listenerRegistration?.remove()
@@ -149,4 +150,25 @@ class ExpensesViewModel : ViewModel() {
             false
         }
     }
+    //eliminar un gasto
+    fun eliminarGasto(gasto: ExpensesModel) {
+        val homeId = homeIdBD ?: return
+
+        viewModelScope.launch {
+            try {
+                db.collection("hogares")
+                    .document(homeId)
+                    .collection("gastos")
+                    .document(gasto.id!!)
+                    .delete()
+                    .await()
+
+                Log.d(TAG, "Gasto eliminado correctamente")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al eliminar gasto", e)
+                _uiEvent.emit(UiEvent.Error("Error al eliminar gasto: ${e.localizedMessage}"))
+            }
+        }
+    }
+
 }

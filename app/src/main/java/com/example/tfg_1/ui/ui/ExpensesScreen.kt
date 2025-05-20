@@ -5,6 +5,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,11 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tfg_1.R
-import com.example.tfg_1.model.ExpensesModel
 import com.example.tfg_1.viewModel.ExpensesViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -216,6 +216,7 @@ fun ExpensesScreen() {
             )
 
             Spacer(Modifier.height(9.dp))
+            //formo la lista de gastos
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(bottom = 72.dp)
@@ -229,17 +230,34 @@ fun ExpensesScreen() {
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Text(
-                                text = "${g.categoria.replaceFirstChar { it.uppercase() }}: " +
-                                        "${"%.2f".format(g.importe)}€  ·  ${dateFmt.format(g.fecha)}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            if (g.descripcion.isNotBlank()) {
-                                Spacer(Modifier.height(4.dp))
+                        Row(
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        )
+                        {
+                            Column(modifier = Modifier.padding(12.dp)) {
                                 Text(
-                                    text = g.descripcion,
-                                    style = MaterialTheme.typography.bodyLarge
+                                    text = "${g.categoria.replaceFirstChar { it.uppercase() }}: " +
+                                            "${"%.2f".format(g.importe)}€  ·  ${dateFmt.format(g.fecha)}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                if (g.descripcion.isNotBlank()) {
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(
+                                        text = g.descripcion,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            }
+                            //icono para eliminar el gasto
+                            IconButton(onClick = { vm.eliminarGasto(g) }) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Eliminar gasto",
+                                    tint = colorResource(id = R.color.red)
                                 )
                             }
                         }
@@ -278,127 +296,6 @@ fun ExpensesScreen() {
     }
 
 }
-
-
-
-
-/*
-           Button(
-               onClick = { scope.launch { save() } },
-               enabled = !loading,           // deshabilitado mientras carga
-               modifier = Modifier
-                   .align(Alignment.End)
-                   .padding(top = 8.dp)
-           ) {
-               Text(stringResource(R.string.aniadir_gastoBT))
-           }*/
-
-/*
-*
-* /* -------- Categoría -------- */
-* var expanded by remember { mutableStateOf(false) }
-            ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
-                TextField(
-                    value = categoria,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(stringResource(R.string.categoria)) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                    modifier = Modifier.menuAnchor()
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    categorias.forEach { opt ->
-                        DropdownMenuItem(
-                            text = { Text(opt) },
-                            onClick = {            // ← añade onClick
-                                categoria = opt
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
-            if (categoria == "otra") {
-                OutlinedTextField(
-                    value = otraCategoria,
-                    onValueChange = { otraCategoria = it },
-                    label = { Text(stringResource(R.string.otra_categoria)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            /* -------- Descripción -------- */
-            OutlinedTextField(
-                value = descripcion,
-                onValueChange = { descripcion = it },
-                label = { Text(stringResource(R.string.descripcion)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            /* -------- Importe -------- */
-            OutlinedTextField(
-                value = importeTxt,
-                onValueChange = { importeTxt = it },
-                label = { Text("Importe (€)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            /* -------- Fecha -------- */
-            Text(
-                text = stringResource(R.string.selecciona_una_fecha),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            OutlinedButton(onClick = { showPicker = true }) {
-                Text(dateFmt.format(fecha))
-            }
-            val datePickerState = rememberDatePickerState(fecha.time)
-            if (showPicker) {
-                DatePickerDialog(
-                    onDismissRequest = { showPicker = false },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            datePickerState.selectedDateMillis?.let { millis ->
-                                fecha = Date(millis)
-                            }
-                            showPicker = false
-                        }) { Text("Aceptar") }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showPicker = false }) { Text("Cancelar") }
-                    }
-                ) { DatePicker(state = datePickerState) }
-            }
-
-            Spacer(Modifier.height(16.dp))
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-* */
-
-
-
-
-
-
-
 
 
 
