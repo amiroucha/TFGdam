@@ -92,7 +92,8 @@ class ExpensesViewModel : ViewModel() {
         // Cancela listener anterior si lo hubiera
         listenerRegistration?.remove()
 
-        listenerRegistration = db.collection("gastos")
+        listenerRegistration = db.collection("hogares").document(homeId)
+            .collection("gastos")
             .whereEqualTo("homeId", homeId)
             .addSnapshotListener { snap, err ->
                 if (err != null || snap == null) {
@@ -107,7 +108,6 @@ class ExpensesViewModel : ViewModel() {
                 gastos = snap.documents.mapNotNull { d ->
                     d.toObject(ExpensesModel::class.java)?.copy(id = d.id)
                 }
-                Log.d(TAG, "Snapshot gastos -> size=${gastos.size}")
                 loading = false
             }
     }
@@ -136,7 +136,8 @@ class ExpensesViewModel : ViewModel() {
         )
 
         return try {
-            db.collection("gastos")
+            db.collection("hogares").document(homeId)
+                .collection("gastos")
                 .add(data)
                 .await()
             Log.i(TAG, "Gasto añadido correctamente")
