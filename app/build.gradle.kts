@@ -102,7 +102,7 @@ dependencies {
 
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
     //grafico
-    //implementation ("com.github.tehras:charts:0.2.4")
+    implementation ("com.github.tehras:charts:0.2.4-alpha")
     //vico para graficos
     //implementation("com.patrykandpatrick.vico:core:1.13.4")
 //    implementation("com.patrykandpatrick.vico:compose-m3:1.13.4")
