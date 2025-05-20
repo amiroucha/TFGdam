@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tfg_1.model.ExpensesModel
-import com.example.tfg_1.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -15,6 +14,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import androidx.compose.runtime.State
 import java.util.*
 
 class ExpensesViewModel : ViewModel() {
@@ -33,10 +33,12 @@ class ExpensesViewModel : ViewModel() {
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent: SharedFlow<UiEvent> = _uiEvent
 
-    sealed interface UiEvent {
-        object Added : UiEvent
-        data class Error(val msg: String) : UiEvent
-    }
+    // Filtros de fechas
+    private val _fechaInicio = mutableStateOf<Date?>(null)
+    val fechaInicio: State<Date?> = _fechaInicio
+
+    private val _fechaFin = mutableStateOf<Date?>(null)
+    val fechaFin: State<Date?> = _fechaFin
 
     companion object {
         private const val TAG = "ExpensesViewModel"
@@ -171,4 +173,28 @@ class ExpensesViewModel : ViewModel() {
         }
     }
 
+    //filtrado de fechas
+    fun setFechaInicio(fecha: Date?) {
+        _fechaInicio.value = fecha
+    }
+
+    fun setFechaFin(fecha: Date?) {
+        _fechaFin.value = fecha
+    }
+
+    val gastosFiltrados: List<ExpensesModel>
+        get() {
+            val inicio = _fechaInicio.value
+            val fin = _fechaFin.value
+            return gastos.filter { gasto ->
+                val fechaGasto = gasto.fecha
+                (inicio == null || !fechaGasto.before(inicio)) &&
+                        (fin == null || !fechaGasto.after(fin))
+            }
+        }
+
+    sealed interface UiEvent {
+        object Added : UiEvent
+        data class Error(val msg: String) : UiEvent
+    }
 }

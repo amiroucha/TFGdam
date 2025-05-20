@@ -30,6 +30,8 @@ fun ExpensesScreen() {
     val vm: ExpensesViewModel = viewModel()
     val gastos  by remember { derivedStateOf { vm.gastos } }
     val loading by remember { derivedStateOf { vm.loading } }
+    val gastosFiltrados by remember { derivedStateOf { vm.gastosFiltrados } }
+
 
     var showDialog by remember { mutableStateOf(false) }
     // Snackbar  para avisar cuando fue guardado
@@ -58,6 +60,9 @@ fun ExpensesScreen() {
     val datePickerState = rememberDatePickerState(fecha.time)
     val scope        = rememberCoroutineScope()
 
+
+
+
     /* ---------- guardar el gasto---------- */
     suspend fun save() {
         val imp = importeTxt.toDoubleOrNull() ?: 0.0
@@ -73,7 +78,6 @@ fun ExpensesScreen() {
             importeTxt    = ""
         }
     }
-
     /* ---------- UI ---------- */
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -221,8 +225,8 @@ fun ExpensesScreen() {
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(bottom = 72.dp)
             ) {
-                items(gastos.sortedByDescending { it.fecha }) { g ->
-                    //colocar cada item de la lista en cajitas
+                items(gastosFiltrados.sortedByDescending { it.fecha }) { g ->
+                //colocar cada item de la lista en cajitas
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()

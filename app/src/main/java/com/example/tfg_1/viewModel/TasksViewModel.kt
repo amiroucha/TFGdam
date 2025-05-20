@@ -137,7 +137,7 @@ class TasksViewModel: ViewModel()
             .document(tarea.id)
             .set(nuevaTarea)
     }
-
+    //filtrar por usuario en pendientes y completadas
     fun tareasPendientes(): List<TasksModel> =
         tareasList.filter {  tarea ->
             !tarea.completada &&

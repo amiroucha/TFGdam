@@ -1,5 +1,6 @@
 package com.example.tfg_1.navigation
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
@@ -35,6 +37,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,8 +62,11 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
     val showTopBar = currentRoute != Screens.Home.route
     val showBottomBar = currentRoute == Screens.Tasks.route || currentRoute == Screens.Expenses.route
 
-    //filtro de tareas por s¡usesr
+    //filtro de tareas por usesr
     var tasksViewModel by remember { mutableStateOf<TasksViewModel?>(null) }
+
+    //filtro de expenses por fecha
+    var expensesViewModel by remember { mutableStateOf<ExpensesViewModel?>(null) }
 
     //drawer
     //pantallas en las que no quiero que se vea el drawer
@@ -144,7 +152,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                         },actions = {
                             if (currentRoute == Screens.Tasks.route && tasksViewModel != null) {
                                 var expanded by remember { mutableStateOf(false) }
-                                val viewModel = tasksViewModel!!
+                                val tasksviewModel = tasksViewModel!!
                                 Box {
                                     IconButton(onClick = { expanded = true }) {
                                         Icon(Icons.Default.FilterList, contentDescription = "Filtrar por usuario")
@@ -160,22 +168,43 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                                 color= MaterialTheme.colorScheme.onBackground
                                                 ) },
                                             onClick = {
-                                                viewModel.modificaUsuarioFiltrado(null)
+                                                tasksviewModel.modificaUsuarioFiltrado(null)
                                                 expanded = false
                                             }
                                         )
-                                        viewModel.usuarios.forEach { usuario ->
+                                        tasksviewModel.usuarios.forEach { usuario ->
                                             DropdownMenuItem(
                                                 text = { Text(text = usuario,
                                                     color= MaterialTheme.colorScheme.onBackground) },
                                                 onClick = {
-                                                    viewModel.modificaUsuarioFiltrado(usuario)
+                                                    tasksviewModel.modificaUsuarioFiltrado(usuario)
                                                     expanded = false
                                                 }
                                             )
                                         }
                                     }
                                 }
+                            }
+                            if (currentRoute == Screens.Expenses.route && expensesViewModel != null) {
+                                var showFilterDialog by remember { mutableStateOf(false) }
+                                val expensesVM = expensesViewModel!!
+                                IconButton(onClick = { showFilterDialog = true }) {
+                                    Icon(Icons.Default.FilterList, contentDescription = "Filtrar por fecha")
+                                }
+                                if (showFilterDialog) {
+                                    // Aquí muestras un diálogo para elegir fechas
+                                    DateFilterDialog(
+                                        initialStartDate = expensesVM.fechaInicio.value,
+                                        initialEndDate = expensesVM.fechaFin.value,
+                                        onDismiss = { showFilterDialog = false },
+                                        onFilter = { start, end ->
+                                            expensesVM.setFechaInicio(start)
+                                            expensesVM.setFechaFin(end)
+                                            showFilterDialog = false
+                                        }
+                                    )
+                                }
+
                             }
                             //logo de mi app
                                 Image(
@@ -229,7 +258,8 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                 composable(Screens.Settings.route){
                     SettingsScreen(navController,themeViewModel)
                 }
-                composable(Screens.Expenses.route){
+                composable(Screens.Expenses.route){ backStackEntry ->
+                    expensesViewModel = viewModel(backStackEntry)
                     ExpensesScreen()
                 }
             }
@@ -437,4 +467,113 @@ private fun LineaSeparacion() {
         )
     }
 }
+@Composable
+fun DateFilterDialog(
+    initialStartDate: Date?,
+    initialEndDate: Date?,
+    onDismiss: () -> Unit,
+    onFilter: (startDate: Date?, endDate: Date?) -> Unit
+) {
+    var startDate by remember { mutableStateOf(initialStartDate) }
+    var endDate by remember { mutableStateOf(initialEndDate) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.filtrar_por_fecha)) },
+        text = {
+            Column {
+                //fecha inicio------------------------------------
+                Text(stringResource(R.string.fecha_inicio))
+                DatePickerField(
+                    selectedDate = startDate,
+                    onDateSelected = { startDate = it })
+
+                Spacer(Modifier.height(16.dp))
+
+                //fecha fin------------------------------------
+                Text(stringResource(R.string.fecha_fin))
+                DatePickerField(
+                    selectedDate = endDate,
+                    onDateSelected = { endDate = it })
+
+
+                Spacer(Modifier.height(24.dp))
+
+                // botón para quitar el filtro------------------------------
+                TextButton(
+                    onClick = {
+                        onFilter(null, null) // Quita el filtro
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    modifier = Modifier.align(Alignment.Start),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(text =stringResource(R.string.quitar_filtros))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onFilter(startDate, endDate) }) {
+                Text(stringResource(R.string.aceptar))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancelar))
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerField(selectedDate: Date?, onDateSelected: (Date?) -> Unit) {
+    val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+    var showPicker by remember { mutableStateOf(false) }
+    val calendar = Calendar.getInstance()
+    if (selectedDate != null) calendar.time = selectedDate
+
+    OutlinedButton(onClick = { showPicker = true },
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), // fondo claro
+            contentColor = MaterialTheme.colorScheme.primary // color del texto e iconos
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+    ) {
+        Text(text = selectedDate?.let { dateFormat.format(it) } ?: stringResource(R.string.seleccionar_fecha))
+    }
+
+    if (showPicker) {
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = calendar.timeInMillis)
+
+        DatePickerDialog(
+            onDismissRequest = { showPicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val pickedMillis = datePickerState.selectedDateMillis
+                    if (pickedMillis != null) {
+                        onDateSelected(Date(pickedMillis))
+                    }
+                    showPicker = false
+                }) {
+                    Text(stringResource(R.string.aceptar))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPicker = false
+                }) {
+                    Text(stringResource(R.string.cancelar))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
+}
+
 
