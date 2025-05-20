@@ -52,7 +52,10 @@ class TasksViewModel: ViewModel()
     }
     private fun cargarTareasDesdeFirebase() {
         val idcasa = homeId
-        FirebaseFirestore.getInstance().collection("tareas")
+        FirebaseFirestore.getInstance()
+            .collection("hogares")
+            .document(idcasa.toString())
+            .collection("tareas")
             .whereEqualTo("homeId", idcasa)
             .addSnapshotListener { snapshot, exception ->
                 if (exception != null) {
@@ -78,7 +81,8 @@ class TasksViewModel: ViewModel()
 
     private fun cargarUsuariosDesdeFirebase() {
         val idcasa = homeId ?: return
-        FirebaseFirestore.getInstance().collection("usuarios")
+        FirebaseFirestore.getInstance()
+            .collection("usuarios")
             .whereEqualTo("homeId", idcasa)
             .addSnapshotListener { snapshot, exception ->
                 if (exception != null) {
@@ -103,25 +107,33 @@ class TasksViewModel: ViewModel()
     }
 
     fun agregarTarea(titulo: String, fecha: String, asignadoA: String) {
-        val idcasa = homeId
+        val idcasa = homeId.toString()
         val nuevaTarea = TasksModel(
             id = UUID.randomUUID().toString(),
             titulo = titulo,
             fecha = fecha,
             asignadoA = asignadoA,
             completada = false,
-            homeId = idcasa.toString()
+            homeId = idcasa
         )
 
-        FirebaseFirestore.getInstance().collection("tareas")
+        FirebaseFirestore.getInstance()
+            .collection("hogares")
+            .document(idcasa)
+            .collection("tareas")
             .document(nuevaTarea.id)
             .set(nuevaTarea)
+
     }
 
 
     fun comprobarEstadoTarea(tarea: TasksModel) {
+        val idcasa = homeId.toString()
         val nuevaTarea = tarea.copy(completada = !tarea.completada)
-        FirebaseFirestore.getInstance().collection("tareas")
+        FirebaseFirestore.getInstance()
+            .collection("hogares")
+            .document(idcasa)
+            .collection("tareas")
             .document(tarea.id)
             .set(nuevaTarea)
     }
