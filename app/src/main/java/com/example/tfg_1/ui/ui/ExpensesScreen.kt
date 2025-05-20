@@ -84,7 +84,6 @@ fun ExpensesScreen() {
             .map { (timeMillis, listaGastos) ->
                 val total = listaGastos.sumOf { it.importe }
                 calendar.timeInMillis = timeMillis
-
             val label = when (filtro) {
                 PeriodoFiltro.SEMANA -> {
                     val semana = calendar.get(Calendar.WEEK_OF_YEAR)
