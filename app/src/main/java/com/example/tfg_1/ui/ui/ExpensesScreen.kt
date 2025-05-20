@@ -192,10 +192,10 @@ fun ExpensesScreen() {
                                                 fecha = Date(millis)
                                             }
                                             showPicker = false
-                                        }) { Text("Aceptar") }
+                                        }) { Text(stringResource(R.string.aceptar)) }
                                     },
                                     dismissButton = {
-                                        TextButton(onClick = { showPicker = false }) { Text("Cancelar") }
+                                        TextButton(onClick = { showPicker = false }) { Text(stringResource(R.string.cancelar)) }
                                     }
                                 ) {
                                     DatePicker(state = datePickerState)
@@ -256,7 +256,7 @@ fun ExpensesScreen() {
                             IconButton(onClick = { vm.eliminarGasto(g) }) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
-                                    contentDescription = "Eliminar gasto",
+                                    contentDescription = stringResource(R.string.eliminar_gasto),
                                     tint = colorResource(id = R.color.red)
                                 )
                             }

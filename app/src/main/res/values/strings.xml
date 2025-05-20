@@ -112,6 +112,8 @@
     <string name="aniadir_gastoBT">Añadir gasto</string>
     <string name="lista_de_gastos">Lista de gastos</string>
     <string name="nuevo_gasto">Nuevo gasto</string>
+    <string name="eliminar_gasto">Eliminar gasto</string>
+    <string name="eliminar_tarea">Eliminar tarea</string>
 
 
 </resources>

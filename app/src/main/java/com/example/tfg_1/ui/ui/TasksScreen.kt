@@ -10,10 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.model.TasksModel
@@ -73,7 +71,6 @@ fun TasksScreen(viewModel: TasksViewModel, navcontroller : NavController) {
                     showDialog = false
                 },
                 usuarios = viewModel.usuarios,
-                viewModel = viewModel,
             )
 
 
@@ -113,7 +110,6 @@ fun TabsPag(viewModel: TasksViewModel) {
                         imageVector = tab.icon,
                         contentDescription = null // Provide a content description if needed
                     )},
-                    //unselectedContentColor = MaterialTheme.colorScheme.background
 
                 )
             }
@@ -131,9 +127,14 @@ fun TabsPag(viewModel: TasksViewModel) {
 //Creamos una data class para el texto y el titulo del Tab
 data class TabData(val title: String, val icon: ImageVector)
 
-//caja de item
+//caja de item, cada tarea creada
 @Composable
-fun tareaItem(tarea: TasksModel, modificarCompletada: (TasksModel) -> Unit) {
+fun tareaItem(tarea: TasksModel,
+              modificarCompletada: (TasksModel) -> Unit,
+              eliminarTarea: (TasksModel) -> Unit)
+{
+    val viewModel: TasksViewModel = viewModel()
+
     // Contenedor de la tarea con padding y márgenes
     Row(
         modifier = Modifier
@@ -180,6 +181,13 @@ fun tareaItem(tarea: TasksModel, modificarCompletada: (TasksModel) -> Unit) {
                 modifier = Modifier.padding(8.dp)
             )
         }
+        IconButton(onClick = { eliminarTarea(tarea)  }) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = stringResource(R.string.eliminar_tarea),
+                tint = Color.Red
+            )
+        }
     }
 }
 
@@ -190,8 +198,7 @@ fun tareaItem(tarea: TasksModel, modificarCompletada: (TasksModel) -> Unit) {
 fun NuevaTareaFormulario(
     dismiss: () -> Unit,
     save: (String, String, String) -> Unit,
-    usuarios: List<String>,
-    viewModel: TasksViewModel
+    usuarios: List<String>
 ) {
     val context = LocalContext.current
     var titulo by remember { mutableStateOf("") }
@@ -329,9 +336,11 @@ fun pendientes(viewModel: TasksViewModel) {
 
     LazyColumn {
         items(tareasPendientes) { tarea ->
-            tareaItem(tarea = tarea) {
-                viewModel.comprobarEstadoTarea(tarea)
-            }
+            tareaItem(
+                tarea = tarea,
+                modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
+                eliminarTarea = { viewModel.eliminarTarea(it) }
+            )
         }
     }
 }
@@ -345,38 +354,11 @@ fun completadas(viewModel: TasksViewModel) {
 
     LazyColumn {
         items(tareasCompletadas) { tarea ->
-            tareaItem(tarea = tarea) {
-                viewModel.comprobarEstadoTarea(tarea)
-            }
+            tareaItem(
+                tarea = tarea,
+                modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
+                eliminarTarea = { viewModel.eliminarTarea(it) }
+            )
         }
     }
 }
-/*
-@Composable
-fun TasksScreenEntry(navController: NavController) {
-    var viewModel by remember { mutableStateOf<TasksViewModel?>(null) }
-
-    LaunchedEffect(Unit) {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            FirebaseFirestore.getInstance().collection("usuarios")
-                .document(currentUser.uid)
-                .get()
-                .addOnSuccessListener { document ->
-                    val homeId = document.getString("homeId")
-                    if (!homeId.isNullOrEmpty()) {
-                        viewModel = TasksViewModel(homeId)
-                    }
-                }
-        }
-    }
-
-    viewModel?.let {
-        TasksScreen(viewModel = it, navcontroller = navController)
-    } ?: run {
-        // puedes mostrar un loader o mensaje de error
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-    }
-}*/

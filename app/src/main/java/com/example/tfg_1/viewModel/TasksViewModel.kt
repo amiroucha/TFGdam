@@ -149,4 +149,23 @@ class TasksViewModel: ViewModel()
             tarea.completada &&
             (usuarioFiltrado == null || tarea.asignadoA == usuarioFiltrado)
         }
+
+    //eliminar tareas
+    fun eliminarTarea(tarea: TasksModel) {
+        val idcasa = homeId ?: return
+
+        FirebaseFirestore.getInstance()
+            .collection("hogares")
+            .document(idcasa)
+            .collection("tareas")
+            .document(tarea.id)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("TasksViewModel", "Tarea eliminada correctamente")
+            }
+            .addOnFailureListener { e ->
+                Log.e("TasksViewModel", "Error al eliminar tarea: ${e.message}")
+            }
+    }
+
 }

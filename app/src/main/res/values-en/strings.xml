@@ -104,6 +104,9 @@
     <string name="aniadir_gastoBT">Add expense</string>
     <string name="lista_de_gastos">List of expenses</string>
     <string name="nuevo_gasto">New expense</string>
+    <string name="eliminar_gasto">Delete expense</string>
+    <string name="eliminar_tarea">Delete task</string>
+
 
 
 </resources>
