@@ -110,6 +110,8 @@
     <string name="nuevogastos">Añade un nuevo gasto</string>
     <string name="selecciona_una_fecha">Selecciona una fecha: </string>
     <string name="aniadir_gastoBT">Añadir gasto</string>
+    <string name="lista_de_gastos">Lista de gastos</string>
+    <string name="nuevo_gasto">Nuevo gasto</string>
 
 
 </resources>

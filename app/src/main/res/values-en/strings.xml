@@ -101,7 +101,9 @@
     <string name="gastos">Expenses €</string>
     <string name="nuevogastos">Add a new expense</string>
     <string name="selecciona_una_fecha">Choose a date: </string>
-    <string name="aniadir_gastoBT">new expense</string>
+    <string name="aniadir_gastoBT">Add expense</string>
+    <string name="lista_de_gastos">List of expenses</string>
+    <string name="nuevo_gasto">New expense</string>
 
 
 </resources>
