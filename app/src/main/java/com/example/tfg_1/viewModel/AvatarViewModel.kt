@@ -64,8 +64,13 @@ class AvatarViewModel : ViewModel() {
         val userId = auth.currentUser?.uid ?: return
         // leer la imagen
         viewModelScope.launch {
-            val imageUrl = firestoreGetAvatarUrl(userId) // función suspend que lee la URL
-            selectedAvatar = imageUrl
+            val imageUrl = firestoreGetAvatarUrl(userId) //obtenermos imagen
+            if (imageUrl.isNullOrEmpty()) {
+                // Si está vacío o nulo cojo uno de los que existen
+                selectedAvatar = avatarList.randomOrNull()?.image
+            } else {
+                selectedAvatar = imageUrl
+            }
         }
     }
     suspend fun firestoreGetAvatarUrl(userId: String): String? {
