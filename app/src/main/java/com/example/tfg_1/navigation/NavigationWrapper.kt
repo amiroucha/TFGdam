@@ -1,11 +1,8 @@
 package com.example.tfg_1.navigation
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.*
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -472,6 +470,11 @@ private fun FotoPerfil() {
                 .padding(5.dp)
                 .size(85.dp)
                 .clip(CircleShape)
+                .border(
+                    width = 2.dp,
+                    color = colorResource(id = R.color.black),
+                    shape = CircleShape
+                )
                 .clickable { showAvatarPicker = true }
         )
     } else {
@@ -482,6 +485,11 @@ private fun FotoPerfil() {
                 .padding(5.dp)
                 .size(85.dp)
                 .clip(CircleShape)
+                .border(
+                    width = 2.dp,
+                    color = colorResource(id = R.color.black),
+                    shape = CircleShape
+                )
                 .clickable { showAvatarPicker = true }
         )
     }
