@@ -363,7 +363,7 @@ fun DrawerContent(navController: NavController,
             elevation = CardDefaults.cardElevation(8.dp),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Column(
+            Row(
                 modifier = Modifier.padding(8.dp)
             ) {
                 // Encabezado con el nombre del usuario
@@ -371,44 +371,11 @@ fun DrawerContent(navController: NavController,
                     text = userName,
                     fontSize = 30.sp,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 16.dp, top = 20.dp)
+                    modifier = Modifier.padding(bottom = 16.dp, top = 20.dp, start = 6.dp, end=20.dp)
                 )
                 //IMAGEN DE PERFIL-----------------------------------
 
-                var showAvatarPicker by remember{ mutableStateOf(false) }
-                var selectedAvatar by remember { mutableStateOf<String?>(null) }
-
-                if (showAvatarPicker) {
-                    AvatarSheet(
-                        onAvatarSelected = { imageUrl ->
-                            selectedAvatar = imageUrl
-                            showAvatarPicker = false
-                        },
-                        onDismiss = { showAvatarPicker = false }
-                    )
-                }
-
-                if (selectedAvatar != null) {
-                    AsyncImage(
-                        model = selectedAvatar,
-                        contentDescription = "Selected Avatar",
-                        modifier = Modifier
-                            .padding(5.dp)
-                            .size(50.dp)
-                            .clip(CircleShape)
-                            .clickable { showAvatarPicker = true }
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.logotfg),
-                        contentDescription = "Default Avatar",
-                        modifier = Modifier
-                            .padding(5.dp)
-                            .size(50.dp)
-                            .clip(CircleShape)
-                            .clickable { showAvatarPicker = true }
-                    )
-                }
+                FotoPerfil()
             }
         }
 
@@ -477,6 +444,46 @@ fun DrawerContent(navController: NavController,
         }
 
         Spacer(Modifier.height(12.dp))
+    }
+}
+
+@Composable
+private fun FotoPerfil() {
+    val avatarViewModel: AvatarViewModel = viewModel()
+
+    var showAvatarPicker by remember { mutableStateOf(false) }
+    val selectedAvatar = avatarViewModel.selectedAvatar
+
+    if (showAvatarPicker) {
+        AvatarSheet(
+            onAvatarSelected = { imageUrl ->
+                avatarViewModel.guardarAvatar(imageUrl)
+                showAvatarPicker = false
+            },
+            onDismiss = { showAvatarPicker = false }
+        )
+    }
+
+    if (selectedAvatar != null) {
+        AsyncImage(
+            model = selectedAvatar,
+            contentDescription = "Selected Avatar",
+            modifier = Modifier
+                .padding(5.dp)
+                .size(85.dp)
+                .clip(CircleShape)
+                .clickable { showAvatarPicker = true }
+        )
+    } else {
+        Image(
+            painter = painterResource(id = R.drawable.perfil_imagen),
+            contentDescription = "Default Avatar",
+            modifier = Modifier
+                .padding(5.dp)
+                .size(85.dp)
+                .clip(CircleShape)
+                .clickable { showAvatarPicker = true }
+        )
     }
 }
 

@@ -163,7 +163,8 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
                             name = _name.value,
                             email = _email.value,
                             homeId = "",
-                            birthDate = _birthdate.value
+                            birthDate = _birthdate.value,
+                            image = ""
                         )
                         FirebaseFirestore.getInstance()
                             .collection("usuarios")

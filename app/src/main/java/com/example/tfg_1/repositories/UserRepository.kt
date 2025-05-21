@@ -58,7 +58,8 @@ class UserRepository(
                 name = u.getString("name").orEmpty(),
                 email = u.getString("email").orEmpty(),
                 homeId = homeId,
-                birthDate = u.getString("birthDate").orEmpty()
+                birthDate = u.getString("birthDate").orEmpty(),
+                image = u.getString("image").orEmpty(),
             )
         }
     }
