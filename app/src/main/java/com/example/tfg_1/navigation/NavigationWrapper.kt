@@ -5,6 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.example.tfg_1.R
 import com.example.tfg_1.ui.ui.*
 import com.example.tfg_1.viewModel.*
@@ -38,6 +41,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import com.example.tfg_1.ui.ui.AvatarSheet
 import java.util.Date
 import java.util.*
 
@@ -369,16 +373,42 @@ fun DrawerContent(navController: NavController,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 16.dp, top = 20.dp)
                 )
+                //IMAGEN DE PERFIL-----------------------------------
 
-                Image(
-                    painter = painterResource(id= R.drawable.logotfg),
-                    contentDescription = stringResource(id = R.string.hogar),
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .size(50.dp)
-                        .clip(CircleShape)
-                )
+                var showAvatarPicker by remember{ mutableStateOf(false) }
+                var selectedAvatar by remember { mutableStateOf<String?>(null) }
 
+                if (showAvatarPicker) {
+                    AvatarSheet(
+                        onAvatarSelected = { imageUrl ->
+                            selectedAvatar = imageUrl
+                            showAvatarPicker = false
+                        },
+                        onDismiss = { showAvatarPicker = false }
+                    )
+                }
+
+                if (selectedAvatar != null) {
+                    AsyncImage(
+                        model = selectedAvatar,
+                        contentDescription = "Selected Avatar",
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .size(50.dp)
+                            .clip(CircleShape)
+                            .clickable { showAvatarPicker = true }
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.logotfg),
+                        contentDescription = "Default Avatar",
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .size(50.dp)
+                            .clip(CircleShape)
+                            .clickable { showAvatarPicker = true }
+                    )
+                }
             }
         }
 
@@ -467,6 +497,7 @@ private fun LineaSeparacion() {
         )
     }
 }
+//filtro para lista de gastos fecha en x rango
 @Composable
 fun DateFilterDialog(
     initialStartDate: Date?,
