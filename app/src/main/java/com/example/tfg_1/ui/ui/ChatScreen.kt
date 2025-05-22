@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
@@ -21,6 +22,8 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.tfg_1.model.ChatMessageModel
 import com.example.tfg_1.viewModel.ChatViewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun ChatScreen(viewModel: ChatViewModel) {
@@ -97,7 +100,12 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
 @Composable
 fun ChatMessageBubble(message: ChatMessageModel, isCurrentUser: Boolean) {
-    val backgroundColor = if (isCurrentUser) Color(0xFFD1F5C1) else Color(0xFFE0E0E0)
+    val backgroundColor = if (isCurrentUser) {
+        Color(0xFFD1F5C1) // color para el usuario actual
+    } else {
+        getColorForUser(message.senderId)
+    }
+
     val alignment = if (isCurrentUser) Arrangement.End else Arrangement.Start
     val bubbleShape = if (isCurrentUser) {
         RoundedCornerShape(12.dp, 0.dp, 12.dp, 12.dp)
@@ -109,7 +117,7 @@ fun ChatMessageBubble(message: ChatMessageModel, isCurrentUser: Boolean) {
         horizontalArrangement = alignment,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Column(
             modifier = Modifier
@@ -120,20 +128,45 @@ fun ChatMessageBubble(message: ChatMessageModel, isCurrentUser: Boolean) {
             if (!isCurrentUser) {
                 Text(
                     text = message.senderName,
-                    fontSize = 12.sp,
+                    fontSize = 15.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = Color.DarkGray,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
-            Text(text = message.text)
+
+            Text(
+                text = message.text,
+                fontSize = 16.sp,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            // Hora en esquina inferior derecha
+            Text(
+                text = formatTime(message.timestamp),
+                fontSize = 11.sp,
+                color = Color.Gray,
+                modifier = Modifier
+                    .align(Alignment.End)
+            )
         }
     }
 }
 
 
-
-
-
+fun formatTime(timestamp: Long): String {
+    val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+    return sdf.format(Date(timestamp))
+}
+fun getColorForUser(senderId: String): Color {
+    return when (senderId.hashCode() % 5) {
+        0 -> Color(0xFFE0F7FA) // Azul suave
+        1 -> Color(0xFFFFF9C4) // Amarillo suave
+        2 -> Color(0xFFFFE0B2) // Naranja suave
+        3 -> Color(0xFFC8E6C9) // Verde suave
+        else -> Color(0xFFD7CCC8) // Marrón grisáceo suave
+    }
+}
 
 
 
