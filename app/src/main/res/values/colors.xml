@@ -11,5 +11,13 @@
     <color name="red">#ff4646</color>
     <color name="green">#8bff7f</color>
     <color name="purple_500">#9C4EFD</color>
+    <!--colores chat-->
+    <color name="lilaChat">#D3B9F2</color>
+    <color name="azulChat">#B2D6F2</color>
+    <color name="verdeChat">#ADF8C3</color>
+    <color name="rosaChat">#F2CCE0</color>
+    <color name="amarilloChat">#F4E1BE</color>
+    <color name="naranjaChat">#EFCFBF</color>
+
 
 </resources>

@@ -120,6 +120,7 @@
     <string name="filtrar_por_fecha">Filtrar por fecha</string>
     <string name="seleccionar_fecha">Seleccionar fecha</string>
     <string name="chat">chat</string>
+    <string name="chat_familiar">Chat Familiar</string>
 
 
 </resources>

@@ -60,7 +60,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
 
     //para que pantalla se va a ver cada barra
     val showTopBar = currentRoute != Screens.Home.route
-    val showBottomBar = currentRoute == Screens.Tasks.route || currentRoute == Screens.Expenses.route
+    val showBottomBar = currentRoute == Screens.Tasks.route || currentRoute == Screens.Expenses.route || currentRoute == Screens.Chat.route
 
     //filtro de tareas por usesr
     var tasksViewModel by remember { mutableStateOf<TasksViewModel?>(null) }
@@ -132,6 +132,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                     Screens.Tasks.route -> stringResource(R.string.tasks)
                                     Screens.Settings.route -> stringResource(id = R.string.settings)
                                     Screens.Expenses.route -> stringResource(id = R.string.gastos)
+                                    Screens.Chat.route -> stringResource(R.string.chat_familiar)
                                     else -> ""
                                 }
                             )

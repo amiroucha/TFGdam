@@ -112,6 +112,7 @@
     <string name="filtrar_por_fecha">Filter by date</string>
     <string name="seleccionar_fecha">Select date</string>
     <string name="chat">chat</string>
+    <string name="chat_familiar"> Family Chat</string>
 
 
 </resources>

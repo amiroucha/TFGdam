@@ -1,6 +1,5 @@
 package com.example.tfg_1.ui.ui
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,11 +14,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.example.tfg_1.R
 import com.example.tfg_1.model.ChatMessageModel
 import com.example.tfg_1.viewModel.ChatViewModel
 import java.text.SimpleDateFormat
@@ -53,7 +55,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
         ) {
             items(messages) { message ->
                 val isCurrentUser = message.senderId == currentUserId
-                ChatMessageBubble(message = message, isCurrentUser = isCurrentUser)
+                MessageBox(message = message, isCurrentUser = isCurrentUser)
             }
         }
 
@@ -99,9 +101,9 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
 
 @Composable
-fun ChatMessageBubble(message: ChatMessageModel, isCurrentUser: Boolean) {
+fun MessageBox(message: ChatMessageModel, isCurrentUser: Boolean) {
     val backgroundColor = if (isCurrentUser) {
-        Color(0xFFD1F5C1) // color para el usuario actual
+        colorResource(id = R.color.lilaChat) // color para el usuario actual
     } else {
         getColorForUser(message.senderId)
     }
@@ -130,7 +132,8 @@ fun ChatMessageBubble(message: ChatMessageModel, isCurrentUser: Boolean) {
                     text = message.senderName,
                     fontSize = 15.sp,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.DarkGray,
+                    color = colorResource(id = R.color.black),
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
@@ -158,67 +161,14 @@ fun formatTime(timestamp: Long): String {
     val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
     return sdf.format(Date(timestamp))
 }
-fun getColorForUser(senderId: String): Color {
-    return when (senderId.hashCode() % 5) {
-        0 -> Color(0xFFE0F7FA) // Azul suave
-        1 -> Color(0xFFFFF9C4) // Amarillo suave
-        2 -> Color(0xFFFFE0B2) // Naranja suave
-        3 -> Color(0xFFC8E6C9) // Verde suave
-        else -> Color(0xFFD7CCC8) // Marrón grisáceo suave
-    }
-}
-
-
-
-
-
-
-/*@Composable
-fun ChatScreen(viewModel: ChatViewModel) {
-    val messages = viewModel.messages
-    var newMessage by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        viewModel.loadChat() // carga  datos del usuario actual
-    }
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .padding(8.dp),
-            reverseLayout = false
-        ) {
-            items(messages) { message ->
-                Text(
-                    text = "${message.senderName}: ${message.text}",
-                    modifier = Modifier.padding(4.dp)
-                )
-            }
-        }
-
-        ChatBox(newMessage, viewModel)
-    }
-}
 
 @Composable
-private fun ChatBox(newMessage: String, viewModel: ChatViewModel) {
-    var newMessage1 = newMessage
-    Row(modifier = Modifier.padding(8.dp)) {
-        TextField(
-            value = newMessage1,
-            onValueChange = { newMessage1 = it },
-            modifier = Modifier.weight(1f),
-            placeholder = { Text("Escribe un mensaje...") }
-        )
-
-        Button(onClick = {
-            if (newMessage1.isNotBlank()) {
-                viewModel.sendMessage(newMessage1)
-                newMessage1 = ""
-            }
-        }) {
-            Text("Enviar")
-        }
+fun getColorForUser(senderId: String): Color {
+    return when (senderId.hashCode() % 5) {
+        0 -> colorResource(id = R.color.naranjaChat)
+        1 -> colorResource(id = R.color.azulChat)
+        2 -> colorResource(id = R.color.verdeChat)
+        3 -> colorResource(id = R.color.rosaChat)
+        else -> colorResource(id = R.color.amarilloChat)
     }
-}*/
+}
