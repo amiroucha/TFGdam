@@ -1,11 +1,12 @@
 package com.example.tfg_1.navigation
 
 sealed class Screens(val route: String) {
-    object Login : Screens("login")
-    object Register : Screens("register")
-    object Tasks : Screens("tasks")
-    object Home : Screens("home")
-    object Splash : Screens("splash") //mantener sesion logueada
-    object Settings : Screens("settings")
-    object Expenses : Screens("expenses")
+    data object Login : Screens("login")
+    data object Register : Screens("register")
+    data object Tasks : Screens("tasks")
+    data object Home : Screens("home")
+    data object Splash : Screens("splash") //mantener sesion logueada
+    data object Settings : Screens("settings")
+    data object Expenses : Screens("expenses")
+    data object Chat : Screens("chat")
 }

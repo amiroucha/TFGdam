@@ -11,9 +11,25 @@ class UserRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
+    //usuario actual
     fun getCurrentUser(): FirebaseUser? {
         return auth.currentUser
     }
+
+    //usuario id
+    fun getCurrentUserId(): String = auth.currentUser?.uid.orEmpty()
+
+    // nombre del usuario
+    suspend fun getCurrentUserName(): String {
+        val user = getUserDoc(getCurrentUserId())
+        return user.getString("name").orEmpty()
+    }
+        //id del hogar del user
+    suspend fun getCurrentUserHomeId(): String {
+        val user = getUserDoc(getCurrentUserId())
+        return user.getString("homeId").orEmpty()
+    }
+
 
     suspend fun getUserDoc(uid: String): DocumentSnapshot {
         return firestore.collection("usuarios")
@@ -29,6 +45,7 @@ class UserRepository(
             .await()
     }
 
+    //crear un hogar
     suspend fun createHome(homeName: String, address: String): String {
         val newHomeRef = firestore.collection("hogares").document()
         val data = mapOf(
@@ -38,6 +55,15 @@ class UserRepository(
         )
         newHomeRef.set(data).await()
         return newHomeRef.id
+    }
+
+    //obtener el nombre del hogar actual
+    suspend fun getCurrentHomeName(): String {
+        val uid = getCurrentUserId() ?: return ""
+        val userDoc = getUserDoc(uid)
+        val homeId = userDoc.getString("homeId") ?: return ""
+        val homeDoc = getHomeById(homeId)
+        return homeDoc.getString("homeName") ?: ""
     }
 
     suspend fun getHomeById(homeId: String): DocumentSnapshot {

@@ -111,7 +111,7 @@
     <string name="quitar_filtros">Remove filters</string>
     <string name="filtrar_por_fecha">Filter by date</string>
     <string name="seleccionar_fecha">Select date</string>
-
+    <string name="chat">chat</string>
 
 
 </resources>

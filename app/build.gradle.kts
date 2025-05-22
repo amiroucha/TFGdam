@@ -113,4 +113,7 @@ dependencies {
     //coil para asyncImage
     implementation ("io.coil-kt:coil-compose:2.5.0")
 
+    //constraint
+    implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
 }

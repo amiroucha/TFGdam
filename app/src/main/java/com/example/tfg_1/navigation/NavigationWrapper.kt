@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -29,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.example.tfg_1.R
 import com.example.tfg_1.ui.ui.*
 import com.example.tfg_1.viewModel.*
@@ -264,6 +262,11 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                     expensesViewModel = viewModel(backStackEntry)
                     ExpensesScreen()
                 }
+                composable(Screens.Chat.route){ backStackEntry ->
+                    val chatViewModel: ChatViewModel = viewModel(backStackEntry)
+                    ChatScreen(viewModel = chatViewModel)
+
+                }
             }
         }
     }
@@ -303,6 +306,7 @@ fun ScreenInitialize(navController: NavController, loginViewModel: LoginViewMode
 @Composable
 fun BottomBar(navController: NavHostController) {
     NavigationBar {
+        //tareas
         NavigationBarItem(
             icon = { Icon(Icons.Default.List,
                 contentDescription = stringResource(R.string.tasks)) },
@@ -310,15 +314,26 @@ fun BottomBar(navController: NavHostController) {
             selected = false, //
             onClick = { navController.navigate(Screens.Tasks.route) },
         )
-
+        //gastos
         NavigationBarItem(
-            icon = { Icon(Icons.Default.AttachMoney,  // o cualquier icono que prefieras para gastos
+            icon = { Icon(Icons.Default.AttachMoney,
                 contentDescription = stringResource(R.string.gastos)
             ) },
             label = { Text(stringResource(R.string.gastos)) },
             selected = false,
             onClick = {
                 navController.navigate(Screens.Expenses.route)
+            },
+        )
+        //chat
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Chat,
+                contentDescription = stringResource(R.string.chat)
+            ) },
+            label = { Text( stringResource(R.string.chat)) },
+            selected = false,
+            onClick = {
+                navController.navigate(Screens.Chat.route)
             },
         )
     }
