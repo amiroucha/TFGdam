@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,15 +33,25 @@ fun ChatScreen(viewModel: ChatViewModel) {
     val messages = viewModel.messages
     var newMessage by remember { mutableStateOf("") }
     val currentUserId = viewModel.currentUserId
+    val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         viewModel.loadChat()
     }
 
+    // Auto-scroll al último mensaje
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            listState.scrollToItem(messages.lastIndex)
+        }
+    }
+
+
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (messageList, chatBox) = createRefs()
 
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)

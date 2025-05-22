@@ -230,7 +230,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
             },
             bottomBar = {
                 if (showBottomBar) {
-                    BottomBar(navController)
+                    BottomBar(navController, currentRoute)
                 }
             },
 
@@ -305,14 +305,14 @@ fun ScreenInitialize(navController: NavController, loginViewModel: LoginViewMode
 
 
 @Composable
-fun BottomBar(navController: NavHostController) {
+fun BottomBar(navController: NavHostController, currentRoute :String?) {
     NavigationBar {
         //tareas
         NavigationBarItem(
             icon = { Icon(Icons.Default.List,
                 contentDescription = stringResource(R.string.tasks)) },
             label = { Text(stringResource(R.string.tasks)) },
-            selected = false, //
+            selected = currentRoute == Screens.Tasks.route, //le da color
             onClick = { navController.navigate(Screens.Tasks.route) },
         )
         //gastos
@@ -321,7 +321,7 @@ fun BottomBar(navController: NavHostController) {
                 contentDescription = stringResource(R.string.gastos)
             ) },
             label = { Text(stringResource(R.string.gastos)) },
-            selected = false,
+            selected = currentRoute == Screens.Expenses.route,
             onClick = {
                 navController.navigate(Screens.Expenses.route)
             },
@@ -332,7 +332,7 @@ fun BottomBar(navController: NavHostController) {
                 contentDescription = stringResource(R.string.chat)
             ) },
             label = { Text( stringResource(R.string.chat)) },
-            selected = false,
+            selected = currentRoute == Screens.Chat.route,
             onClick = {
                 navController.navigate(Screens.Chat.route)
             },

@@ -1,7 +1,10 @@
 package com.example.tfg_1.viewModel
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tfg_1.model.ChatMessageModel
@@ -24,8 +27,12 @@ class ChatViewModel : ViewModel() {
     var currentUserId: String = ""
     private var currentUserName: String = ""
 
+    var isLoading by mutableStateOf(true)
+        private set
+
     fun loadChat() {
         viewModelScope.launch {
+            isLoading = true
             currentUserId = userRepository.getCurrentUserId()
             currentUserName = userRepository.getCurrentUserName()
             val homeId = userRepository.getCurrentUserHomeId()
@@ -36,16 +43,16 @@ class ChatViewModel : ViewModel() {
     }
 
     private fun listenChat(homeId: String) {
-        listenerRegistration?.remove() // Elimina anterior si existe para evitar duplicaciones
+        listenerRegistration?.remove()
 
         listenerRegistration = db.collection("hogares")
             .document(homeId)
             .collection("mensajes")
             .orderBy("timestamp")
             .addSnapshotListener { snapshot, _ ->
-                snapshot?.let {
+                if (snapshot != null) {
                     _messages.clear()
-                    for (doc in it.documents) {
+                    for (doc in snapshot.documents) {
                         try {
                             val msg = doc.toObject(ChatMessageModel::class.java)
                             if (msg != null) {
@@ -55,6 +62,10 @@ class ChatViewModel : ViewModel() {
                             Log.e("ChatViewModel", "Error parsing message document: ${doc.id}", e)
                         }
                     }
+                    isLoading = false //datos cargados
+                } else {
+                    // En caso de error o snapshot nulo, no dejar carga inf
+                    isLoading = false
                 }
             }
     }
