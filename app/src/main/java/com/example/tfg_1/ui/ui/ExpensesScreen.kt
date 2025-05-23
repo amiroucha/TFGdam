@@ -1,5 +1,6 @@
 package com.example.tfg_1.ui.ui
 
+import android.view.ViewGroup
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,18 +14,31 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tfg_1.R
 import com.example.tfg_1.model.DataChart
 import com.example.tfg_1.model.ExpensesModel
 import com.example.tfg_1.viewModel.ExpensesViewModel
+import com.github.mikephil.charting.data.Entry
 import com.github.tehras.charts.line.LineChart
 import com.github.tehras.charts.line.LineChartData
 import com.github.tehras.charts.line.renderer.line.SolidLineDrawer
+
+import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
+
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -383,6 +397,81 @@ fun ExpensesScreen() {
 
 enum class PeriodoFiltro { SEMANA, MES, ANIO }
 
+
+@Composable
+fun Chart(datos: List<DataChart>) {
+    val context = LocalContext.current
+
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp),
+        factory = {
+            com.github.mikephil.charting.charts.LineChart(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                setBackgroundColor(android.graphics.Color.WHITE)
+                setNoDataText("No hay datos")
+
+                axisLeft.apply {
+                    axisMinimum = 0f
+                    setDrawGridLines(true)
+                }
+
+                axisRight.isEnabled = false
+
+                xAxis.apply {
+                    position = XAxis.XAxisPosition.BOTTOM
+                    setDrawGridLines(false)
+                }
+
+                description.isEnabled = false
+                legend.isEnabled = false
+            }
+        },
+        update = { chart ->
+            val entries = mutableListOf<Entry>()
+            val labels = mutableListOf<String>()
+            datos.forEachIndexed { index, punto ->
+                entries.add(Entry(index.toFloat(), punto.value))
+                labels.add(punto.label)
+            }
+
+            val dataSet = LineDataSet(entries, "Gastos").apply {
+                color = android.graphics.Color.BLUE
+                valueTextColor = android.graphics.Color.BLACK
+                setDrawCircles(true)
+                setDrawValues(true)
+                lineWidth = 2f
+                circleRadius = 4f
+            }
+
+            val formatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    val index = value.toInt()
+                    return if (index in labels.indices) labels[index] else ""
+                }
+            }
+
+            chart.xAxis.apply {
+                valueFormatter = formatter
+                labelRotationAngle = -45f
+                granularity = 1f
+                setLabelCount(labels.size, true)
+            }
+
+            chart.data = LineData(dataSet)
+            chart.invalidate()
+        }
+    )
+}
+
+
+
+
+/*
 @Composable
 fun Chart(datos: List<DataChart>) {
     val puntos = datos.map { dataChart ->
@@ -408,4 +497,4 @@ fun Chart(datos: List<DataChart>) {
             .height(300.dp)
             .fillMaxWidth()
     )
-}
+}*/

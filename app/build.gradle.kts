@@ -103,6 +103,8 @@ dependencies {
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
     //grafico
     implementation ("com.github.tehras:charts:0.2.4-alpha")
+    //intento con otra libreria de graficos
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
 
     //retrofit y api
