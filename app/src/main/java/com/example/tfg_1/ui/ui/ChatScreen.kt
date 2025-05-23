@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -84,7 +85,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 value = newMessage,
                 onValueChange = { newMessage = it },
                 modifier = Modifier.weight(1f),
-                placeholder = { Text("Escribe un mensaje...") },
+                placeholder = { Text(stringResource(R.string.escribe_un_mensaje)) },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(
                     onSend = {
@@ -103,7 +104,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                     }
                 }
             ) {
-                Icon(imageVector = Icons.Default.Send, contentDescription = "Enviar")
+                Icon(imageVector = Icons.Default.Send, contentDescription = stringResource(R.string.escribe_un_mensaje))
             }
         }
     }
@@ -167,7 +168,7 @@ fun MessageBox(message: ChatMessageModel, isCurrentUser: Boolean) {
     }
 }
 
-
+//hora/minutos
 fun formatTime(timestamp: Long): String {
     val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
     return sdf.format(Date(timestamp))

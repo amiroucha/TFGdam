@@ -121,6 +121,7 @@
     <string name="seleccionar_fecha">Seleccionar fecha</string>
     <string name="chat">chat</string>
     <string name="chat_familiar">Chat Familiar</string>
+    <string name="escribe_un_mensaje">Escribe un mensaje…</string>
 
 
 </resources>
