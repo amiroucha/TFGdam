@@ -5,7 +5,7 @@ import java.util.*
 data class ExpensesModel  (
     val id: String = "",
     val categoria: String = "",
-    val creadoPor: String = "",
+    val asignadoA: String = "",
     val descripcion: String = "",
     val fecha: Date = Date(),
     val homeId:String = "",

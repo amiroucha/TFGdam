@@ -151,12 +151,14 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                 }
                             }
                         },actions = {
-                            if (currentRoute == Screens.Tasks.route && tasksViewModel != null) {
+                            //filtro de usuario en tasks y expenses
+                            if (currentRoute == Screens.Tasks.route && tasksViewModel != null)
+                            {
                                 var expanded by remember { mutableStateOf(false) }
                                 val tasksviewModel = tasksViewModel!!
                                 Box {
                                     IconButton(onClick = { expanded = true }) {
-                                        Icon(Icons.Default.FilterList, contentDescription = "Filtrar por usuario")
+                                        Icon(Icons.Default.Person, contentDescription = "Filtrar por usuario")
                                     }
 
                                     DropdownMenu(
@@ -186,26 +188,43 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                     }
                                 }
                             }
+                            //filtro pantalla de gastos/expenses
                             if (currentRoute == Screens.Expenses.route && expensesViewModel != null) {
-                                var showFilterDialog by remember { mutableStateOf(false) }
-                                val expensesVM = expensesViewModel!!
-                                IconButton(onClick = { showFilterDialog = true }) {
-                                    Icon(Icons.Default.FilterList, contentDescription = "Filtrar por fecha")
-                                }
-                                if (showFilterDialog) {
-                                    // Aquí muestras un diálogo para elegir fechas
-                                    DateFilterDialog(
-                                        initialStartDate = expensesVM.fechaInicio.value,
-                                        initialEndDate = expensesVM.fechaFin.value,
-                                        onDismiss = { showFilterDialog = false },
-                                        onFilter = { start, end ->
-                                            expensesVM.setFechaInicio(start)
-                                            expensesVM.setFechaFin(end)
-                                            showFilterDialog = false
-                                        }
-                                    )
-                                }
+                                var expanded by remember { mutableStateOf(false) }
+                                val viewModelExpenses = expensesViewModel!!
+                                Box {
+                                    IconButton(onClick = { expanded = true }) {
+                                        Icon(Icons.Default.Person,
+                                            contentDescription = "Filtrar por usuario")
+                                    }
 
+                                    DropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false }
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = { Text(
+                                                text= stringResource(R.string.todos),
+                                                color= MaterialTheme.colorScheme.onBackground
+                                            ) },
+                                            onClick = {
+                                                viewModelExpenses.modificaUsuarioFiltrado(null)
+                                                expanded = false
+                                            }
+                                        )
+                                        viewModelExpenses.usuarios.forEach { usuario ->
+                                            //por cada usuario me enseña su nombre
+                                            DropdownMenuItem(
+                                                text = { Text(text = usuario,
+                                                    color= MaterialTheme.colorScheme.onBackground) },
+                                                onClick = {
+                                                    viewModelExpenses.modificaUsuarioFiltrado(usuario)
+                                                    expanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
                             }
                             //logo de mi app
                                 Image(
@@ -528,6 +547,10 @@ private fun LineaSeparacion() {
         )
     }
 }
+
+//filtro de fecha que quiero quitar
+
+/*
 //filtro para lista de gastos fecha en x rango
 @Composable
 fun DateFilterDialog(
@@ -636,6 +659,35 @@ fun DatePickerField(selectedDate: Date?, onDateSelected: (Date?) -> Unit) {
         }
     }
 
-}
+}*/
+
+
+
+
+
+
+
+
+
+
+/*
+                        var showFilterDialog by remember { mutableStateOf(false) }
+                        val expensesVM = expensesViewModel!!
+                        IconButton(onClick = { showFilterDialog = true }) {
+                            Icon(Icons.Default.FilterList, contentDescription = "Filtrar por fecha")
+                        }
+                        if (showFilterDialog) {
+                            // Aquí muestras un diálogo para elegir fechas
+                            DateFilterDialog(
+                                initialStartDate = expensesVM.fechaInicio.value,
+                                initialEndDate = expensesVM.fechaFin.value,
+                                onDismiss = { showFilterDialog = false },
+                                onFilter = { start, end ->
+                                    expensesVM.setFechaInicio(start)
+                                    expensesVM.setFechaFin(end)
+                                    showFilterDialog = false
+                                }
+                            )
+                        }*/
 
 

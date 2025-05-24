@@ -122,6 +122,10 @@
     <string name="chat">chat</string>
     <string name="chat_familiar">Chat Familiar</string>
     <string name="escribe_un_mensaje">Escribe un mensaje…</string>
+    <string name="importe">Importe</string>
+    <string name="gasto_guardado">Gasto guardado</string>
+    <string name="asignar_gasto_a">Asignar gasto a</string>
+    <string name="no_hay_datos">No hay datos</string>
 
 
 </resources>

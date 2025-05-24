@@ -15,12 +15,16 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import androidx.compose.runtime.State
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tfg_1.repositories.UserRepository
 import java.util.*
 
 class ExpensesViewModel : ViewModel() {
 
     private val db   = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+    private val userRepository = UserRepository()
+
 
     var gastos  by mutableStateOf<List<ExpensesModel>>(emptyList())
         private set
@@ -33,46 +37,53 @@ class ExpensesViewModel : ViewModel() {
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent: SharedFlow<UiEvent> = _uiEvent
 
-    // Filtros de fechas
-    private val _fechaInicio = mutableStateOf<Date?>(null)
-    val fechaInicio: State<Date?> = _fechaInicio
+    // Filtros de usuario
+    var usuarioFiltrado by mutableStateOf<String?>(null)
+        private set
 
-    private val _fechaFin = mutableStateOf<Date?>(null)
-    val fechaFin: State<Date?> = _fechaFin
+    var usuarios by mutableStateOf<List<String>>(emptyList())
+        private set
 
+    init {
+        escucharUsuario()
+    }
+    //para logs
     companion object {
         private const val TAG = "ExpensesViewModel"
     }
 
-    init {
-        Log.d(TAG, "init -> escucharUsuario()")
-        escucharUsuario()
+
+    fun modificaUsuarioFiltrado(usuario: String?) {
+        usuarioFiltrado = usuario
     }
 
     //escuchar cambios en el usuario
+    //si el homeID de ese usuario no es = al que habia guardado se act
     private fun escucharUsuario() {
         val uid = auth.currentUser?.uid
+        //en caso de que el usuario no este logueado
         if (uid == null) {
             loading = false
             Log.w(TAG, "Usuario no autenticado")
             viewModelScope.launch { _uiEvent.emit(UiEvent.Error("Usuario no autenticado")) }
             return
         }
-
+        //
         db.collection("usuarios").document(uid)
             .addSnapshotListener { snapshot, error ->
+                //en caso de error o documento no encontrado
                 if (error != null || snapshot == null) {
-                    loading = false
-
+                    loading = false //quito circularProgresion
                     Log.e(TAG, "Error leyendo usuario", error)
                     viewModelScope.launch {
                         _uiEvent.emit(UiEvent.Error("Error leyendo usuario: ${error?.message}"))
                     }
                     return@addSnapshotListener
                 }
-
+                //recojo el homeID
                 val homeId = snapshot.getString("homeId")
                 Log.d(TAG, "Snapshot usuario -> homeId=$homeId")
+                //si no es correcto homeID
                 if (homeId.isNullOrBlank()) {
                     loading = false
                     Log.w(TAG, "homeId no encontrado en el perfil")
@@ -81,11 +92,22 @@ class ExpensesViewModel : ViewModel() {
                     }
                     return@addSnapshotListener
                 }
-
+                //si no es igual actualizo
                 if (homeIdBD != homeId) {
                     homeIdBD = homeId
                     Log.d(TAG, "homeId actualizado, llamo a escucharGastos()")
+                   //recojo los gatsos de ese hogar
                     escucharGastos(homeId)
+                    //cargo los usuarios que tiene
+                    viewModelScope.launch {
+                        try{
+                            val miembros = userRepository.getMembersByHomeId(homeId)
+                            usuarios = miembros.map { it.name }
+                        }catch (e: Exception) {
+                            Log.e(TAG, "Error al cargar usuarios", e)
+                            _uiEvent.emit(UiEvent.Error("Error al cargar usuarios: ${e.localizedMessage}"))
+                        }
+                    }
                 }
             }
     }
@@ -108,6 +130,7 @@ class ExpensesViewModel : ViewModel() {
                     return@addSnapshotListener
                 }
 
+                //convertir los nuevos gastos
                 gastos = snap.documents.mapNotNull { d ->
                     d.toObject(ExpensesModel::class.java)?.copy(id = d.id)
                 }
@@ -124,14 +147,14 @@ class ExpensesViewModel : ViewModel() {
         categoria: String,
         descripcion: String,
         importe: Double,
-        fecha: Date
+        fecha: Date,
+        asignadoA: String
     ): Boolean {
-        val uid = auth.currentUser?.uid ?: return false
         val homeId = homeIdBD ?: return false
 
         val data = mapOf(
             "categoria"  to categoria.lowercase(),
-            "creadoPor"  to uid,
+            "asignadoA"  to asignadoA,
             "descripcion" to descripcion,
             "fecha"      to fecha,
             "homeId"     to homeId,
@@ -161,7 +184,7 @@ class ExpensesViewModel : ViewModel() {
                 db.collection("hogares")
                     .document(homeId)
                     .collection("gastos")
-                    .document(gasto.id!!)
+                    .document(gasto.id)
                     .delete()
                     .await()
 
@@ -173,25 +196,11 @@ class ExpensesViewModel : ViewModel() {
         }
     }
 
-    //filtrado de fechas
-    fun setFechaInicio(fecha: Date?) {
-        _fechaInicio.value = fecha
-    }
-
-    fun setFechaFin(fecha: Date?) {
-        _fechaFin.value = fecha
-    }
 
     val gastosFiltrados: List<ExpensesModel>
-        get() {
-            val inicio = _fechaInicio.value
-            val fin = _fechaFin.value
-            return gastos.filter { gasto ->
-                val fechaGasto = gasto.fecha
-                (inicio == null || !fechaGasto.before(inicio)) &&
-                        (fin == null || !fechaGasto.after(fin))
-            }
-        }
+        get() = gastos.filter { gasto ->
+        usuarioFiltrado == null || gasto.asignadoA == usuarioFiltrado
+    }
 
     sealed interface UiEvent {
         object Added : UiEvent

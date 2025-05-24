@@ -113,7 +113,9 @@
     <string name="seleccionar_fecha">Select date</string>
     <string name="chat">chat</string>
     <string name="chat_familiar"> Family Chat</string>
-    <string name="escribe_un_mensaje">Write a message...</string>
-
-
+    <string name="escribe_un_mensaje">Write a message…</string>
+    <string name="importe">Amount</string>
+    <string name="gasto_guardado">Expense saved</string>
+    <string name="asignar_gasto_a">Assign expense to</string>
+    <string name="no_hay_datos">There is no data</string>
 </resources>

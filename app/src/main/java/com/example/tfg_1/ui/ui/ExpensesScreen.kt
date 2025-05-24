@@ -1,6 +1,8 @@
 package com.example.tfg_1.ui.ui
 
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.ui.text.input.KeyboardType
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.LineData
@@ -42,6 +45,7 @@ import java.util.*
 @Composable
 fun ExpensesScreen() {
     val vm: ExpensesViewModel = viewModel()
+    val context = LocalContext.current
 
     val gastos by remember { derivedStateOf { vm.gastos } } //estado lista gastos
     val loading by remember { derivedStateOf { vm.loading } } //estado carga
@@ -116,7 +120,9 @@ fun ExpensesScreen() {
         agruparGastosPorPeriodo(gastosFiltrados, periodoFiltro) // agrupo y guardo/recuerdo datos para el gráfico
     }
 
-    var expandedFiltro by remember { mutableStateOf(false) } //menú desplegable está abierto??
+    var expandedFiltroFecha by remember { mutableStateOf(false) } //menú desplegable está abierto??
+    var expandedCategoria by remember { mutableStateOf(false) }     // para categoría en el diálogo
+
     var showDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -136,24 +142,27 @@ fun ExpensesScreen() {
     var categoria by remember { mutableStateOf(categorias.first()) } // categoría seleccionada
     var otraCategoria by remember { mutableStateOf("") } //categoría personalizada
     var descripcion by remember { mutableStateOf("") } // Descripción
-    var importeTxt by remember { mutableStateOf("") } // Importe
-    val fecha by remember { mutableStateOf(Calendar.getInstance().time) } // Fecha
+    var importe by remember { mutableStateOf("") } // Importe
+    val usuariosAsignar = listOf("hogar") + vm.usuarios
+    var asignadaA by remember { mutableStateOf(usuariosAsignar.first()) } // asigando a ...
+    var fecha by remember { mutableStateOf(Calendar.getInstance().time) } // Fecha
+    var showDatePicker by remember { mutableStateOf(false) }
 
     val dateFmt = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) } // Formateador de fecha
 
     //guarda gasto
     suspend fun save() {
-        val imp = importeTxt.toDoubleOrNull() ?: 0.0 // Se convierte el texto a número
+        val imp = importe.toDoubleOrNull() ?: 0.0 // Se convierte el texto a número
         val cat = if (categoria == "otra") otraCategoria else categoria // Se determina la categoría
         if (cat.isBlank() || imp <= 0) { // Validación básica
             snackbarHostState.showSnackbar("Completa categoría e importe")
             return
         }
-        if (vm.aniadirGastoVM(cat, descripcion, imp, fecha)) { // Se guarda el gasto en el ViewModel
+        if (vm.aniadirGastoVM(cat, descripcion, imp, fecha, asignadaA )) { // Se guarda el gasto en el ViewModel
             categoria = categorias.first() // Se reinician los campos
             otraCategoria = ""
             descripcion = ""
-            importeTxt = ""
+            importe = ""
         }
     }
 
@@ -167,22 +176,25 @@ fun ExpensesScreen() {
             // Encabezado = gráfico y filtro fecha
             item {
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    ExposedDropdownMenuBox(expanded = expandedFiltro, onExpandedChange = { expandedFiltro = !expandedFiltro }) {
+                    ExposedDropdownMenuBox(
+                        expanded = expandedFiltroFecha, onExpandedChange = { expandedFiltroFecha = !expandedFiltroFecha }) {
                         TextField(
                             readOnly = true,
                             value = periodoFiltro.name,//asigno nombre de "mes/semna/año"
                             onValueChange = {},
                             label = { Text("Filtro de tiempo") },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedFiltro) },
-                            modifier = Modifier.menuAnchor().fillMaxWidth()
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedFiltroFecha) },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
                         )
-                        ExposedDropdownMenu(expanded = expandedFiltro, onDismissRequest = { expandedFiltro = false }) {
+                        ExposedDropdownMenu(expanded = expandedFiltroFecha, onDismissRequest = { expandedFiltroFecha = false }) {
                             PeriodoFiltro.entries.forEach { filtro ->
                                 DropdownMenuItem(
                                     text = { Text(filtro.name) },
                                     onClick = {
                                         periodoFiltro = filtro // Cambia el filtro
-                                        expandedFiltro = false // Cierra el menú
+                                        expandedFiltroFecha = false // Cierra el menú
                                     }
                                 )
                             }
@@ -193,7 +205,7 @@ fun ExpensesScreen() {
                 Chart(datosChart) // muestra el gráfico con dato
 
                 Spacer(modifier = Modifier.height(10.dp)) // Espacio
-
+                //lista de los gastos:
                 Text(
                     text = stringResource(R.string.lista_de_gastos),
                     style = MaterialTheme.typography.titleMedium,
@@ -201,28 +213,39 @@ fun ExpensesScreen() {
                 )
             }
 
-            // lista de gastos filtrados
+            // lista de gastos filtrados, tarjeta
             items(gastosFiltrados.sortedByDescending { it.fecha }) { g ->
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp, horizontal = 8.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(
-                        modifier = Modifier.padding(12.dp).fillMaxWidth(),
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         //creacion de nuevos gastos
                         Column(modifier = Modifier.padding(12.dp)) {
                             Text(
-                                text = "${g.categoria.replaceFirstChar { it.uppercase() }}: ${"%.2f".format(g.importe)}€  ·  ${dateFmt.format(g.fecha)}",
-                                style = MaterialTheme.typography.bodyMedium
+                                text = "${g.categoria.replaceFirstChar { it.uppercase() }}: ${"%.2f".format(g.importe)}€    ·    ${dateFmt.format(g.fecha)}",
+                                style = MaterialTheme.typography.bodyMedium,
+
                             )
+
                             if (g.descripcion.isNotBlank()) {
                                 Spacer(Modifier.height(4.dp))
-                                Text(text = g.descripcion, style = MaterialTheme.typography.bodyLarge)
+                                Text(text = g.descripcion,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
                             }
+
+                            Text(text = "Asignado a: ${g.asignadoA}")
+
                         }
                         IconButton(onClick = { vm.eliminarGasto(g) }) {
                             Icon(
@@ -240,7 +263,9 @@ fun ExpensesScreen() {
         Button(
             onClick = { showDialog = true },
             enabled = !loading,
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
         ) {
             Text(stringResource(R.string.aniadir_gastoBT))
         }
@@ -249,38 +274,192 @@ fun ExpensesScreen() {
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },
-                title = { Text("Nuevo Gasto") },
+                title = { Text(stringResource(id = R.string.nuevogastos)) },
                 text = {
                     Column {
+                        // Categoría
+                        ExposedDropdownMenuBox(
+                            expanded = expandedCategoria,
+                            onExpandedChange = { expandedCategoria = !expandedCategoria }
+                        ) {
+                            TextField(
+                                value = categoria,
+                                onValueChange = {},
+                                label = { Text(stringResource(id = R.string.categoria)) },
+                                readOnly = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedCategoria) },
+                                modifier = Modifier
+                                    .menuAnchor()
+                                    .fillMaxWidth()
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expandedCategoria,
+                                onDismissRequest = { expandedCategoria = false }
+                            ) {
+                                categorias.forEach {
+                                    DropdownMenuItem(
+                                        text = { Text(it) },
+                                        onClick = {
+                                            categoria = it
+                                            expandedCategoria = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        // campo adicional si es "otra"
+                        if (categoria == "otra") {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            TextField(
+                                value = otraCategoria,
+                                onValueChange = { otraCategoria = it },
+                                label = { Text(stringResource(id = R.string.otra_categoria)) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        //descripcion
                         TextField(
                             value = descripcion,
                             onValueChange = { descripcion = it },
-                            label = { Text("Descripción") },
+                            label = { Text(stringResource(id = R.string.descripcion)) },
                             modifier = Modifier.fillMaxWidth()
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        //importe
                         TextField(
-                            value = importeTxt,
-                            onValueChange = { importeTxt = it },
-                            label = { Text("Importe") },
+                            value = importe,
+                            onValueChange = { importe = it },
+                            label = { Text(stringResource(id = R.string.importe)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
-                        // Puedes agregar campos extra como categoría, fecha, etc.
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // fecha
+                        val calendar = Calendar.getInstance().apply { time = fecha }
+                        if (showDatePicker) {
+                            android.app.DatePickerDialog(
+                                context,
+                                { _, year, month, dayOfMonth ->
+                                    val selectedCalendar = Calendar.getInstance()
+                                    selectedCalendar.set(year, month, dayOfMonth)
+                                    fecha = selectedCalendar.time
+                                    showDatePicker = false
+                                },
+                                calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH)
+                            ).show()
+                            showDatePicker=false // evitar que se reabra solo
+                        }
+                        //manejar el clic
+                        Box(modifier = Modifier.fillMaxWidth()
+                            .clickable{showDatePicker = true}
+                        ) {
+                            //=estilo
+                            TextField(
+                                value = dateFmt.format(fecha),
+                                onValueChange = {},
+                                label = { Text(stringResource(id = R.string.seleccionar_fecha)) },
+                                trailingIcon = {
+                                    IconButton(onClick = { showDatePicker=true }) {
+                                        Icon(
+                                            imageVector = Icons.Filled.CalendarToday,
+                                            contentDescription = stringResource(R.string.seleccionaFecha)
+                                        )
+                                    }
+                                },
+                                readOnly = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                enabled = true,
+                            )
+/*
+                            OutlinedTextField(
+                                value = fecha,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text(stringResource(R.string.fechaMax)) },
+                                trailingIcon = {
+                                    IconButton(onClick = { showDatePicker.show() }) {
+                                        Icon(
+                                            imageVector = Icons.Filled.CalendarToday,
+                                            contentDescription = stringResource(R.string.seleccionaFecha)
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                enabled = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
+                                    disabledTextColor = Color.Black
+                                )
+                            )*/
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Asignar gasto a----------------------------------
+                        var expandedAsignadoA by remember { mutableStateOf(false) }
+
+                        ExposedDropdownMenuBox(
+                            expanded = expandedAsignadoA,
+                            onExpandedChange = { expandedAsignadoA = !expandedAsignadoA }
+                        ) {
+                            TextField(
+                                value = asignadaA,
+                                onValueChange = {},
+                                label = { Text(stringResource(R.string.asignar_gasto_a)) },
+                                readOnly = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedAsignadoA) },
+                                modifier = Modifier
+                                    .menuAnchor()
+                                    .fillMaxWidth()
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expandedAsignadoA,
+                                onDismissRequest = { expandedAsignadoA = false }
+                            ) {
+                                usuariosAsignar.forEach { usuario ->
+                                    DropdownMenuItem(
+                                        text = { Text(usuario) },
+                                        onClick = {
+                                            asignadaA = usuario
+                                            expandedAsignadoA = false
+                                        }
+                                    )
+                                }
+                            }
+
+                        }
                     }
                 },
                 confirmButton = {
                     TextButton(onClick = {
-                        showDialog = false
                         CoroutineScope(Dispatchers.Main).launch {
-                            save()
+                            if (categoria.isNotBlank() && importe.isNotBlank() && asignadaA.isNotBlank()) {
+                                save()
+                                showDialog = false
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.completaTodosCampos),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }) {
-                        Text("Guardar")
+                        Text(stringResource(id = R.string.guardar))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showDialog = false }) {
-                        Text("Cancelar")
+                        Text(stringResource(id = R.string.cancelar))
                     }
                 }
             )
@@ -289,7 +468,9 @@ fun ExpensesScreen() {
         // Snackbar para mensajes flotantes
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp)
         )
 
         // Cargando indicador circular
@@ -323,7 +504,7 @@ fun Chart(datos: List<DataChart>) { //DAtaChart = label and value
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
                 setBackgroundColor(android.graphics.Color.WHITE) //fondo blanco del grfa
-                setNoDataText("No hay datos") //si no hay gastos, aviso
+                setNoDataText(context.getString(R.string.no_hay_datos)) //si no hay gastos, aviso
 
                 //Eje y izq
                 axisLeft.apply {
