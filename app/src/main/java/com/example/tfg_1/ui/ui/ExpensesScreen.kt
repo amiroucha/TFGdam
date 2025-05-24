@@ -35,6 +35,8 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,7 +52,8 @@ fun ExpensesScreen() {
 
     val gastos by remember { derivedStateOf { vm.gastos } } //estado lista gastos
     val loading by remember { derivedStateOf { vm.loading } } //estado carga
-    val gastosFiltrados by remember { derivedStateOf { vm.gastosFiltrados } } //lista de gastos filtrada
+    //lista de gastos filtrada
+    val gastosFiltrados by remember { derivedStateOf { vm.gastosFiltrados } }
 
     var periodoFiltro by remember { mutableStateOf(PeriodoFiltro.MES) } // por defecto es mensual
 
@@ -503,6 +506,9 @@ fun Chart(datos: List<DataChart>) { //DAtaChart = label and value
                 //no quiero q se vean
                 description.isEnabled = false
                 legend.isEnabled = false
+                setScaleEnabled(false) //zoom haciedno 2 dedos
+                isDoubleTapToZoomEnabled = true  //zoom dos toques
+                isDragEnabled = true //scroll horizonal
             }
         },
         //cada cambio lo act
@@ -540,8 +546,29 @@ fun Chart(datos: List<DataChart>) { //DAtaChart = label and value
             }
 
             chart.data = LineData(dataSet)
-            chart.invalidate()//act dibujo con nuevos datos
+            //dar informacion al tocar los puntos
+            chart.setOnChartValueSelectedListener(
+                object : OnChartValueSelectedListener {
+                    override fun onValueSelected(e: Entry?, h: Highlight?) {
+                        e?.let {
+                            val index = e.x.toInt()
+                            if (index in labels.indices) {
+                                val labelSeleccionada = labels[index]
+                                val valor = e.y
+                                Toast.makeText(
+                                    context,
+                                    " -  $labelSeleccionada, ${"%.2f".format(valor)}€",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
 
+                    override fun onNothingSelected() {
+                        // nada
+                    }
+            })
+            chart.invalidate()//act dibujo con nuevos datos
 
         }
     )
