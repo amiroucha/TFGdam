@@ -108,19 +108,19 @@ fun ExpensesScreen() {
 
             val label = when (filtro) { //etiqueta segn filtro semana, mes,año
                 PeriodoFiltro.SEMANA -> {
-
                     val semana = calendar.get(Calendar.WEEK_OF_YEAR) // numero semana
                     val anio = calendar.get(Calendar.YEAR) % 100 // ultimos 2 dígitos del año
-                    "$semana-$anio"
-
+                    "$semana//$anio"
                 }
                 PeriodoFiltro.MES -> {
-
                     val anio = calendar.get(Calendar.YEAR)
                     val mesNombre = SimpleDateFormat("MMM", Locale.getDefault()).format(calendar.time) // nombre mes
-                    "$mesNombre $anio" // Ejemplo: "May 2025"
+                    "$mesNombre $anio"
                 }
-                PeriodoFiltro.ANIO -> calendar.get(Calendar.YEAR).toString()
+                PeriodoFiltro.ANIO -> {
+                    val anio = calendar.get(Calendar.YEAR)
+                    "$anio"
+                }
             }
             DataChart(label = label, value = total.toFloat())
         }
@@ -185,6 +185,16 @@ fun ExpensesScreen() {
         ) {
             // Encabezado = gráfico y filtro fecha
             item {
+                //titulo encima de grafico:
+                Text(
+                    text = stringResource(R.string.gastos_totales_del_hogar),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
+                        .padding(top = 9.dp, bottom = 7.dp, start = 15.dp),
+                    fontSize = 19.sp
+                )
+                Spacer(modifier = Modifier.height(10.dp)) // Espacio
+
                 Box(modifier = Modifier.fillMaxWidth()) {
                     ExposedDropdownMenuBox(
                         expanded = expandedFiltroFecha, onExpandedChange = { expandedFiltroFecha = !expandedFiltroFecha }) {
@@ -192,7 +202,7 @@ fun ExpensesScreen() {
                             readOnly = true,
                             value = periodoFiltro.name,//asigno nombre de "mes/semna/año"
                             onValueChange = {},
-                            label = { Text("Filtro de tiempo") },
+                            label = { Text(stringResource(R.string.filtro_de_tiempo)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedFiltroFecha) },
                             modifier = Modifier
                                 .menuAnchor()
@@ -219,7 +229,9 @@ fun ExpensesScreen() {
                 Text(
                     text = stringResource(R.string.lista_de_gastos),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier
+                        .padding(top = 9.dp, bottom = 7.dp, start = 15.dp),
+                    fontSize = 19.sp
                 )
             }
 

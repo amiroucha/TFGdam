@@ -127,6 +127,8 @@
     <string name="asignar_gasto_a">Asignar gasto a</string>
     <string name="no_hay_datos">No hay datos</string>
     <string name="seguroEliminarGasto">¿Estás segura de que deseas eliminar este gasto? Esta acción no se puede deshacer.</string>
+    <string name="filtro_de_tiempo">Filtro de tiempo</string>
+    <string name="gastos_totales_del_hogar">Gastos totales del hogar</string>
 
 
 </resources>

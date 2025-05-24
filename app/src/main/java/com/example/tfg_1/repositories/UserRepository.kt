@@ -1,10 +1,13 @@
 package com.example.tfg_1.repositories
 
+import android.util.Log
+import com.example.tfg_1.model.ExpensesModel
 import com.example.tfg_1.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.tasks.await
 
 class UserRepository(
@@ -59,7 +62,7 @@ class UserRepository(
 
     //obtener el nombre del hogar actual
     suspend fun getCurrentHomeName(): String {
-        val uid = getCurrentUserId() ?: return ""
+        val uid = getCurrentUserId()
         val userDoc = getUserDoc(uid)
         val homeId = userDoc.getString("homeId") ?: return ""
         val homeDoc = getHomeById(homeId)
@@ -87,6 +90,79 @@ class UserRepository(
                 birthDate = u.getString("birthDate").orEmpty(),
                 image = u.getString("image").orEmpty(),
             )
+        }
+    }
+    //expenses ------------------------------------------------------------------
+    fun escucharHomeIdUsuarioActual(onChange: (String?) -> Unit): ListenerRegistration? {
+        val uid = auth.currentUser?.uid ?: return null
+
+        return firestore.collection("usuarios").document(uid)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null) {
+                    Log.e("UserRepository", "Error escuchando usuario", error)
+                    onChange(null)
+                    return@addSnapshotListener
+                }
+
+                val homeId = snapshot.getString("homeId")
+                Log.d("UserRepository", "Snapshot usuario -> homeId=$homeId")
+                onChange(homeId)
+            }
+    }
+
+
+    //obtener y actualizar gastos
+    fun escucharGastos(homeId: String, onChange: (List<ExpensesModel>) -> Unit): ListenerRegistration {
+        return firestore.collection("hogares").document(homeId)
+            .collection("gastos")
+            .addSnapshotListener { snap, err ->
+                if (err != null || snap == null) {
+                    Log.e("ExpensesViewModel", "Error escuchando gastos", err)
+                    onChange(emptyList())
+                    return@addSnapshotListener
+                }
+
+                val gastos = snap.documents.mapNotNull { d ->
+                    d.toObject(ExpensesModel::class.java)?.copy(id = d.id)
+                }
+                onChange(gastos)
+            }
+    }
+    //añadir gasto
+    suspend fun addExpense(homeId: String, gasto: ExpensesModel): Boolean {
+        val data = mapOf(
+            "categoria"  to gasto.categoria.lowercase(),
+            "asignadoA"  to gasto.asignadoA,
+            "descripcion" to gasto.descripcion,
+            "fecha"      to gasto.fecha,
+            "homeId"     to homeId,
+            "importe"    to gasto.importe
+        )
+
+        return try {
+            firestore.collection("hogares").document(homeId)
+                .collection("gastos")
+                .add(data)
+                .await()
+            true
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error al guardar gasto", e)
+            false
+        }
+    }
+    //eliminar gasto
+    suspend fun deleteExpense(homeId: String, gastoId: String): Boolean {
+        return try {
+            firestore.collection("hogares")
+                .document(homeId)
+                .collection("gastos")
+                .document(gastoId)
+                .delete()
+                .await()
+            true
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error al eliminar gasto", e)
+            false
         }
     }
 }
