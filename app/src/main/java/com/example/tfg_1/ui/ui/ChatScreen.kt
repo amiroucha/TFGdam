@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +33,7 @@ import java.util.*
 
 @Composable
 fun ChatScreen(viewModel: ChatViewModel) {
+
     val messages = viewModel.messages
     var newMessage by remember { mutableStateOf("") }
     val currentUserId = viewModel.currentUserId
@@ -50,6 +53,8 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (messageList, chatBox) = createRefs()
+        val chatItems = messages.withDateLabels()
+
 
         LazyColumn(
             state = listState,
@@ -65,9 +70,23 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 },
             reverseLayout = false
         ) {
-            items(messages) { message ->
-                val isCurrentUser = message.senderId == currentUserId
-                MessageBox(message = message, isCurrentUser = isCurrentUser)
+            items(chatItems) { item ->
+                when (item) {
+                    is ChatItem.DateLabel -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = item.label, color = Color.Gray)
+                        }
+                    }
+                    is ChatItem.Message -> {
+                        val isCurrentUser = item.message.senderId == currentUserId
+                        MessageBox(message = item.message, isCurrentUser = isCurrentUser, viewModel = viewModel)
+                    }
+                }
             }
         }
 
@@ -104,7 +123,17 @@ fun ChatScreen(viewModel: ChatViewModel) {
                     }
                 }
             ) {
-                Icon(imageVector = Icons.Default.Send, contentDescription = stringResource(R.string.escribe_un_mensaje))
+                Box( //para poder ponerle un fondo
+                    modifier = Modifier
+                        .background(colorResource(id = R.color.greenOscuro), shape = CircleShape)
+                        .padding(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Send,
+                        contentDescription = stringResource(R.string.escribe_un_mensaje),
+                        tint = colorResource(id = R.color.white)
+                    )
+                }
             }
         }
     }
@@ -113,11 +142,16 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
 
 @Composable
-fun MessageBox(message: ChatMessageModel, isCurrentUser: Boolean) {
+fun MessageBox(
+    message: ChatMessageModel,
+    isCurrentUser: Boolean,
+    viewModel: ChatViewModel
+) {
     val backgroundColor = if (isCurrentUser) {
         colorResource(id = R.color.lilaChat) // color para el usuario actual
     } else {
-        getColorForUser(message.senderId)
+        //getColorForUser(message.senderId)
+        viewModel.getUserColor(message.senderId)
     }
 
     val alignment = if (isCurrentUser) Arrangement.End else Arrangement.Start
@@ -174,13 +208,48 @@ fun formatTime(timestamp: Long): String {
     return sdf.format(Date(timestamp))
 }
 
+
+
+
+sealed class ChatItem {
+    data class Message(val message: ChatMessageModel) : ChatItem()
+    data class DateLabel(val label: String) : ChatItem()
+}
 @Composable
-fun getColorForUser(senderId: String): Color {
-    return when (senderId.hashCode() % 5) {
-        0 -> colorResource(id = R.color.naranjaChat)
-        1 -> colorResource(id = R.color.azulChat)
-        2 -> colorResource(id = R.color.verdeChat)
-        3 -> colorResource(id = R.color.rosaChat)
-        else -> colorResource(id = R.color.amarilloChat)
+fun getDateLabel(timestamp: Long): String {
+    val now = System.currentTimeMillis()
+    val oneDay = 24 * 60 * 60 * 1000L
+    val diff = now - timestamp
+
+
+    return when {
+        diff < oneDay && isSameDay(now, timestamp) ->  stringResource(id = R.string.hoy)
+        diff < 2 * oneDay && isSameDay(now - oneDay, timestamp) -> stringResource(id = R.string.ayer)
+        else -> SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(timestamp))
     }
+}
+
+@Composable
+fun List<ChatMessageModel>.withDateLabels(): List<ChatItem> {
+    val result = mutableListOf<ChatItem>()
+    var lastDate: String? = null
+
+    this.forEach { message ->
+        val dateLabel = getDateLabel(message.timestamp)  // Esta función la defines tú (más abajo te ayudo)
+
+        if (dateLabel != lastDate) {
+            result.add(ChatItem.DateLabel(dateLabel))
+            lastDate = dateLabel
+        }
+        result.add(ChatItem.Message(message))
+    }
+    return result
+}
+
+
+fun isSameDay(time1: Long, time2: Long): Boolean {
+    val cal1 = Calendar.getInstance().apply { timeInMillis = time1 }
+    val cal2 = Calendar.getInstance().apply { timeInMillis = time2 }
+    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+            cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
 }

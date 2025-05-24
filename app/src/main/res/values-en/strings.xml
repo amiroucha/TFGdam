@@ -121,5 +121,9 @@
     <string name="seguroEliminarGasto">Are you sure you want to delete this expense? This action cannot be undone.</string>
     <string name="filtro_de_tiempo">Time filter</string>
     <string name="gastos_totales_del_hogar">Total household expenses</string>
+    <string name="hoy">Today</string>
+    <string name="ayer">Yesterday</string>
+
+
 
 </resources>
