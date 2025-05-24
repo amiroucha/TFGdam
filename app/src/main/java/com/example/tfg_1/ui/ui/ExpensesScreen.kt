@@ -55,7 +55,13 @@ fun ExpensesScreen() {
     //lista de gastos filtrada
     val gastosFiltrados by remember { derivedStateOf { vm.gastosFiltrados } }
 
-    var periodoFiltro by remember { mutableStateOf(PeriodoFiltro.MES) } // por defecto es mensual
+    //btn elimnar gasto
+    var gastoAEliminar by remember { mutableStateOf<ExpensesModel?>(null) }
+    var showConfirmDelete by remember { mutableStateOf(false) }
+
+
+    // por defecto es mensual
+    var periodoFiltro by remember { mutableStateOf(PeriodoFiltro.MES) }
 
     // agrupa gastos por semana, mes o año
     fun agruparGastosPorPeriodo(gastos: List<ExpensesModel>, filtro: PeriodoFiltro): List<DataChart> {
@@ -253,7 +259,10 @@ fun ExpensesScreen() {
                                 fontSize = 15.sp)
 
                         }
-                        IconButton(onClick = { vm.eliminarGasto(g) }) {
+                        IconButton(onClick = {
+                            gastoAEliminar = g
+                            showConfirmDelete = true}
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = stringResource(R.string.eliminar_gasto),
@@ -364,8 +373,9 @@ fun ExpensesScreen() {
                             showDatePicker=false // evitar que se reabra solo
                         }
                         //manejar el clic
-                        Box(modifier = Modifier.fillMaxWidth()
-                            .clickable{showDatePicker = true}
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showDatePicker = true }
                         ) {
                             //=estilo
                             TextField(
@@ -443,6 +453,35 @@ fun ExpensesScreen() {
                 },
                 dismissButton = {
                     TextButton(onClick = { showDialog = false }) {
+                        Text(stringResource(id = R.string.cancelar))
+                    }
+                }
+            )
+        }
+
+        //alerta para asegurar eliminar ese gasto
+        if (showConfirmDelete && gastoAEliminar != null) {
+            AlertDialog(
+                onDismissRequest = {
+                    showConfirmDelete = false
+                    gastoAEliminar = null
+                },
+                title = { Text(stringResource(id = R.string.eliminar_gasto)) },
+                text = { Text(stringResource(R.string.seguroEliminarGasto)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        vm.eliminarGasto(gastoAEliminar!!) // elimina gasto
+                        showConfirmDelete = false
+                        gastoAEliminar = null
+                    }) {
+                        Text(stringResource(id = R.string.eliminar_gasto), color = colorResource(id = R.color.red))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        showConfirmDelete = false
+                        gastoAEliminar = null
+                    }) {
                         Text(stringResource(id = R.string.cancelar))
                     }
                 }
@@ -557,7 +596,7 @@ fun Chart(datos: List<DataChart>) { //DAtaChart = label and value
                                 val valor = e.y
                                 Toast.makeText(
                                     context,
-                                    " -  $labelSeleccionada, ${"%.2f".format(valor)}€",
+                                    " -  $labelSeleccionada // ${"%.2f".format(valor)}€",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }

@@ -118,4 +118,5 @@
     <string name="gasto_guardado">Expense saved</string>
     <string name="asignar_gasto_a">Assign expense to</string>
     <string name="no_hay_datos">There is no data</string>
+    <string name="seguroEliminarGasto">Are you sure you want to delete this expense? This action cannot be undone.</string>
 </resources>
