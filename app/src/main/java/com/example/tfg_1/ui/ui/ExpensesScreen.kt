@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.sp
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -143,7 +144,7 @@ fun ExpensesScreen() {
     var otraCategoria by remember { mutableStateOf("") } //categoría personalizada
     var descripcion by remember { mutableStateOf("") } // Descripción
     var importe by remember { mutableStateOf("") } // Importe
-    val usuariosAsignar = listOf("hogar") + vm.usuarios
+    val usuariosAsignar = listOf("Hogar") + vm.usuarios ///añado opcion "Hogar"
     var asignadaA by remember { mutableStateOf(usuariosAsignar.first()) } // asigando a ...
     var fecha by remember { mutableStateOf(Calendar.getInstance().time) } // Fecha
     var showDatePicker by remember { mutableStateOf(false) }
@@ -230,21 +231,23 @@ fun ExpensesScreen() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         //creacion de nuevos gastos
-                        Column(modifier = Modifier.padding(12.dp)) {
+                        Column(modifier = Modifier.padding(10.dp)) {
                             Text(
-                                text = "${g.categoria.replaceFirstChar { it.uppercase() }}: ${"%.2f".format(g.importe)}€    ·    ${dateFmt.format(g.fecha)}",
+                                text = "${g.categoria.replaceFirstChar { it.uppercase() }}: ${"%.2f".format(g.importe)}€ -- ${dateFmt.format(g.fecha)}",
                                 style = MaterialTheme.typography.bodyMedium,
-
+                                fontSize = 16.sp
                             )
-
                             if (g.descripcion.isNotBlank()) {
                                 Spacer(Modifier.height(4.dp))
                                 Text(text = g.descripcion,
-                                    style = MaterialTheme.typography.bodyLarge,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontSize = 15.sp
                                 )
                             }
 
-                            Text(text = "Asignado a: ${g.asignadoA}")
+                            Text(text = "Asignado a: ${g.asignadoA}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 15.sp)
 
                         }
                         IconButton(onClick = { vm.eliminarGasto(g) }) {
@@ -378,28 +381,6 @@ fun ExpensesScreen() {
                                 modifier = Modifier.fillMaxWidth(),
                                 enabled = true,
                             )
-/*
-                            OutlinedTextField(
-                                value = fecha,
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text(stringResource(R.string.fechaMax)) },
-                                trailingIcon = {
-                                    IconButton(onClick = { showDatePicker.show() }) {
-                                        Icon(
-                                            imageVector = Icons.Filled.CalendarToday,
-                                            contentDescription = stringResource(R.string.seleccionaFecha)
-                                        )
-                                    }
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                enabled = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.Black,
-                                    disabledTextColor = Color.Black
-                                )
-                            )*/
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))

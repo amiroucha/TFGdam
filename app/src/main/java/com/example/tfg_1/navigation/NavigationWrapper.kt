@@ -212,6 +212,16 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                                 expanded = false
                                             }
                                         )
+                                        DropdownMenuItem(
+                                            text = { Text(
+                                                text="Hogar",
+                                                color= MaterialTheme.colorScheme.onBackground
+                                            ) },
+                                            onClick = {
+                                                viewModelExpenses.modificaUsuarioFiltrado("Hogar")
+                                                expanded = false
+                                            }
+                                        )
                                         viewModelExpenses.usuarios.forEach { usuario ->
                                             //por cada usuario me enseña su nombre
                                             DropdownMenuItem(
