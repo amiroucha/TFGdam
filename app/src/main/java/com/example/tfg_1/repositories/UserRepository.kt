@@ -1,6 +1,7 @@
 package com.example.tfg_1.repositories
 
 import android.util.Log
+import com.example.tfg_1.model.ChatMessageModel
 import com.example.tfg_1.model.ExpensesModel
 import com.example.tfg_1.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
@@ -92,6 +93,47 @@ class UserRepository(
             )
         }
     }
+
+    //chat--------------------------------------------------------------------
+    fun escucharMensajes(homeId: String, onMessagesChanged: (List<ChatMessageModel>) -> Unit): ListenerRegistration {
+        return firestore.collection("hogares")
+            .document(homeId)
+            .collection("mensajes")
+            .orderBy("timestamp")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null) {
+                    Log.e("UserRepository", "Error escuchando mensajes", error)
+                    onMessagesChanged(emptyList())
+                    return@addSnapshotListener
+                }
+
+                val mensajes = snapshot.documents.mapNotNull { doc ->
+                    try {
+                        doc.toObject(ChatMessageModel::class.java)
+                    } catch (e: Exception) {
+                        Log.e("UserRepository", "Error parsing message: ${doc.id}", e)
+                        null
+                    }
+                }
+
+                onMessagesChanged(mensajes)
+            }
+    }
+    suspend fun enviarMensaje(homeId: String, message: ChatMessageModel): Boolean {
+        return try {
+            firestore.collection("hogares")
+                .document(homeId)
+                .collection("mensajes")
+                .add(message)
+                .await()
+            true
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error enviando mensaje", e)
+            false
+        }
+    }
+
+
     //expenses ------------------------------------------------------------------
     fun escucharHomeIdUsuarioActual(onChange: (String?) -> Unit): ListenerRegistration? {
         val uid = auth.currentUser?.uid ?: return null
