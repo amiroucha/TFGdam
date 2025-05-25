@@ -33,7 +33,7 @@ import java.util.*
 @Composable
 fun ChatScreen(viewModel: ChatViewModel, searchText: String) {
 
-    val messages = viewModel.messages //lista de mensajes
+    val messages = viewModel.filteredMessages //lista de mensajes filtrados o no
     //mensajes que se van escribiendo
     var newMessage by remember { mutableStateOf("") }
     //distinguir quien ha enviado el mensaje
