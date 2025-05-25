@@ -47,7 +47,7 @@ fun ChatScreen(viewModel: ChatViewModel, searchText: String) {
         viewModel.loadChat()
     }
 
-    // Auto-scroll al último mensaje cada vez que hay `++ mensaje
+    // Auto-scroll al último mensaje cada vez que hay ++ mensaje
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.scrollToItem(messages.lastIndex)
