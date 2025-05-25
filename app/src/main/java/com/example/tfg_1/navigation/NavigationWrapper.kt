@@ -12,9 +12,9 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -36,9 +36,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import com.example.tfg_1.ui.ui.AvatarSheet
-import java.util.Date
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,6 +73,11 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    //filtro de busqueda para chat
+    val chatViewModel: ChatViewModel = viewModel()
+
+    var showSearchBar by remember { mutableStateOf(false) }
+    var searchText by remember { mutableStateOf("") }
 
 
     // Observa los cambios en authState para manejo de navegación
@@ -127,15 +130,45 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                 if (showTopBar) {
                     TopAppBar(
                         title = {
-                            Text(
-                                text = when (currentRoute) { //texto del titulo de la pagina
-                                    Screens.Tasks.route -> stringResource(R.string.tasks)
-                                    Screens.Settings.route -> stringResource(id = R.string.settings)
-                                    Screens.Expenses.route -> stringResource(id = R.string.gastos)
-                                    Screens.Chat.route -> stringResource(R.string.chat_familiar)
-                                    else -> ""
+                            if (currentRoute == Screens.Chat.route && showSearchBar) {
+                                Box(modifier = Modifier.fillMaxWidth()) {
+                                    TextField(
+                                        value = searchText,
+                                        onValueChange = { newText ->
+                                            searchText = newText
+                                            chatViewModel.updateSearchQuery(newText)
+                                        },
+                                        placeholder = { Text("Buscar mensaje...") },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(70.dp)
+                                            .size(15.dp),
+                                        singleLine = true,
+                                        colors = TextFieldDefaults.colors(
+                                            focusedContainerColor = Color.Transparent,
+                                            unfocusedContainerColor = Color.Transparent,
+                                            disabledContainerColor = Color.Transparent,
+                                            cursorColor = MaterialTheme.colorScheme.primary,
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent,
+                                            disabledIndicatorColor = Color.Transparent,
+                                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                        ),
+                                        textStyle = MaterialTheme.typography.bodyLarge
+                                    )
                                 }
-                            )
+                            }  else {
+                                Text(
+                                    text = when (currentRoute) { //texto del titulo de la pagina
+                                        Screens.Tasks.route -> stringResource(R.string.tasks)
+                                        Screens.Settings.route -> stringResource(id = R.string.settings)
+                                        Screens.Expenses.route -> stringResource(id = R.string.gastos)
+                                        Screens.Chat.route -> stringResource(R.string.chat_familiar)
+                                        else -> ""
+                                    }
+                                )
+                            }
                         },
                         navigationIcon = {
                             if (currentRoute == Screens.Register.route) { //en el registro debe aparecer la flecha hacia atras
@@ -188,7 +221,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                     }
                                 }
                             }
-                            //filtro pantalla de gastos/expenses
+                            //filtro usuario pantalla de gastos/expenses
                             if (currentRoute == Screens.Expenses.route && expensesViewModel != null) {
                                 var expanded by remember { mutableStateOf(false) }
                                 val viewModelExpenses = expensesViewModel!!
@@ -233,6 +266,25 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                                 }
                                             )
                                         }
+                                    }
+                                }
+                            }
+
+                            if (currentRoute == Screens.Chat.route) {
+                                if (showSearchBar) {
+                                    IconButton(onClick = {
+                                        searchText = ""
+                                        showSearchBar = false
+                                        chatViewModel.updateSearchQuery("")
+
+                                    }) {
+                                        Icon(Icons.Default.Close, contentDescription = "Cerrar búsqueda")
+                                    }
+                                } else {
+                                    IconButton(onClick = {
+                                        showSearchBar = true
+                                    }) {
+                                        Icon(Icons.Default.Search, contentDescription = "Buscar")
                                     }
                                 }
                             }
@@ -292,9 +344,9 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                     expensesViewModel = viewModel(backStackEntry)
                     ExpensesScreen()
                 }
-                composable(Screens.Chat.route){ backStackEntry ->
-                    val chatViewModel: ChatViewModel = viewModel(backStackEntry)
-                    ChatScreen(viewModel = chatViewModel)
+                composable(Screens.Chat.route){
+                    ChatScreen(viewModel = chatViewModel,
+                        searchText = searchText)
 
                 }
             }

@@ -10,6 +10,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.tfg_1.model.ChatMessageModel
 import com.example.tfg_1.repositories.UserRepository
 import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ChatViewModel : ViewModel() {
@@ -20,9 +22,24 @@ class ChatViewModel : ViewModel() {
     val messages: List<ChatMessageModel> = _messages
 
     private var listenerRegistration: ListenerRegistration? = null
+
     var currentUserId: String = ""
     private var currentUserName: String = ""
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
+
+    val filteredMessages: List<ChatMessageModel>
+        get() = if (searchQuery.value.isBlank()) {
+            messages
+        } else {
+            messages.filter {
+                it.text.contains(searchQuery.value, ignoreCase = true) ||
+                        it.senderName.contains(searchQuery.value, ignoreCase = true)
+            }
+        }
+
+    //colores para los bocadillos
     private val userColors = mutableMapOf<String, androidx.compose.ui.graphics.Color>()
     private val availableColors = listOf(
             Color(0xFFEFCFBF), // naranja
@@ -36,6 +53,12 @@ class ChatViewModel : ViewModel() {
     )
 
     private var isLoading by mutableStateOf(true)
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+
 
     fun loadChat() {
         viewModelScope.launch {
@@ -68,7 +91,7 @@ class ChatViewModel : ViewModel() {
 
         }
     }
-    //cada usuario tenga un color diferente
+    //cada usuario tenga un color diferente, cojo los que no s ehan usado
     fun getUserColor(userId: String): Color {
         return userColors.getOrPut(userId) {
             val usedColors = userColors.values.toSet()
