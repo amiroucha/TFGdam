@@ -41,7 +41,7 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat: Boolean = false) {
+fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat:Boolean) {
     val navController = rememberNavController()
 
     val loginViewModel: LoginViewModel = viewModel()
@@ -79,57 +79,59 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat: Boolean = false)
     var showSearchBar by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
 
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
 
     // Observa los cambios en authState para manejo de navegación
     LaunchedEffect(authState) {
-        if (authState is LoginViewModel.AuthState.Unauthenticated) {
-            navController.navigate(Screens.Login.route) {
-                popUpTo(0) { inclusive = true }
+        if (navBackStackEntry.value != null) {
+            if (authState is LoginViewModel.AuthState.Unauthenticated) {
+                navController.navigate(Screens.Login.route) {
+                    popUpTo(0) { inclusive = true }
+                }
             }
         }
     }
 
-    LaunchedEffect(homeUiState, settingsUiState) {
-        when (homeUiState) {
-            is HomeViewModel.UiState.HasHome -> {
-               //navega solo cuando ha cambiado ya de hogar
-                if (settingsUiState !is SettingsViewModel.SettingsUiState.LeftHome &&
-                    settingsUiState !is SettingsViewModel.SettingsUiState.Loading) {
 
-                    navController.navigate(Screens.Tasks.route) {
+
+    LaunchedEffect(homeUiState, settingsUiState) {
+        if (navBackStackEntry.value != null) {
+            when (homeUiState) {
+                is HomeViewModel.UiState.HasHome -> {
+                    //navega solo cuando ha cambiado ya de hogar
+                    if (settingsUiState !is SettingsViewModel.SettingsUiState.LeftHome &&
+                        settingsUiState !is SettingsViewModel.SettingsUiState.Loading) {
+
+                        navController.navigate(Screens.Tasks.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                }
+                is HomeViewModel.UiState.NotHome -> {
+                    navController.navigate(Screens.Home.route) {
                         popUpTo(0) { inclusive = true }
                     }
                 }
+                else -> {}
             }
-            is HomeViewModel.UiState.NotHome -> {
-                navController.navigate(Screens.Home.route) {
-                    popUpTo(0) { inclusive = true }
-                }
-            }
-            else -> {}
         }
     }
 
     // Observa cambios en settingsUiState para sincronizar con HomeViewModel
     LaunchedEffect(settingsUiState) {
-        if (settingsUiState is SettingsViewModel.SettingsUiState.LeftHome) {
-            //refresca HomeViewModel
-            homeViewModel.loadUser()
+        if (navBackStackEntry.value != null) {
+            if (settingsUiState is SettingsViewModel.SettingsUiState.LeftHome) {
+                //refresca HomeViewModel
+                homeViewModel.loadUser()
 
-            // pantalla Home
-            navController.navigate(Screens.Home.route) {
-                popUpTo(0) { inclusive = true }
+                // pantalla Home
+                navController.navigate(Screens.Home.route) {
+                    popUpTo(0) { inclusive = true }
+                }
             }
         }
     }
-    //notificaciones
-    LaunchedEffect(openChat) {
-        if (openChat) {
-            navController.navigate(Screens.Chat.route) {
-                popUpTo(0) { inclusive = true }
-            }
-        }
-    }
+
 
 
     val contentScaffold: @Composable () -> Unit = {
@@ -617,147 +619,3 @@ private fun LineaSeparacion() {
         )
     }
 }
-
-//filtro de fecha que quiero quitar
-
-/*
-//filtro para lista de gastos fecha en x rango
-@Composable
-fun DateFilterDialog(
-    initialStartDate: Date?,
-    initialEndDate: Date?,
-    onDismiss: () -> Unit,
-    onFilter: (startDate: Date?, endDate: Date?) -> Unit
-) {
-    var startDate by remember { mutableStateOf(initialStartDate) }
-    var endDate by remember { mutableStateOf(initialEndDate) }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.filtrar_por_fecha)) },
-        text = {
-            Column {
-                //fecha inicio------------------------------------
-                Text(stringResource(R.string.fecha_inicio))
-                DatePickerField(
-                    selectedDate = startDate,
-                    onDateSelected = { startDate = it })
-
-                Spacer(Modifier.height(16.dp))
-
-                //fecha fin------------------------------------
-                Text(stringResource(R.string.fecha_fin))
-                DatePickerField(
-                    selectedDate = endDate,
-                    onDateSelected = { endDate = it })
-
-
-                Spacer(Modifier.height(24.dp))
-
-                // botón para quitar el filtro------------------------------
-                TextButton(
-                    onClick = {
-                        onFilter(null, null) // Quita el filtro
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    modifier = Modifier.align(Alignment.Start),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(text =stringResource(R.string.quitar_filtros))
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { onFilter(startDate, endDate) }) {
-                Text(stringResource(R.string.aceptar))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancelar))
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerField(selectedDate: Date?, onDateSelected: (Date?) -> Unit) {
-    val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
-    var showPicker by remember { mutableStateOf(false) }
-    val calendar = Calendar.getInstance()
-    if (selectedDate != null) calendar.time = selectedDate
-
-    OutlinedButton(onClick = { showPicker = true },
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), // fondo claro
-            contentColor = MaterialTheme.colorScheme.primary // color del texto e iconos
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-    ) {
-        Text(text = selectedDate?.let { dateFormat.format(it) } ?: stringResource(R.string.seleccionar_fecha))
-    }
-
-    if (showPicker) {
-        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = calendar.timeInMillis)
-
-        DatePickerDialog(
-            onDismissRequest = { showPicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    val pickedMillis = datePickerState.selectedDateMillis
-                    if (pickedMillis != null) {
-                        onDateSelected(Date(pickedMillis))
-                    }
-                    showPicker = false
-                }) {
-                    Text(stringResource(R.string.aceptar))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showPicker = false
-                }) {
-                    Text(stringResource(R.string.cancelar))
-                }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
-
-}*/
-
-
-
-
-
-
-
-
-
-
-/*
-                        var showFilterDialog by remember { mutableStateOf(false) }
-                        val expensesVM = expensesViewModel!!
-                        IconButton(onClick = { showFilterDialog = true }) {
-                            Icon(Icons.Default.FilterList, contentDescription = "Filtrar por fecha")
-                        }
-                        if (showFilterDialog) {
-                            // Aquí muestras un diálogo para elegir fechas
-                            DateFilterDialog(
-                                initialStartDate = expensesVM.fechaInicio.value,
-                                initialEndDate = expensesVM.fechaFin.value,
-                                onDismiss = { showFilterDialog = false },
-                                onFilter = { start, end ->
-                                    expensesVM.setFechaInicio(start)
-                                    expensesVM.setFechaFin(end)
-                                    showFilterDialog = false
-                                }
-                            )
-                        }*/
-
-

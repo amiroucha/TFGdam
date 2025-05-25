@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -94,20 +95,50 @@ fun TabsPag(viewModel: TasksViewModel) {
         TabData(stringResource(R.string.pendientes), Icons.Filled.List),
         TabData(stringResource(R.string.completadas), Icons.Filled.Check),
     )
+    val selectedColor = Color.White
+    val unselectedColor = Color.Gray
 
     Column {
-        TabRow(selectedTabIndex = selectedTab.intValue) {
+        TabRow(
+            selectedTabIndex = selectedTab.intValue,
+            contentColor = selectedColor, //color del indicador
+            //subrayar en la que estoy
+            indicator = { tabPositions ->
+                TabRowDefaults.Indicator(
+                    Modifier.tabIndicatorOffset(tabPositions[selectedTab.intValue]),
+                    color = selectedColor,
+                    height = 3.dp
+                )
+            }
+        ) {
             tabs.forEachIndexed { index, tab ->
+                val isSelected = selectedTab.intValue == index
                 Tab(
-                    selected = selectedTab.intValue == index,
+                    selected = isSelected,
                     onClick = { selectedTab.intValue = index },
-                    text = { Text(text = tab.title) },
-                    icon = { Icon(
-                        imageVector = tab.icon,
-                        contentDescription = null // Provide a content description if needed
-                    )},
+                    text = {
+                        Text(
+                            text = tab.title,
+                            color = if (isSelected) selectedColor else unselectedColor
+                        )
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = tab.icon,
+                            contentDescription = null,
+                            tint = if (isSelected) selectedColor else unselectedColor
+                        )
+                    },
+                    modifier = Modifier
+                        .background(
+                            if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                        ),
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
+                    unselectedContentColor = Color.Gray,
+
 
                 )
+
             }
         }
 
@@ -238,6 +269,7 @@ fun TareaItem(tarea: TasksModel,
 
 //para el dialog que aparece y rellenar datos
 //le paso 2 funciones: cuando se cancela - para los datos
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NuevaTareaFormulario(
     dismiss: () -> Unit,
