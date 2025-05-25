@@ -1,5 +1,6 @@
 package com.example.tfg_1.ui.ui
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,12 +28,14 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.tfg_1.R
 import com.example.tfg_1.model.ChatMessageModel
+import com.example.tfg_1.notifications.PreferenceMnger
 import com.example.tfg_1.viewModel.ChatViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun ChatScreen(viewModel: ChatViewModel, searchText: String) {
+    val context = LocalContext.current
 
     val messages = viewModel.filteredMessages //lista de mensajes filtrados o no
     //mensajes que se van escribiendo
@@ -42,9 +46,11 @@ fun ChatScreen(viewModel: ChatViewModel, searchText: String) {
     val listState = rememberLazyListState()
 
 
+
     //cargar la informacion (mensajes)
     LaunchedEffect(Unit) {
-        viewModel.loadChat()
+        viewModel.init(context)//para notificaciones
+        viewModel.loadChat(context)
     }
 
     // Auto-scroll al último mensaje cada vez que hay ++ mensaje

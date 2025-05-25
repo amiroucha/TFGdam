@@ -1,13 +1,22 @@
 package com.example.tfg_1.viewModel
 
+import android.app.NotificationManager
+import android.content.Context
+import android.util.Log
+import androidx.core.graphics.drawable.IconCompat
+import androidx.core.app.Person
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tfg_1.MyApp
+import com.example.tfg_1.R
 import com.example.tfg_1.model.ChatMessageModel
+import com.example.tfg_1.notifications.PreferenceMnger
 import com.example.tfg_1.repositories.UserRepository
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +28,7 @@ class ChatViewModel : ViewModel() {
     private val userRepository = UserRepository()
 
     private val _messages = mutableStateListOf<ChatMessageModel>()
-    val messages: List<ChatMessageModel> = _messages
+    private val messages: List<ChatMessageModel> = _messages
 
     private var listenerRegistration: ListenerRegistration? = null
 
@@ -27,7 +36,7 @@ class ChatViewModel : ViewModel() {
     private var currentUserName: String = ""
 
     private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery
+    private val searchQuery: StateFlow<String> = _searchQuery
 
     val filteredMessages: List<ChatMessageModel>
         get() = if (searchQuery.value.isBlank()) {
@@ -39,8 +48,20 @@ class ChatViewModel : ViewModel() {
             }
         }
 
+    //ultimo mensaje enviado, para contrlar notificaciones
+    private var lastNotifiedTimestamp: Long = 0L
+    private lateinit var preferencesManager: PreferenceMnger
+
+
+    fun init(context: Context) {
+        preferencesManager = PreferenceMnger(context)
+        lastNotifiedTimestamp = preferencesManager.getLastNotifiedTimestamp()
+        Log.d("ChatViewModel", "Timestamp leído desde SharedPreferences: $lastNotifiedTimestamp")
+
+    }
+
     //colores para los bocadillos
-    private val userColors = mutableMapOf<String, androidx.compose.ui.graphics.Color>()
+    private val userColors = mutableMapOf<String, Color>()
     private val availableColors = listOf(
             Color(0xFFEFCFBF), // naranja
             Color(0xFFB2D6F2), // azul
@@ -60,21 +81,46 @@ class ChatViewModel : ViewModel() {
 
 
 
-    fun loadChat() {
+    fun loadChat(context: Context) {
         viewModelScope.launch {
             isLoading = true
             currentUserId = userRepository.getCurrentUserId()
             currentUserName = userRepository.getCurrentUserName()
             val homeId = userRepository.getCurrentUserHomeId()
 
-            listenerRegistration?.remove() // Detener escucha anterior
+            listenerRegistration?.remove()
+
             listenerRegistration = userRepository.escucharMensajes(homeId) { mensajes ->
+                Log.d("ChatViewModel", "Mensajes recibidos: ${mensajes.size}")
+
+                val mensajesNuevos = mensajes.filter {
+                    it.senderId != currentUserId && it.timestamp > lastNotifiedTimestamp
+                }
+
+                mensajesNuevos.forEach { mensaje ->
+                    sendLocalNotification(
+                        context = context,
+                        senderName = mensaje.senderName,
+                        message = mensaje.text
+                    )
+                }
+
+                if (mensajes.isNotEmpty()) {
+                    val maxTimestamp = mensajes.maxOf { it.timestamp }
+                    if (maxTimestamp > lastNotifiedTimestamp) {
+                        lastNotifiedTimestamp = maxTimestamp
+                        preferencesManager.setLastNotifiedTimestamp(lastNotifiedTimestamp)
+                        Log.d("ChatViewModel", "Actualizado timestamp: $lastNotifiedTimestamp")
+                    }
+                }
+
                 _messages.clear()
                 _messages.addAll(mensajes)
                 isLoading = false
             }
         }
     }
+
 
     fun sendMessage(text: String) {
         viewModelScope.launch {
@@ -91,6 +137,34 @@ class ChatViewModel : ViewModel() {
 
         }
     }
+
+    // Notificación local
+    private fun sendLocalNotification(context: Context, senderName: String, message: String) {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val channelId = MyApp.NOTIFICATION_ID
+
+        val person = Person.Builder()
+            .setName(senderName)
+            .setIcon(IconCompat.createWithResource(context, R.drawable.logotfg)) // tu logo
+            .build()
+
+        // Estilo tipo chat con encabezado FlowHome
+        val messageStyle = NotificationCompat.MessagingStyle(person)
+            .setConversationTitle("FLOWHOME") // Encabezado
+            .addMessage(message, System.currentTimeMillis(), person) // Mensaje
+
+
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.logotfg) // icono superior
+            .setStyle(messageStyle)
+            .setAutoCancel(true)
+            .build()
+
+        notificationManager.notify(senderName.hashCode() + System.currentTimeMillis().toInt(), notification)
+    }
+
+
     //cada usuario tenga un color diferente, cojo los que no s ehan usado
     fun getUserColor(userId: String): Color {
         return userColors.getOrPut(userId) {

@@ -18,14 +18,18 @@ import androidx.compose.runtime.getValue
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //notificaciones
+        val shouldNavigateToChat = intent?.getBooleanExtra("navigateToChat", false) ?: false
+
         enableEdgeToEdge()
+
         setContent {
             val themeViewModel: ThemeViewModel = viewModel()
             val isDark by themeViewModel.isDarkTheme.collectAsState()
 
             Tfg_1Theme(darkTheme = isDark) {
                 Surface(Modifier.fillMaxSize()) {
-                    NavigationWrapper(themeViewModel = themeViewModel)
+                    NavigationWrapper(themeViewModel = themeViewModel, openChat = shouldNavigateToChat)
                 }
             }
 

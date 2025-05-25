@@ -41,7 +41,7 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationWrapper(themeViewModel: ThemeViewModel) {
+fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat: Boolean = false) {
     val navController = rememberNavController()
 
     val loginViewModel: LoginViewModel = viewModel()
@@ -118,6 +118,14 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
 
             // pantalla Home
             navController.navigate(Screens.Home.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
+    //notificaciones
+    LaunchedEffect(openChat) {
+        if (openChat) {
+            navController.navigate(Screens.Chat.route) {
                 popUpTo(0) { inclusive = true }
             }
         }
