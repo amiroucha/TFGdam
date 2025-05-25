@@ -23,9 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.tfg_1.model.TasksModel
 import com.example.tfg_1.R
 import com.example.tfg_1.viewModel.TasksViewModel
@@ -35,13 +32,12 @@ import java.util.*
 @Preview(showBackground = true)
 @Composable
 fun TasksScreenPreview() {
-    val navController = rememberNavController()
     val viewModel = TasksViewModel()
-    TasksScreen(viewModel = viewModel, navController)
+    TasksScreen(viewModel = viewModel)
 }
 
 @Composable
-fun TasksScreen(viewModel: TasksViewModel, navcontroller : NavController) {
+fun TasksScreen(viewModel: TasksViewModel) {
     Box(
         Modifier
             .fillMaxSize()
@@ -50,7 +46,7 @@ fun TasksScreen(viewModel: TasksViewModel, navcontroller : NavController) {
         TasksBody(
             Modifier
                 .align(Alignment.Center)
-                .padding(10.dp), viewModel ,navcontroller )
+                .padding(10.dp), viewModel )
 
         var showDialog by remember { mutableStateOf(false) }
 
@@ -81,7 +77,7 @@ fun TasksScreen(viewModel: TasksViewModel, navcontroller : NavController) {
 
 
 @Composable
-fun TasksBody (modifier: Modifier, viewModel: TasksViewModel, navcontroller : NavController) {
+fun TasksBody (modifier: Modifier, viewModel: TasksViewModel) {
 
     Column{
         TabsPag(viewModel) // Componente para las pestañas
@@ -92,7 +88,7 @@ fun TasksBody (modifier: Modifier, viewModel: TasksViewModel, navcontroller : Na
 
 @Composable
 fun TabsPag(viewModel: TasksViewModel) {
-    val selectedTab = remember { mutableStateOf(0) }
+    val selectedTab = remember { mutableIntStateOf(0) }
 
     val tabs = listOf(
         TabData(stringResource(R.string.pendientes), Icons.Filled.List),
@@ -100,11 +96,11 @@ fun TabsPag(viewModel: TasksViewModel) {
     )
 
     Column {
-        TabRow(selectedTabIndex = selectedTab.value) {
+        TabRow(selectedTabIndex = selectedTab.intValue) {
             tabs.forEachIndexed { index, tab ->
                 Tab(
-                    selected = selectedTab.value == index,
-                    onClick = { selectedTab.value = index },
+                    selected = selectedTab.intValue == index,
+                    onClick = { selectedTab.intValue = index },
                     text = { Text(text = tab.title) },
                     icon = { Icon(
                         imageVector = tab.icon,
@@ -116,9 +112,9 @@ fun TabsPag(viewModel: TasksViewModel) {
         }
 
         // Contenido para cada tab
-        when (selectedTab.value) {
-            0 -> pendientes(viewModel)
-            1 -> completadas(viewModel)
+        when (selectedTab.intValue) {
+            0 -> Pendientes(viewModel)
+            1 -> Completadas(viewModel)
         }
     }
 }
@@ -129,12 +125,59 @@ data class TabData(val title: String, val icon: ImageVector)
 
 //caja de item, cada tarea creada
 @Composable
-fun tareaItem(tarea: TasksModel,
+fun TareaItem(tarea: TasksModel,
               modificarCompletada: (TasksModel) -> Unit,
-              eliminarTarea: (TasksModel) -> Unit)
-{
-    val viewModel: TasksViewModel = viewModel()
+              eliminarTarea: (TasksModel) -> Unit
+) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showToggleCompletedDialog by remember { mutableStateOf(false) }
 
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(stringResource(R.string.estasSeguro)) },
+            text = { Text(stringResource(R.string.confirmarEliminarTarea)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    eliminarTarea(tarea)
+                    showDeleteDialog = false
+                }) {
+                    Text(stringResource(R.string.eliminar_tarea))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(R.string.cancelar))
+                }
+            }
+        )
+    }
+
+    if (showToggleCompletedDialog) {
+        val mensaje = if (!tarea.completada)
+            stringResource(R.string.confirmarCompletarTarea)
+        else
+            stringResource(R.string.confirmarMarcarComoPendiente)
+
+        AlertDialog(
+            onDismissRequest = { showToggleCompletedDialog = false },
+            title = { Text(stringResource(R.string.estasSeguro)) },
+            text = { Text(mensaje) },
+            confirmButton = {
+                TextButton(onClick = {
+                    modificarCompletada(tarea)
+                    showToggleCompletedDialog = false
+                }) {
+                    Text(stringResource(R.string.aceptar))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showToggleCompletedDialog = false }) {
+                    Text(stringResource(R.string.cancelar))
+                }
+            }
+        )
+    }
     // Contenedor de la tarea con padding y márgenes
     Row(
         modifier = Modifier
@@ -146,7 +189,8 @@ fun tareaItem(tarea: TasksModel,
         // Checkbox para marcar la tarea como completada o no
         Checkbox(
             checked = tarea.completada,
-            onCheckedChange = { modificarCompletada(tarea) }, // Cuando cambia el checkbox, alterna completada
+            // Cuando cambia el checkbox, alterna completada, pregunta ¿seguro?
+            onCheckedChange = { showToggleCompletedDialog = true },
             modifier = Modifier.padding(end = 16.dp) // Separar el checkbox del texto
         )
 
@@ -181,7 +225,7 @@ fun tareaItem(tarea: TasksModel,
                 modifier = Modifier.padding(8.dp)
             )
         }
-        IconButton(onClick = { eliminarTarea(tarea)  }) {
+        IconButton(onClick = { showDeleteDialog = true  }) {
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = stringResource(R.string.eliminar_tarea),
@@ -329,14 +373,14 @@ fun NuevaTareaFormulario(
 
 
 @Composable
-fun pendientes(viewModel: TasksViewModel) {
+fun Pendientes(viewModel: TasksViewModel) {
     val tareasPendientes by remember {
         derivedStateOf { viewModel.tareasPendientes() }
     }
 
     LazyColumn {
         items(tareasPendientes) { tarea ->
-            tareaItem(
+            TareaItem(
                 tarea = tarea,
                 modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
                 eliminarTarea = { viewModel.eliminarTarea(it) }
@@ -347,14 +391,14 @@ fun pendientes(viewModel: TasksViewModel) {
 
 
 @Composable
-fun completadas(viewModel: TasksViewModel) {
+fun Completadas(viewModel: TasksViewModel) {
     val tareasCompletadas by remember {
         derivedStateOf { viewModel.tareasCompletadas() }
     }
 
     LazyColumn {
         items(tareasCompletadas) { tarea ->
-            tareaItem(
+            TareaItem(
                 tarea = tarea,
                 modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
                 eliminarTarea = { viewModel.eliminarTarea(it) }

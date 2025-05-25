@@ -131,6 +131,10 @@
     <string name="gastos_totales_del_hogar">Gastos totales del hogar</string>
     <string name="hoy">Hoy</string>
     <string name="ayer">Ayer</string>
+    <string name="estasSeguro">¿Estas Seguro?</string>
+    <string name="confirmarEliminarTarea">¿Estás seguro de que deseas eliminar esta tarea?</string>
+    <string name="confirmarCompletarTarea">¿Marcar esta tarea como completada?</string>
+    <string name="confirmarMarcarComoPendiente">¿Marcar esta tarea como pendiente?</string>
 
 
 </resources>

@@ -340,7 +340,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat: Boolean = false)
                 }
                 composable(Screens.Tasks.route) { backStackEntry ->
                     tasksViewModel = viewModel(backStackEntry)
-                    TasksScreen(viewModel = tasksViewModel!!, navController)
+                    TasksScreen(viewModel = tasksViewModel!!)
                 }
                 composable(Screens.Home.route) {
                     HomeScreen(viewModel = homeViewModel)
