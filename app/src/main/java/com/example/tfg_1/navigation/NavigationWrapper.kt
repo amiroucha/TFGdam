@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
@@ -29,15 +28,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.tfg_1.R
+import com.example.tfg_1.repositories.UserRepository
 import com.example.tfg_1.ui.ui.*
 import com.example.tfg_1.viewModel.*
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.tfg_1.ui.ui.AvatarSheet
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -362,21 +359,162 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat:Boolean) {
             }
         }
     }
-//Veo que paginas van a ver el drawer
+    val userRepository = remember { UserRepository() }
+
+    //Veo que paginas van a ver el drawer
     if (drawerEnabled) {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = { DrawerContent(navController, loginViewModel,drawerState, scope) },
-            scrimColor = MaterialTheme.colorScheme.surface, // Fondo del Drawer
-            gesturesEnabled = true // swipe desde el borde
-        ) {
-            contentScaffold()
-        }
+        DrawerApp(userRepository, drawerState, scope, navController, loginViewModel, contentScaffold)
     }else
     {
         contentScaffold()
     }
 }
+
+@Composable
+private fun DrawerApp(
+    userRepository: UserRepository,
+    drawerState: DrawerState,
+    scope: CoroutineScope,
+    navController: NavHostController,
+    loginViewModel: LoginViewModel,
+    contentScaffold: @Composable () -> Unit
+) {
+    var userName by remember { mutableStateOf("") }
+    var homeName by remember { mutableStateOf("") }
+    // cargar datos del usuario y hogar
+    LaunchedEffect(Unit) {
+        userName = userRepository.getCurrentUserName()
+        homeName = userRepository.getCurrentHomeName()
+    }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        elevation = CardDefaults.cardElevation(8.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            // Encabezado con el nombre del usuario
+                            Text(
+                                text = userName,
+                                fontSize = 27.sp,
+                                maxLines = 3, // máximo dos líneas
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .weight(1f) //para que no me ocupe la fto perfil
+                                    .padding(bottom = 16.dp, top = 20.dp, start = 6.dp, end = 20.dp)
+                            )
+                            //IMAGEN DE PERFIL-----------------------------------
+
+                            FotoPerfil()
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // caja que envuelve los items
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        elevation = CardDefaults.cardElevation(8.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            //nombre del hogar
+                            Text(
+                                text = homeName,
+                                modifier = Modifier.padding(16.dp),
+                                fontSize = 25.sp,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            NavigationDrawerItem(
+                                label = { Text(stringResource(id = R.string.hogar)) },
+                                selected = false,
+                                icon = {
+                                    Icon(
+                                        Icons.Outlined.Home,
+                                        contentDescription = stringResource(id = R.string.hogar)
+                                    )
+                                },
+                                onClick = {
+                                    scope.launch {
+                                        navController.navigate(Screens.Tasks.route)
+                                        delay(500)
+                                        drawerState.close()
+                                    }
+                                }
+                            )
+                            Spacer(Modifier.height(30.dp))
+                            NavigationDrawerItem(
+                                label = { Text(stringResource(id = R.string.settings)) },
+                                selected = false,
+                                icon = {
+                                    Icon(
+                                        Icons.Outlined.Settings,
+                                        contentDescription = stringResource(id = R.string.settings)
+                                    )
+                                },
+                                onClick = {
+                                    scope.launch {
+                                        navController.navigate(Screens.Settings.route)
+                                        delay(500)
+                                        drawerState.close()
+                                    }
+                                }
+                            )
+                            Spacer(Modifier.height(60.dp))
+                            LineaSeparacion()
+                            Spacer(Modifier.height(50.dp))
+                            NavigationDrawerItem(
+                                label = { Text(stringResource(id = R.string.cerrarSesion)) },
+                                selected = false,
+                                icon = {
+                                    Icon(
+                                        Icons.Default.ExitToApp,
+                                        contentDescription = stringResource(id = R.string.cerrarSesion)
+                                    )
+                                },
+                                onClick = {
+                                    loginViewModel.logout()
+                                    navController.navigate(Screens.Login.route) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+                }
+
+
+            }
+        },
+        gesturesEnabled = true // swipe desde el borde
+    ) {
+        contentScaffold()
+    }
+}
+
 
 //mantener la sesion inciada
 @Composable
@@ -396,7 +534,7 @@ fun ScreenInitialize(navController: NavController, loginViewModel: LoginViewMode
 
 
 @Composable
-fun BottomBar(navController: NavHostController, currentRoute :String?) {
+fun BottomBar(navController: NavHostController, currentRoute: String?) {
     NavigationBar {
         //tareas
         NavigationBarItem(
@@ -431,126 +569,7 @@ fun BottomBar(navController: NavHostController, currentRoute :String?) {
     }
 
 }
-@Composable
-fun DrawerContent(navController: NavController,
-                  loginViewModel: LoginViewModel,
-                  drawerState: DrawerState,
-                  scope: CoroutineScope
-) {
-    var userName by remember { mutableStateOf("") }
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val drawerWidth = screenWidth * 0.955f
 
-    LaunchedEffect(Unit) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
-        if (uid != null) {
-            FirebaseFirestore.getInstance()
-                .collection("usuarios")
-                .document(uid)
-                .get()
-                .addOnSuccessListener { document ->
-                    userName = document.getString("name") ?: ""
-                }
-        }
-    }
-    Column(
-        modifier = Modifier
-            .width(drawerWidth) //ocupa solo el 80 ancho de pantalla
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(30.dp))
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            elevation = CardDefaults.cardElevation(8.dp),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Row(
-                modifier = Modifier.padding(8.dp)
-            ) {
-                // Encabezado con el nombre del usuario
-                Text(
-                    text = userName,
-                    fontSize = 30.sp,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 16.dp, top = 20.dp, start = 6.dp, end=20.dp)
-                )
-                //IMAGEN DE PERFIL-----------------------------------
-
-                FotoPerfil()
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // caja que envuelve los items
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            elevation = CardDefaults.cardElevation(8.dp),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text(stringResource(id = R.string.app),
-                    modifier = Modifier.padding(16.dp),
-                    fontSize = 20.sp,
-                    style = MaterialTheme.typography.titleMedium)
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                NavigationDrawerItem(
-                    label = { Text(stringResource(id = R.string.hogar)) },
-                    selected = false,
-                    icon = { Icon(Icons.Outlined.Home, contentDescription = stringResource(id = R.string.hogar)) },
-                    onClick = {
-                        scope.launch {
-                            navController.navigate(Screens.Tasks.route)
-                            delay(500)
-                            drawerState.close()
-                        }
-                    }
-                )
-                Spacer(Modifier.height(30.dp))
-                NavigationDrawerItem(
-                    label = { Text(stringResource(id = R.string.settings)) },
-                    selected = false,
-                    icon = { Icon(Icons.Outlined.Settings, contentDescription = stringResource(id = R.string.settings)) },
-                    onClick = {
-                        scope.launch {
-                            navController.navigate(Screens.Settings.route)
-                            delay(500)
-                            drawerState.close()
-                        }
-                    }
-                )
-                Spacer(Modifier.height(60.dp))
-                LineaSeparacion()
-                Spacer(Modifier.height(50.dp))
-                NavigationDrawerItem(
-                    label = { Text(stringResource(id = R.string.cerrarSesion)) },
-                    selected = false,
-                    icon = {
-                        Icon(Icons.Default.ExitToApp, contentDescription = stringResource(id = R.string.cerrarSesion))
-                    },
-                    onClick = {
-                        loginViewModel.logout()
-                        navController.navigate(Screens.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
-                )
-            }
-        }
-
-        Spacer(Modifier.height(12.dp))
-    }
-}
 
 @Composable
 private fun FotoPerfil() {
@@ -582,24 +601,27 @@ private fun FotoPerfil() {
                     color = colorResource(id = R.color.black),
                     shape = CircleShape
                 )
+                .background(colorResource(id = R.color.lilaChat))
                 .clickable { showAvatarPicker = true }
         )
     } else {
-        Image(
-            painter = painterResource(id = R.drawable.perfil_imagen),
-            contentDescription = "Default Avatar",
+        LaunchedEffect(Unit) {
+            val randomAvatar = avatarViewModel.avatarList.randomOrNull()?.image
+            if (randomAvatar != null) {
+                avatarViewModel.guardarAvatar(randomAvatar)
+            }
+        }
+        //mientras carga la imagen
+        Box(
             modifier = Modifier
                 .padding(5.dp)
                 .size(85.dp)
                 .clip(CircleShape)
-                .border(
-                    width = 2.dp,
-                    color = colorResource(id = R.color.black),
-                    shape = CircleShape
-                )
-                .clickable { showAvatarPicker = true }
+                .border(2.dp, colorResource(id = R.color.black), CircleShape)
+                .background(colorResource(id = R.color.lilaChat))
         )
     }
+
 }
 
 @Composable

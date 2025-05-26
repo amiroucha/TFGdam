@@ -25,12 +25,22 @@ class UserRepository(
 
     // nombre del usuario
     suspend fun getCurrentUserName(): String {
-        val user = getUserDoc(getCurrentUserId())
+        val uid = getCurrentUserId()
+        if (uid.isEmpty()) {
+            // Usuario no logueado no  consultar Firestore
+            return ""
+        }
+        val user = getUserDoc(uid)
         return user.getString("name").orEmpty()
     }
         //id del hogar del user
     suspend fun getCurrentUserHomeId(): String {
-        val user = getUserDoc(getCurrentUserId())
+        val uid = getCurrentUserId()
+        if (uid.isEmpty()) {
+            // Usuario no logueado no consultar Firestore
+            return ""
+        }
+        val user = getUserDoc(uid)
         return user.getString("homeId").orEmpty()
     }
 
@@ -64,6 +74,10 @@ class UserRepository(
     //obtener el nombre del hogar actual
     suspend fun getCurrentHomeName(): String {
         val uid = getCurrentUserId()
+        if (uid.isEmpty()) {
+            // Usuario no logueado no consultar Firestore
+            return ""
+        }
         val userDoc = getUserDoc(uid)
         val homeId = userDoc.getString("homeId") ?: return ""
         val homeDoc = getHomeById(homeId)
