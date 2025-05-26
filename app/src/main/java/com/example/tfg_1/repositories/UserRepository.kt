@@ -1,6 +1,8 @@
 package com.example.tfg_1.repositories
 
+import android.content.Context
 import android.util.Log
+import com.example.tfg_1.R
 import com.example.tfg_1.model.ChatMessageModel
 import com.example.tfg_1.model.ExpensesModel
 import com.example.tfg_1.model.UserModel
@@ -10,11 +12,24 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.tasks.await
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.auth.GoogleAuthProvider
+
+
 
 class UserRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-) {
+)
+{
+    //logn con google
+    private lateinit var credentialManager: CredentialManager
+
+
     //usuario actual
     fun getCurrentUser(): FirebaseUser? {
         return auth.currentUser
@@ -33,7 +48,9 @@ class UserRepository(
         val user = getUserDoc(uid)
         return user.getString("name").orEmpty()
     }
-        //id del hogar del user
+
+    //id del hogar del user actual
+    //lo uso en el chat,, es importante no tocar
     suspend fun getCurrentUserHomeId(): String {
         val uid = getCurrentUserId()
         if (uid.isEmpty()) {
@@ -51,7 +68,7 @@ class UserRepository(
             .get()
             .await()
     }
-
+    //ACTUALIZAR EL home id DEL usuario, SE CAMBIA DE CASA
     suspend fun updateUserHomeId(uid: String, homeId: String) {
         firestore.collection("usuarios")
             .document(uid)
@@ -107,6 +124,63 @@ class UserRepository(
             )
         }
     }
+
+    //login ----------------------------------------------------------------------------
+    suspend fun loginWithEmail(email: String, password: String): Result<FirebaseUser?> {
+        return try {
+            val result = auth.signInWithEmailAndPassword(email, password).await()
+            Result.success(result.user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+    suspend fun loginWithGoogle(context: Context): Result<FirebaseUser?> {
+        try {
+            val credentialManager = CredentialManager.create(context)  // inicializas aquí
+
+            val googleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(context.getString(R.string.idWeb))
+                .setAutoSelectEnabled(false)
+                .build()
+
+            val request = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
+
+            val result = credentialManager.getCredential(context, request)
+            val credential = result.credential
+
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            val googleIdToken = googleIdTokenCredential.idToken
+
+            val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
+
+            val authResult = auth.signInWithCredential(firebaseCredential).await()
+            val user = auth.currentUser
+
+            // Guardar datos usuario
+            val userMap = hashMapOf(
+                "email" to (user?.email ?: ""),
+                "uid" to user?.uid,
+                "name" to (user?.displayName ?: "")
+            )
+            user?.uid?.let {
+                firestore.collection("usuarios").document(it).set(userMap, SetOptions.merge()).await()
+            }
+
+            return Result.success(user)
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
+
+    fun logout() {
+        auth.signOut()
+    }
+
 
     //chat--------------------------------------------------------------------
     fun escucharMensajes(homeId: String, onMessagesChanged: (List<ChatMessageModel>) -> Unit): ListenerRegistration {

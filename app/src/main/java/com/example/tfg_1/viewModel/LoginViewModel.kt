@@ -6,27 +6,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
-import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.tfg_1.R
 import com.example.tfg_1.navigation.Screens
-import com.google.android.gms.tasks.Task
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.firebase.auth.AuthResult
+import com.example.tfg_1.repositories.UserRepository
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 
-class LoginViewModel : ViewModel() {
-    //private val _navController = navController
-    private lateinit var credentialManager: androidx.credentials.CredentialManager
+class LoginViewModel : ViewModel()
+{
+    private val userRepository = UserRepository()
 
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
@@ -118,159 +109,69 @@ class LoginViewModel : ViewModel() {
     fun login(navController: NavController, context: Context) {
         val email = _email.value
         val password = _password.value
-        if (validateOnSubmit(context = context)) {
-            _isLoading.value = true
-            _authState.value = AuthState.Loading
+        if (!validateOnSubmit(context)) {
+            _authState.value = AuthState.Unauthenticated
+            return
+        }
 
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task: Task<AuthResult> ->
-                    _isLoading.value = false
-                    if (task.isSuccessful) {
-                        _authState.value = AuthState.Authenticated
+        _isLoading.value = true
+        _authState.value = AuthState.Loading
 
-                        val currentUser = auth.currentUser
-                        if (currentUser != null) {
-                            // Llamada asíncrona para obtener el homeId
-                            viewModelScope.launch {
-                                val homeId = getHomeId(currentUser)
+        viewModelScope.launch {
+            val result = userRepository.loginWithEmail(email, password)
+            _isLoading.value = false
 
-                                // Después de obtener el homeId, realizar la navegación
-                                if (homeId != null) {
-                                    // Si tiene un homeId, ir a Tasks
-                                    navController.navigate(Screens.Tasks.route) {
-                                        popUpTo(Screens.Login.route) { inclusive = true }
-                                    }
-                                } else {
-                                    // Si no tiene homeId, ir a Home
-                                    navController.navigate(Screens.Home.route) {
-                                        popUpTo(Screens.Login.route) { inclusive = true }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        val errorMsg = task.exception?.message ?: context.getString(R.string.error_algo_fue_mal)
-                        _authState.value = AuthState.Error(errorMsg)
+            if (result.isSuccess) {
+                _authState.value = AuthState.Authenticated
+                //val user = result.getOrNull()
+                val homeId = userRepository.getCurrentUserHomeId()
+
+                if (homeId != "") {
+                    navController.navigate(Screens.Tasks.route) {
+                        popUpTo(Screens.Login.route) { inclusive = true }
+                    }
+                } else {
+                    navController.navigate(Screens.Home.route) {
+                        popUpTo(Screens.Login.route) { inclusive = true }
                     }
                 }
-        } else {
-            _authState.value = AuthState.Unauthenticated
-        }
-    }
-
-
-
-    private suspend fun getHomeId(user: FirebaseUser?): String? {
-        return try {
-            val db = FirebaseFirestore.getInstance()
-            val userDocRef = db.collection("usuarios").document(user?.uid ?: "")
-            val documentSnapshot = userDocRef.get().await()
-
-            // Si existe el documento, intenta obtener el homeId
-            if (documentSnapshot.exists()) {
-                return documentSnapshot.getString("homeId")
             } else {
-                null
+                _authState.value = AuthState.Error(result.exceptionOrNull()?.message ?: context.getString(R.string.error_algo_fue_mal))
             }
-        } catch (e: Exception) {
-            null
         }
     }
+
 
 
     fun loginGoogle(context: Context, navController: NavController) {
-        val auth = FirebaseAuth.getInstance() // inicializar FirebaseAuth
-
-        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false) // false para cuenta de Google
-            .setServerClientId(context.getString(R.string.idWeb))
-            .setAutoSelectEnabled(false) // No selecciona automáticamente una cuenta
-            .build()
-
-        // solicitud para obtener las credenciales
-        val request: androidx.credentials.GetCredentialRequest = androidx.credentials.GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
+        _isLoading.value = true
+        _authState.value = AuthState.Loading
 
         viewModelScope.launch {
-            credentialManager = androidx.credentials.CredentialManager.create(context)
-            try {
-                // cojo las credenciales
-                val result = credentialManager.getCredential(context, request)
-                val credential = result.credential
+            val result = userRepository.loginWithGoogle(context)
+            _isLoading.value = false
 
-                // extraer token de Google
-                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                val googleIdToken = googleIdTokenCredential.idToken
+            if (result.isSuccess) {
+                _authState.value = AuthState.Authenticated
+                //val user = result.getOrNull()
+                val homeId = userRepository.getCurrentUserHomeId()
 
-                // crea una credencial de Firebase usndo google
-                val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
-
-                // Intento autenticar al user
-                val authResult = auth.signInWithCredential(firebaseCredential).await()
-
-                // Si la autenticación es exitosa
-                if (authResult != null) {
-                    // Recojo datos del usuario
-                    val user = auth.currentUser
-                    val userUid = user?.uid
-                    val userEmail = user?.email
-                    val userName = user?.displayName //extraigo el nombre del usuario
-
-
-                    val userMap = hashMapOf(
-                        "email" to (userEmail ?: ""),
-                        "uid" to userUid,
-                        "name" to (userName ?: "")
-                    )
-
-                    // Guardar los datos del usuario en la base de datos
-                    userUid?.let {
-                        FirebaseFirestore.getInstance()
-                            .collection("usuarios")
-                            .document(it) // UID en Firebase =  ID del documento de ese user
-                            .set(userMap, SetOptions.merge()) //para que se acople pero nome sobreescriba
-                            .addOnSuccessListener {
-                                Toast.makeText(context, context.getString(R.string.login_exitoso), Toast.LENGTH_LONG).show()
-
-                                // Después de guardar los datos, revisamos si tiene un homeId
-
-                                viewModelScope.launch {
-                                    val currentUser = auth.currentUser
-                                    val homeId = getHomeId(currentUser)
-
-
-                                    // Después de obtener el homeId, realizar la navegación
-                                    if (homeId != null) {
-                                        // Si tiene un homeId, ir a Tasks
-                                        navController.navigate(Screens.Tasks.route) {
-                                            popUpTo(Screens.Login.route) { inclusive = true }
-                                        }
-                                    } else {
-                                        // Si no tiene homeId, ir a Home
-                                        navController.navigate(Screens.Home.route) {
-                                            popUpTo(Screens.Login.route) { inclusive = true }
-                                        }
-                                    }
-                                }
-                            }
-                            .addOnFailureListener { _ ->
-                                // Error al guardar los datos
-                                Toast.makeText(context, context.getString(R.string.error_guardarDatos), Toast.LENGTH_LONG).show()
-                            }
+                if (homeId != "") {
+                    navController.navigate(Screens.Tasks.route) {
+                        popUpTo(Screens.Login.route) { inclusive = true }
                     }
                 } else {
-                    // Error en autenticación
-                    Toast.makeText(context, context.getString(R.string.error_login_google), Toast.LENGTH_LONG).show()
+                    navController.navigate(Screens.Home.route) {
+                        popUpTo(Screens.Login.route) { inclusive = true }
+                    }
                 }
-            } catch (e: androidx.credentials.exceptions.GetCredentialException) {
-                // Error al obtener las credenciales
-                Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
+            } else {
+                _authState.value = AuthState.Error(result.exceptionOrNull()?.message ?: context.getString(R.string.error_login_google))
             }
         }
     }
     fun logout() {
-        auth.signOut() // cierra sesión en Firebase
+        userRepository.logout() // cierra sesión en Firebase
         _email.value = ""
         _password.value = ""
         _authState.value = AuthState.Unauthenticated
