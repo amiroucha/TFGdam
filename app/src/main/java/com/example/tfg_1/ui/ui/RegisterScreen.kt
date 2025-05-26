@@ -27,6 +27,7 @@ import com.example.tfg_1.viewModel.RegisterViewModel
 import java.util.Calendar
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.ui.res.stringResource
+import androidx.compose.foundation.lazy.LazyColumn
 
 
 @Preview(showBackground = true)
@@ -42,7 +43,6 @@ fun RegisterScreen(viewModel: RegisterViewModel/*, navcontroller : NavController
     Box(
         Modifier
             .fillMaxSize()
-            //.padding(5.dp)
             .background(color = colorResource(id = R.color.greyBackground))
     ) {
         RegisterBody(
@@ -75,67 +75,98 @@ fun RegisterBody (modifier: Modifier, viewModel: RegisterViewModel) {
             CircularProgressIndicator(Modifier.align(Alignment.Center))
         }
     }else{
-        val scrollState = rememberScrollState()
-        Column(
+        LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-
-                .verticalScroll(scrollState)
-                .padding(top = 16.dp)
+                .padding(top = 16.dp),
+            contentPadding = PaddingValues(bottom = 32.dp)
         ) {
-            Box(modifier = Modifier
+            item {
+                Box(modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 5.dp, bottom = 16.dp, end = 16.dp, start = 16.dp),
-                contentAlignment = Alignment.Center
-            )
-            {
-                Row(
-                    modifier = Modifier,
-                    verticalAlignment = Alignment.CenterVertically // Alinea verticalmente al centro
-                ) {
-                    Text(
-                        text = stringResource(R.string.app),
-                        modifier = Modifier.align(Alignment.CenterVertically), // Espaciado a la izquierda
-                        fontSize = 40.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1
-                    )
+                    contentAlignment = Alignment.Center
+                )
+                {
+                    Row(
+                        modifier = Modifier,
+                        verticalAlignment = Alignment.CenterVertically // Alinea verticalmente al centro
+                    ) {
+                        Text(
+                            text = stringResource(R.string.app),
+                            modifier = Modifier.align(Alignment.CenterVertically), // Espaciado a la izquierda
+                            fontSize = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
 
-                   // LogoHeaderReg(Modifier) // Ajusta el tamaño del logo según sea necesario
+                        // LogoHeaderReg(Modifier) // Ajusta el tamaño del logo según sea necesario
+                    }
                 }
             }
-            TituloRegister(Modifier.align(Alignment.CenterHorizontally))
-
-            NameFieldReg(name = name, error = nameError){ viewModel.onLoginChanges(email, passwordR, password2, it) }
-
-            Spacer(modifier = Modifier.padding(5.dp))
-            EmailFieldReg(email, error = emailError) { viewModel.onLoginChanges(it, passwordR, password2, name) }
-            Spacer(modifier = Modifier.padding(2.dp))
-            PasswordFieldReg(passwordR, error = passwordError1) { viewModel.onLoginChanges(email, it, password2,name) }
-            Spacer(modifier = Modifier.padding(4.dp))
-            PasswordFieldReg2(password2, error = passwordError2)
-            { viewModel.onLoginChanges(email,passwordR, it,name) }
-
-            // error de contraseñas diferentes
-            if (passwordSameError.isNotEmpty()) {
-                Text(
-                    text = passwordSameError,
-                    color = colorResource(id = R.color.red),
-                    fontSize = 15.sp,
-                    modifier = Modifier.padding(start = 20.dp)
+            item {
+                TituloRegister(Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally))
+            }
+            item {
+                NameFieldReg(name = name, error = nameError){ viewModel.onLoginChanges(email, passwordR, password2, it) }
+            }
+            item {
+                Spacer(modifier = Modifier.padding(5.dp))
+            }
+            item {
+                EmailFieldReg(email, error = emailError) { viewModel.onLoginChanges(it, passwordR, password2, name) }
+            }
+            item {
+                Spacer(modifier = Modifier.padding(2.dp))
+            }
+                item {
+                PasswordFieldReg(passwordR, error = passwordError1) {
+                    viewModel.onLoginChanges(
+                        email,
+                        it,
+                        password2,
+                        name
+                    )
+                }
+            }
+                item {
+                Spacer(modifier = Modifier.padding(4.dp))
+            }
+            item {
+                PasswordFieldReg2(password2, error = passwordError2)
+                { viewModel.onLoginChanges(email, passwordR, it, name) }
+            }
+            item {
+                // error de contraseñas diferentes
+                if (passwordSameError.isNotEmpty()) {
+                    Text(
+                        text = passwordSameError,
+                        color = colorResource(id = R.color.red),
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(start = 20.dp)
+                    )
+                }
+            }
+            item {
+                FechaNacimientoField(viewModel)
+            }
+            item {
+                Spacer(modifier = Modifier.padding(15.dp))
+            }
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.End)
+                        .padding(end = 20.dp)
                 )
+                {
+                    RegisterButtonReg(viewModel)
+                }
             }
-
-            FechaNacimientoField(viewModel)
-            Spacer(modifier = Modifier.padding(15.dp))
-            Column(modifier = Modifier
-                .align(Alignment.End)
-                .padding(end = 20.dp))
-            {
-                RegisterButtonReg(viewModel)
+            item {
+                Spacer(modifier = Modifier.padding(20.dp))
             }
-
-            Spacer(modifier = Modifier.padding(20.dp))
         }
 
     }
