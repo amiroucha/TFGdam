@@ -3,6 +3,7 @@ package com.example.tfg_1.ui.ui
 import android.content.Context
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -75,109 +76,122 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
             )
         }
     } else {
-        val scrollState = rememberScrollState()
-        Column(
+        LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState)//se pueda desplazar verticalmente
-                .padding(top = 50.dp)
+                .padding(top = 50.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = PaddingValues(bottom = 32.dp)
         ) {
+            item {
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.app),
-                        // modifier = Modifier.padding(start = 8.dp, end = 15.dp),
-                        fontSize = 40.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1
-                    )
-                    // LogoHeader(Modifier)
-                }
-            }
-
-            TituloLogin(Modifier.align(Alignment.CenterHorizontally))
-
-            Spacer(modifier = Modifier.padding(5.dp))
-
-            EmailField(email = email, error = emailError) {
-                viewModel.onLoginChanges(it, password)
-            }
-
-            Spacer(modifier = Modifier.padding(4.dp))
-
-            PasswordField(password = password, error = passwordError) {
-                viewModel.onLoginChanges(email, it)
-            }
-
-            ForgotPassword(Modifier.align(Alignment.End), viewModel,context)
-
-
-            if (passwordResetMessage != null) {
-                AlertDialog(
-                    onDismissRequest = { viewModel.clearPasswordResetMessage() },
-                    title = { Text(stringResource(R.string.RecuperaContrasenia)) },
-                    text = { Text(passwordResetMessage!!) },
-                    confirmButton = {
-                        Button(
-                            onClick = { viewModel.clearPasswordResetMessage() }
-                        ) {
-                            Text(stringResource(R.string.aceptar))
-                        }
-                    }
-                )
-            }
-            Spacer(modifier = Modifier.padding(16.dp))
-
-            //alert errores de firebase-------------------------
-            var showDialog by remember { mutableStateOf(false) }
-            var errorMessage by remember { mutableStateOf("") }
-            LaunchedEffect(authState) {
-                if (authState is LoginViewModel.AuthState.Error) {
-                    errorMessage = (authState as LoginViewModel.AuthState.Error).error
-                    showDialog = true
-                }
-            }
-
-            if (showDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text(text = stringResource(R.string.errorlogin)) },
-                    text = { Text(text = errorMessage) },
-                    confirmButton = {
-                        Button(
-                            onClick = { showDialog = false }
-                        ) {
-                            Text(stringResource(R.string.aceptar))
-                        }
-                    }
-                )
-            }
-            //--------------------------------------------------
-
-            Column(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                LoginButton(viewModel, navController, context)
-
-                Spacer(modifier = Modifier.padding(16.dp))
-                GoogleButton(viewModel, navController)
-                Spacer(modifier = Modifier.padding(16.dp))
-                Text(
-                    text = stringResource(R.string.no_tienes_cuenta),
-                    fontSize = 20.sp,
-                    color = colorResource(id = R.color.black),
+                Box(
                     modifier = Modifier
-                        .padding(10.dp)
-                        .align(Alignment.CenterHorizontally)
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.app),
+                            // modifier = Modifier.padding(start = 8.dp, end = 15.dp),
+                            fontSize = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
+                        // LogoHeader(Modifier)
+                    }
+                }
+
+                TituloLogin(Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.CenterHorizontally)
                 )
-                RegisterButton(navController)
+
+                Spacer(modifier = Modifier.padding(5.dp))
+
+                EmailField(email = email, error = emailError) {
+                    viewModel.onLoginChanges(it, password)
+                }
+
+                Spacer(modifier = Modifier.padding(4.dp))
+
+                PasswordField(password = password, error = passwordError) {
+                    viewModel.onLoginChanges(email, it)
+                }
+
+                ForgotPassword(Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.End),
+                    viewModel,
+                    context)
+
+
+                if (passwordResetMessage != null) {
+                    AlertDialog(
+                        onDismissRequest = { viewModel.clearPasswordResetMessage() },
+                        title = { Text(stringResource(R.string.RecuperaContrasenia)) },
+                        text = { Text(passwordResetMessage!!) },
+                        confirmButton = {
+                            Button(
+                                onClick = { viewModel.clearPasswordResetMessage() }
+                            ) {
+                                Text(stringResource(R.string.aceptar))
+                            }
+                        }
+                    )
+                }
+                Spacer(modifier = Modifier.padding(16.dp))
+
+                //alert errores de firebase-------------------------
+                var showDialog by remember { mutableStateOf(false) }
+                var errorMessage by remember { mutableStateOf("") }
+                LaunchedEffect(authState) {
+                    if (authState is LoginViewModel.AuthState.Error) {
+                        errorMessage = (authState as LoginViewModel.AuthState.Error).error
+                        showDialog = true
+                    }
+                }
+
+                if (showDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDialog = false },
+                        title = { Text(text = stringResource(R.string.errorlogin)) },
+                        text = { Text(text = errorMessage) },
+                        confirmButton = {
+                            Button(
+                                onClick = { showDialog = false }
+                            ) {
+                                Text(stringResource(R.string.aceptar))
+                            }
+                        }
+                    )
+                }
+                //--------------------------------------------------
+
+                Column(modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.CenterHorizontally))
+                {
+                    LoginButton(viewModel, navController, context)
+
+                    Spacer(modifier = Modifier.padding(16.dp))
+                    GoogleButton(viewModel, navController)
+                    Spacer(modifier = Modifier.padding(16.dp))
+                    Text(
+                        text = stringResource(R.string.no_tienes_cuenta),
+                        fontSize = 20.sp,
+                        color = colorResource(id = R.color.black),
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                    RegisterButton(navController)
+                }
+
             }
         }
     }
