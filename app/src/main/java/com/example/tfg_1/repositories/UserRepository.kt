@@ -16,6 +16,7 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import com.example.tfg_1.model.TasksModel
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.auth.GoogleAuthProvider
 
@@ -321,6 +322,61 @@ class UserRepository(
             true
         } catch (e: Exception) {
             Log.e("UserRepository", "Error al eliminar gasto", e)
+            false
+        }
+    }
+
+    //tareas------------------------------------------------------------------------
+    fun escucharTareas(homeId: String, onChange: (List<TasksModel>) -> Unit): ListenerRegistration {
+        return firestore.collection("hogares").document(homeId)
+            .collection("tareas")
+            .addSnapshotListener { snap, err ->
+                if (err != null || snap == null) {
+                    Log.e("UserRepository", "Error escuchando tareas", err)
+                    onChange(emptyList())
+                    return@addSnapshotListener
+                }
+
+                val tareas = snap.documents.mapNotNull { d ->
+                    d.toObject(TasksModel::class.java)
+                }
+
+                onChange(tareas)
+            }
+    }
+
+    suspend fun agregarTarea(tarea: TasksModel): Boolean {
+        return try {
+            firestore.collection("hogares").document(tarea.homeId)
+                .collection("tareas").document(tarea.id)
+                .set(tarea).await()
+            true
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error al agregar tarea", e)
+            false
+        }
+    }
+
+    suspend fun actualizarTarea(tarea: TasksModel): Boolean {
+        return try {
+            firestore.collection("hogares").document(tarea.homeId)
+                .collection("tareas").document(tarea.id)
+                .set(tarea).await()
+            true
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error al actualizar tarea", e)
+            false
+        }
+    }
+
+    suspend fun eliminarTarea(homeId: String, tareaId: String): Boolean {
+        return try {
+            firestore.collection("hogares").document(homeId)
+                .collection("tareas").document(tareaId)
+                .delete().await()
+            true
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error al eliminar tarea", e)
             false
         }
     }

@@ -35,11 +35,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 fun RegisterScreenPreview() {
     val navController = rememberNavController()
     val viewModel = RegisterViewModel(navController)
-    RegisterScreen(viewModel = viewModel/*, navController*/)
+    RegisterScreen(viewModel = viewModel)
 }
 
 @Composable
-fun RegisterScreen(viewModel: RegisterViewModel/*, navcontroller : NavController*/) {
+fun RegisterScreen(viewModel: RegisterViewModel) {
     Box(
         Modifier
             .fillMaxSize()

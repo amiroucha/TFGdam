@@ -1,19 +1,21 @@
 package com.example.tfg_1.viewModel
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.tfg_1.model.TasksModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.tfg_1.repositories.UserRepository
+import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.launch
 import java.util.*
 
 
 class TasksViewModel: ViewModel()
 {
+    private val userRepository = UserRepository()
     private var homeId : String? = null
     //lista de tareas
     private val _tareasList = mutableStateListOf<TasksModel>()
@@ -24,148 +26,74 @@ class TasksViewModel: ViewModel()
 
     private var usuarioFiltrado by mutableStateOf<String?>(null)//null=all users
 
+    private var tareasListener: ListenerRegistration? = null
 
     init {
-        obtenerHomeIdYDatos()
-    }
-
-    private fun obtenerHomeIdYDatos() {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            FirebaseFirestore.getInstance().collection("usuarios")
-                .document(currentUser.uid)
-                .get()
-                .addOnSuccessListener { document ->
-                    val homeIdResult = document.getString("homeId")
-                    if (!homeIdResult.isNullOrEmpty()) {
-                        homeId = homeIdResult
-                        cargarTareasDesdeFirebase()
-                        cargarUsuariosDesdeFirebase()
-                    } else {
-                        Log.e("TasksViewModel", "homeId no encontrado")
-                    }
-                }
-                .addOnFailureListener {
-                    Log.e("TasksViewModel", "Error al obtener homeId: ${it.message}")
-                }
+        viewModelScope.launch {
+            homeId = userRepository.getCurrentUserHomeId()
+            cargarUsuarios()
+            escucharTareas()
         }
     }
-    private fun cargarTareasDesdeFirebase() {
-        val idcasa = homeId
-        FirebaseFirestore.getInstance()
-            .collection("hogares")
-            .document(idcasa.toString())
-            .collection("tareas")
-            .whereEqualTo("homeId", idcasa)
-            .addSnapshotListener { snapshot, exception ->
-                if (exception != null) {
-                    Log.e("TasksViewModel", "Error al obtener tareas: ${exception.message}")
-                    return@addSnapshotListener
-                }
 
-                if (snapshot != null) {
-                    _tareasList.clear()
-                    for (doc in snapshot) {
-                        try {
-                            val tarea = doc.toObject(TasksModel::class.java)
-                            if (tarea != null) {
-                                _tareasList.add(tarea)
-                            }
-                        } catch (e: Exception) {
-                            Log.e("TasksViewModel", "Error al convertir tarea: ${e.message}")
-                        }
-                    }
-                }
-            }
+    private suspend fun cargarUsuarios() {
+        homeId?.let { it ->
+            val users = userRepository.getMembersByHomeId(it)
+            _usuarios.clear()
+            _usuarios.addAll(users.map { it.name })
+        }
     }
 
-    private fun cargarUsuariosDesdeFirebase() {
-        val idcasa = homeId ?: return
-        FirebaseFirestore.getInstance()
-            .collection("usuarios")
-            .whereEqualTo("homeId", idcasa)
-            .addSnapshotListener { snapshot, exception ->
-                if (exception != null) {
-                    Log.e("TasksViewModel", "Error al cargar usuarios: ${exception.message}")
-                    return@addSnapshotListener
-                }
-
-                if (snapshot != null) {
-                    _usuarios.clear()
-                    for (doc in snapshot.documents) {
-                        val nombreUsuario = doc.getString("name")
-                        if (!nombreUsuario.isNullOrBlank()) {
-                            _usuarios.add(nombreUsuario)
-                        }
-                    }
-                }
+    private fun escucharTareas() {
+        homeId?.let { id ->
+            tareasListener = userRepository.escucharTareas(id) { tareas ->
+                _tareasList.clear()
+                _tareasList.addAll(tareas)
             }
+        }
     }
 
     fun modificaUsuarioFiltrado(usuario: String?) {
         usuarioFiltrado = usuario
     }
 
+    fun tareasPendientes(): List<TasksModel> =
+        tareasList.filter { !it.completada && (usuarioFiltrado == null || it.asignadoA == usuarioFiltrado) }
+
+    fun tareasCompletadas(): List<TasksModel> =
+        tareasList.filter { it.completada && (usuarioFiltrado == null || it.asignadoA == usuarioFiltrado) }
+
     fun agregarTarea(titulo: String, fecha: String, asignadoA: String) {
-        val idcasa = homeId.toString()
-        val nuevaTarea = TasksModel(
+        val tarea = TasksModel(
             id = UUID.randomUUID().toString(),
             titulo = titulo,
             fecha = fecha,
             asignadoA = asignadoA,
             completada = false,
-            homeId = idcasa
+            homeId = homeId ?: return
         )
 
-        FirebaseFirestore.getInstance()
-            .collection("hogares")
-            .document(idcasa)
-            .collection("tareas")
-            .document(nuevaTarea.id)
-            .set(nuevaTarea)
-
+        viewModelScope.launch {
+            userRepository.agregarTarea(tarea)
+        }
     }
-
 
     fun comprobarEstadoTarea(tarea: TasksModel) {
-        val idcasa = homeId.toString()
-        val nuevaTarea = tarea.copy(completada = !tarea.completada)
-        FirebaseFirestore.getInstance()
-            .collection("hogares")
-            .document(idcasa)
-            .collection("tareas")
-            .document(tarea.id)
-            .set(nuevaTarea)
+        val nueva = tarea.copy(completada = !tarea.completada)
+        viewModelScope.launch {
+            userRepository.actualizarTarea(nueva)
+        }
     }
-    //filtrar por usuario en pendientes y completadas
-    fun tareasPendientes(): List<TasksModel> =
-        tareasList.filter {  tarea ->
-            !tarea.completada &&
-            (usuarioFiltrado == null || tarea.asignadoA == usuarioFiltrado)
-        }
 
-    fun tareasCompletadas(): List<TasksModel> =
-        tareasList.filter  { tarea ->
-            tarea.completada &&
-            (usuarioFiltrado == null || tarea.asignadoA == usuarioFiltrado)
-        }
-
-    //eliminar tareas
     fun eliminarTarea(tarea: TasksModel) {
-        val idcasa = homeId ?: return
+        viewModelScope.launch {
+            userRepository.eliminarTarea(homeId ?: return@launch, tarea.id)
+        }
+    }
 
-        FirebaseFirestore.getInstance()
-            .collection("hogares")
-            .document(idcasa)
-            .collection("tareas")
-            .document(tarea.id)
-            .delete()
-            .addOnSuccessListener {
-                Log.d("TasksViewModel", "Tarea eliminada correctamente")
-            }
-            .addOnFailureListener { e ->
-                Log.e("TasksViewModel", "Error al eliminar tarea: ${e.message}")
-            }
+    override fun onCleared() {
+        super.onCleared()
+        tareasListener?.remove()
     }
 
 }
