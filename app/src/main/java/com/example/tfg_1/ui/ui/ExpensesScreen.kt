@@ -63,6 +63,7 @@ fun ExpensesScreen() {
     // por defecto es mensual
     var periodoFiltro by remember { mutableStateOf(PeriodoFiltro.MES) }
 
+
     // agrupa gastos por semana, mes o año
     fun agruparGastosPorPeriodo(gastos: List<ExpensesModel>, filtro: PeriodoFiltro): List<DataChart> {
         val calendar = Calendar.getInstance()
@@ -126,9 +127,9 @@ fun ExpensesScreen() {
         }
     }
 
-    val datosChart = remember(gastos, periodoFiltro) {
-        agruparGastosPorPeriodo(gastosFiltrados, periodoFiltro) // agrupo y guardo/recuerdo datos para el gráfico
-    }
+   // val datosChart = remember(gastos, periodoFiltro) {
+      //  agruparGastosPorPeriodo(gastosFiltrados, periodoFiltro) // agrupo y guardo/recuerdo datos para el gráfico
+    //}
 
     var expandedFiltroFecha by remember { mutableStateOf(false) } //menú desplegable está abierto??
     var expandedCategoria by remember { mutableStateOf(false) }     // para categoría en el diálogo
@@ -228,6 +229,10 @@ fun ExpensesScreen() {
                             }
                         }
                     }
+                }
+
+                val datosChart = remember(gastosFiltrados, periodoFiltro) {
+                    agruparGastosPorPeriodo(gastosFiltrados, periodoFiltro)
                 }
 
                 Chart(datosChart) // muestra el gráfico con dato

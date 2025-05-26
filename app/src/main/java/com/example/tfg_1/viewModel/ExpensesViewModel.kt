@@ -1,6 +1,7 @@
 package com.example.tfg_1.viewModel
 
 import android.util.Log
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,9 +21,13 @@ class ExpensesViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val userRepository = UserRepository()
 
-
     var gastos  by mutableStateOf<List<ExpensesModel>>(emptyList())
         private set
+
+    //lista de gastos filtrados por usuario
+    var gastosFiltrados by mutableStateOf<List<ExpensesModel>>(emptyList())
+        private set
+
     var loading by mutableStateOf(true)
         private set
 
@@ -45,9 +50,15 @@ class ExpensesViewModel : ViewModel() {
         private const val TAG = "ExpensesViewModel"
     }
 
+    private fun actualizarGastosFiltrados() {
+        gastosFiltrados = gastos.filter { gasto ->
+            usuarioFiltrado == null || gasto.asignadoA == usuarioFiltrado
+        }
+    }
 
     fun modificaUsuarioFiltrado(usuario: String?) {
         usuarioFiltrado = usuario
+        actualizarGastosFiltrados()
     }
 
     //escuchar cambios en el usuario
@@ -79,6 +90,7 @@ class ExpensesViewModel : ViewModel() {
                 listenerRegistration?.remove()
                 listenerRegistration = userRepository.escucharGastos(homeId) { nuevosGastos ->
                     gastos = nuevosGastos
+                    actualizarGastosFiltrados()
                     loading = false
                 }
 
@@ -135,11 +147,7 @@ class ExpensesViewModel : ViewModel() {
             if (!success) _uiEvent.emit(UiEvent.Error("Error al eliminar gasto"))
         }
     }
-    //lista de gastos filtrados por usuario
-    val gastosFiltrados: List<ExpensesModel>
-        get() = gastos.filter { gasto ->
-        usuarioFiltrado == null || gasto.asignadoA == usuarioFiltrado
-    }
+
 
     sealed interface UiEvent {
         data object Added : UiEvent
