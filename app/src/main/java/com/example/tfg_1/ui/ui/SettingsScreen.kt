@@ -13,12 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.tfg_1.R
 import com.example.tfg_1.navigation.Screens
+import com.example.tfg_1.repositories.UserRepository
 import com.example.tfg_1.viewModel.SettingsViewModel
 import com.example.tfg_1.viewModel.ThemeViewModel
 
@@ -90,7 +93,12 @@ fun SettingsScreen(
         }
 
         Spacer(Modifier.height(16.dp))
-
+        val userRepository = remember { UserRepository() }
+        var homeName by remember { mutableStateOf("") }
+        // cargar datos del usuario y hogar
+        LaunchedEffect(Unit) {
+            homeName = userRepository.getCurrentHomeName()
+        }
         // Miembros del hogar -------------------------------------------
         Card(
             shape = cardShape,
@@ -99,16 +107,30 @@ fun SettingsScreen(
         ) {
             Column(Modifier.padding(20.dp)) {
                 Text(
+                    text = stringResource(R.string.hogarNombre, homeName),
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    ),
+                    color= MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+
+                )
+                Text(
                     text = stringResource(R.string.miembrosHogar),
                     style = MaterialTheme.typography.titleMedium,
-                    color= MaterialTheme.colorScheme.onBackground
+                    color= MaterialTheme.colorScheme.onBackground,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(5.dp)
                 )
                 members.forEach {
                     Text(
                         text = "• ${it.name} (${it.email})",
                         style = MaterialTheme.typography.bodyMedium,
                         color= MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(top = 6.dp)
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(5.dp)
                     )
                 }
             }
