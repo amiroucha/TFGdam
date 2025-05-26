@@ -7,13 +7,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tfg_1.model.DataChart
 import com.example.tfg_1.model.ExpensesModel
+import com.example.tfg_1.model.PeriodoFiltro
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import com.example.tfg_1.repositories.UserRepository
+import java.text.SimpleDateFormat
 import java.util.*
 
 class ExpensesViewModel : ViewModel() {
@@ -145,6 +148,69 @@ class ExpensesViewModel : ViewModel() {
         viewModelScope.launch {
             val success = userRepository.deleteExpense(homeIdBD ?: return@launch, gasto.id)
             if (!success) _uiEvent.emit(UiEvent.Error("Error al eliminar gasto"))
+        }
+    }
+
+
+    fun agruparGastosPorPeriodo(gastos: List<ExpensesModel>, filtro: PeriodoFiltro): List<DataChart> {
+        val calendar = Calendar.getInstance()
+
+        val agrupados: Map<Long, List<ExpensesModel>> = when (filtro) {
+            PeriodoFiltro.SEMANA -> { // Agrupación por semna
+                gastos.groupBy { gasto ->
+                    calendar.time = gasto.fecha // fecha del gasto al calendario
+                    calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek) // ajusto primer dia de semana
+                    calendar.timeInMillis
+                }
+            }
+            PeriodoFiltro.MES -> { // Agrupación por mes
+                gastos.groupBy { gasto ->
+                    calendar.time = gasto.fecha // fecha cuando se gasta
+                    calendar.set(Calendar.DAY_OF_MONTH, 1) // dia uno del mes
+                    calendar.set(Calendar.HOUR_OF_DAY, 0)
+                    calendar.set(Calendar.MINUTE, 0)
+                    calendar.set(Calendar.SECOND, 0)
+                    calendar.set(Calendar.MILLISECOND, 0) // reseteo la hora
+                    calendar.timeInMillis // Timestamp como clave
+                }
+            }
+            PeriodoFiltro.ANIO -> { // Agrupación por año
+                gastos.groupBy { gasto ->
+                    calendar.time = gasto.fecha // fecha cuando se gasta
+                    calendar.set(Calendar.DAY_OF_YEAR, 1) // Día uno del año
+                    calendar.set(Calendar.HOUR_OF_DAY, 0)
+                    calendar.set(Calendar.MINUTE, 0)
+                    calendar.set(Calendar.SECOND, 0)
+                    calendar.set(Calendar.MILLISECOND, 0) // Reset de tiempo
+                    calendar.timeInMillis // Timestamp como clave
+                }
+            }
+        }
+
+        // Se transforma el mapa agrupado en una lista ordenada de DataChart
+        return agrupados.entries.sortedBy { it.key }.map { (timeMillis, listaGastos) ->
+
+            val total = listaGastos.sumOf { it.importe } // total de los gastos (campo iportes)
+
+            calendar.timeInMillis = timeMillis // Se establece la fecha del grupo
+
+            val label = when (filtro) { //etiqueta segn filtro semana, mes,año
+                PeriodoFiltro.SEMANA -> {
+                    val semana = calendar.get(Calendar.WEEK_OF_YEAR) // numero semana
+                    val anio = calendar.get(Calendar.YEAR) % 100 // ultimos 2 dígitos del año
+                    "$semana//$anio"
+                }
+                PeriodoFiltro.MES -> {
+                    val anio = calendar.get(Calendar.YEAR)
+                    val mesNombre = SimpleDateFormat("MMM", Locale.getDefault()).format(calendar.time) // nombre mes
+                    "$mesNombre $anio"
+                }
+                PeriodoFiltro.ANIO -> {
+                    val anio = calendar.get(Calendar.YEAR)
+                    "$anio"
+                }
+            }
+            DataChart(label = label, value = total.toFloat())
         }
     }
 

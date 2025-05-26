@@ -140,9 +140,12 @@
     <string name="agua">Agua</string>
     <string name="luz">Luz</string>
     <string name="limpieza">Limpieza</string>
-    <string name="aseo">Aseo</string>
+    <string name="aseo">Higiene</string>
     <string name="gas">Gas</string>
     <string name="otra">Otra</string>
+    <string name="semana">SEMANA</string>
+    <string name="mes">MES</string>
+    <string name="anio">AÑO</string>
 
 
 </resources>

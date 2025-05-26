@@ -1,5 +1,6 @@
 package com.example.tfg_1.ui.ui
 
+
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -41,6 +42,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import com.example.tfg_1.model.PeriodoFiltro
+import com.example.tfg_1.model.toDisplayString
 import java.util.*
 
 
@@ -50,7 +53,6 @@ fun ExpensesScreen() {
     val vm: ExpensesViewModel = viewModel()
     val context = LocalContext.current
 
-    val gastos by remember { derivedStateOf { vm.gastos } } //estado lista gastos
     val loading by remember { derivedStateOf { vm.loading } } //estado carga
     //lista de gastos filtrada
     val gastosFiltrados by remember { derivedStateOf { vm.gastosFiltrados } }
@@ -65,67 +67,7 @@ fun ExpensesScreen() {
 
 
     // agrupa gastos por semana, mes o año
-    fun agruparGastosPorPeriodo(gastos: List<ExpensesModel>, filtro: PeriodoFiltro): List<DataChart> {
-        val calendar = Calendar.getInstance()
 
-        val agrupados: Map<Long, List<ExpensesModel>> = when (filtro) {
-            PeriodoFiltro.SEMANA -> { // Agrupación por semna
-                gastos.groupBy { gasto ->
-                    calendar.time = gasto.fecha // fecha del gasto al calendario
-                    calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek) // ajusto primer dia de semana
-                    calendar.timeInMillis
-                }
-            }
-            PeriodoFiltro.MES -> { // Agrupación por mes
-                gastos.groupBy { gasto ->
-                    calendar.time = gasto.fecha // fecha cuando se gasta
-                    calendar.set(Calendar.DAY_OF_MONTH, 1) // dia uno del mes
-                    calendar.set(Calendar.HOUR_OF_DAY, 0)
-                    calendar.set(Calendar.MINUTE, 0)
-                    calendar.set(Calendar.SECOND, 0)
-                    calendar.set(Calendar.MILLISECOND, 0) // reseteo la hora
-                    calendar.timeInMillis // Timestamp como clave
-                }
-            }
-            PeriodoFiltro.ANIO -> { // Agrupación por año
-                gastos.groupBy { gasto ->
-                    calendar.time = gasto.fecha // fecha cuando se gasta
-                    calendar.set(Calendar.DAY_OF_YEAR, 1) // Día uno del año
-                    calendar.set(Calendar.HOUR_OF_DAY, 0)
-                    calendar.set(Calendar.MINUTE, 0)
-                    calendar.set(Calendar.SECOND, 0)
-                    calendar.set(Calendar.MILLISECOND, 0) // Reset de tiempo
-                    calendar.timeInMillis // Timestamp como clave
-                }
-            }
-        }
-
-        // Se transforma el mapa agrupado en una lista ordenada de DataChart
-        return agrupados.entries.sortedBy { it.key }.map { (timeMillis, listaGastos) ->
-
-            val total = listaGastos.sumOf { it.importe } // total de los gastos (campo iportes)
-
-            calendar.timeInMillis = timeMillis // Se establece la fecha del grupo
-
-            val label = when (filtro) { //etiqueta segn filtro semana, mes,año
-                PeriodoFiltro.SEMANA -> {
-                    val semana = calendar.get(Calendar.WEEK_OF_YEAR) // numero semana
-                    val anio = calendar.get(Calendar.YEAR) % 100 // ultimos 2 dígitos del año
-                    "$semana//$anio"
-                }
-                PeriodoFiltro.MES -> {
-                    val anio = calendar.get(Calendar.YEAR)
-                    val mesNombre = SimpleDateFormat("MMM", Locale.getDefault()).format(calendar.time) // nombre mes
-                    "$mesNombre $anio"
-                }
-                PeriodoFiltro.ANIO -> {
-                    val anio = calendar.get(Calendar.YEAR)
-                    "$anio"
-                }
-            }
-            DataChart(label = label, value = total.toFloat())
-        }
-    }
 
    // val datosChart = remember(gastos, periodoFiltro) {
       //  agruparGastosPorPeriodo(gastosFiltrados, periodoFiltro) // agrupo y guardo/recuerdo datos para el gráfico
@@ -204,12 +146,15 @@ fun ExpensesScreen() {
                 )
                 Spacer(modifier = Modifier.height(10.dp)) // Espacio
 
+
                 Box(modifier = Modifier.fillMaxWidth()) {
                     ExposedDropdownMenuBox(
-                        expanded = expandedFiltroFecha, onExpandedChange = { expandedFiltroFecha = !expandedFiltroFecha }) {
+                        expanded = expandedFiltroFecha,
+                        onExpandedChange = { expandedFiltroFecha = !expandedFiltroFecha }
+                    ) {
                         TextField(
                             readOnly = true,
-                            value = periodoFiltro.name,//asigno nombre de "mes/semna/año"
+                            value = periodoFiltro.toDisplayString(context),
                             onValueChange = {},
                             label = { Text(stringResource(R.string.filtro_de_tiempo)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedFiltroFecha) },
@@ -217,13 +162,16 @@ fun ExpensesScreen() {
                                 .menuAnchor()
                                 .fillMaxWidth()
                         )
-                        ExposedDropdownMenu(expanded = expandedFiltroFecha, onDismissRequest = { expandedFiltroFecha = false }) {
+                        ExposedDropdownMenu(
+                            expanded = expandedFiltroFecha,
+                            onDismissRequest = { expandedFiltroFecha = false }
+                        ) {
                             PeriodoFiltro.entries.forEach { filtro ->
                                 DropdownMenuItem(
-                                    text = { Text(filtro.name) },
+                                    text = { Text(filtro.toDisplayString(context)) },
                                     onClick = {
-                                        periodoFiltro = filtro // Cambia el filtro
-                                        expandedFiltroFecha = false // Cierra el menú
+                                        periodoFiltro = filtro
+                                        expandedFiltroFecha = false
                                     }
                                 )
                             }
@@ -232,7 +180,7 @@ fun ExpensesScreen() {
                 }
 
                 val datosChart = remember(gastosFiltrados, periodoFiltro) {
-                    agruparGastosPorPeriodo(gastosFiltrados, periodoFiltro)
+                    vm.agruparGastosPorPeriodo(gastosFiltrados, periodoFiltro)
                 }
 
                 Chart(datosChart) // muestra el gráfico con dato
@@ -533,7 +481,6 @@ fun ExpensesScreen() {
     }
 }
 
-enum class PeriodoFiltro { SEMANA, MES, ANIO }
 
 
 @Composable

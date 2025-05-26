@@ -135,6 +135,9 @@
     <string name="aseo">Hygiene</string>
     <string name="gas">Gas</string>
     <string name="otra">Other</string>
+    <string name="semana">WEEK</string>
+    <string name="mes">MONTH</string>
+    <string name="anio">YEAR</string>
 
 
 </resources>
