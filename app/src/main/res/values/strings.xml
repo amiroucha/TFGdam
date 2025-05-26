@@ -136,6 +136,13 @@
     <string name="confirmarCompletarTarea">¿Marcar esta tarea como completada?</string>
     <string name="confirmarMarcarComoPendiente">¿Marcar esta tarea como pendiente?</string>
     <string name="hogarNombre">Hogar: %1$s</string>
+    <string name="comida">Comida</string>
+    <string name="agua">Agua</string>
+    <string name="luz">Luz</string>
+    <string name="limpieza">Limpieza</string>
+    <string name="aseo">Aseo</string>
+    <string name="gas">Gas</string>
+    <string name="otra">Otra</string>
 
 
 </resources>

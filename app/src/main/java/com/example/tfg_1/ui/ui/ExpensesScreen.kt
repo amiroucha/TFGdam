@@ -148,7 +148,15 @@ fun ExpensesScreen() {
         }
     }
 
-    val categorias = listOf("comida", "agua", "luz", "limpieza", "aseo", "gas", "otra") //lista de categorías
+    val categorias = listOf(
+        stringResource(R.string.comida),
+        stringResource(R.string.agua),
+        stringResource(R.string.luz),
+        stringResource(R.string.limpieza),
+        stringResource(R.string.aseo),
+        stringResource(R.string.gas),
+        stringResource(R.string.otra)
+    ) //lista de categorías
     var categoria by remember { mutableStateOf(categorias.first()) } // categoría seleccionada
     var otraCategoria by remember { mutableStateOf("") } //categoría personalizada
     var descripcion by remember { mutableStateOf("") } // Descripción

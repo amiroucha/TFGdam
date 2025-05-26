@@ -128,6 +128,13 @@
     <string name="confirmarCompletarTarea">Mark this task as complete?</string>
     <string name="confirmarMarcarComoPendiente">Mark this task as pending?</string>
     <string name="hogarNombre">Home: %1$s</string>
+    <string name="comida">Food</string>
+    <string name="agua">Water</string>
+    <string name="luz">Light</string>
+    <string name="limpieza">Cleaning</string>
+    <string name="aseo">Hygiene</string>
+    <string name="gas">Gas</string>
+    <string name="otra">Other</string>
 
 
 </resources>
