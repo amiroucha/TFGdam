@@ -5,18 +5,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.tfg_1.R
-import com.example.tfg_1.model.UserModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.tfg_1.repositories.UserRepository
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 class RegisterViewModel(navController: NavController) : ViewModel() {
     private val _navController = navController
-    private lateinit var auth: FirebaseAuth
-    //val context = LocalContext.current
+    private val userRepository = UserRepository()
+
     //----------------------------------------------------------------------
 
     private val _email = MutableStateFlow("")
@@ -146,44 +146,28 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
                 _nameError.value.isEmpty()
     }
     fun botonRegistro(context: Context){
-        if (!validateOnSubmit(context)) return //si hay un dato incorrecto se sale
+        if (!validateOnSubmit(context)) return
 
         _isLoadingR.value = true
-        auth = FirebaseAuth.getInstance()
 
-        auth.createUserWithEmailAndPassword(_email.value, _password.value)
-            .addOnCompleteListener { task ->
-                _isLoadingR.value = false
-                if (task.isSuccessful) {
-                    val userUid = auth.currentUser?.uid
+        viewModelScope.launch {
+            val result = userRepository.registerUser(
+                email = _email.value,
+                password = _password.value,
+                name = _name.value,
+                birthDate = _birthdate.value
+            )
 
-                    userUid?.let { id -> // si el id no es null
-                        val userModel = UserModel(
-                            id = id,
-                            name = _name.value,
-                            email = _email.value,
-                            homeId = "",
-                            birthDate = _birthdate.value,
-                            image = ""
-                        )
-                        FirebaseFirestore.getInstance()
-                            .collection("usuarios")
-                            .document(id)
-                            .set(userModel)
-                            .addOnSuccessListener {
-                               _navController.navigate("home") {
-                                    popUpTo("register") { inclusive = true }
-                                    popUpTo("login") { inclusive = true }
-                               }
-                            }.addOnFailureListener { e ->
-                                _emailError.value = e.localizedMessage ?: context.getString(R.string.errorGuardarUsuario)
-                            }
-                    }
+            _isLoadingR.value = false
 
-                } else {
-                    // Mostrar error si hubo un problema
-                    _emailError.value = task.exception?.localizedMessage ?: context.getString(R.string.erroRegistrar)
+            result.onSuccess {
+                _navController.navigate("home") {
+                    popUpTo("register") { inclusive = true }
+                    popUpTo("login") { inclusive = true }
                 }
+            }.onFailure { e ->
+                _emailError.value = e.localizedMessage ?: context.getString(R.string.erroRegistrar)
             }
+        }
     }
 }

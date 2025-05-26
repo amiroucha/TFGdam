@@ -26,9 +26,6 @@ class UserRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 )
 {
-    //logn con google
-    private lateinit var credentialManager: CredentialManager
-
 
     //usuario actual
     fun getCurrentUser(): FirebaseUser? {
@@ -179,6 +176,38 @@ class UserRepository(
 
     fun logout() {
         auth.signOut()
+    }
+
+    //registro-------------------------------------------------------------------
+    suspend fun registerUser(
+        email: String,
+        password: String,
+        name: String,
+        birthDate: String
+    ): Result<FirebaseUser?> {
+        return try {
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val user = result.user
+
+            user?.uid?.let { uid ->
+                val userModel = UserModel(
+                    id = uid,
+                    name = name,
+                    email = email,
+                    homeId = "",
+                    birthDate = birthDate,
+                    image = ""
+                )
+                firestore.collection("usuarios")
+                    .document(uid)
+                    .set(userModel)
+                    .await()
+            }
+
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
 
