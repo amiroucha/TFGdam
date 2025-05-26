@@ -89,21 +89,20 @@ class UserRepository(
     //obtener el nombre del hogar actual
     suspend fun getCurrentHomeName(): String {
         val uid = getCurrentUserId()
-        if (uid.isEmpty()) {
-            // Usuario no logueado no consultar Firestore
-            return ""
-        }
+        // Usuario no logueado no consultar Firestore
+        if (uid.isEmpty()) return ""
+
         val userDoc = getUserDoc(uid)
-        val homeId = userDoc.getString("homeId") ?: return ""
+        val homeId = userDoc.getString("homeId")?.takeIf { it.isNotBlank() } ?: return ""
+
         val homeDoc = getHomeById(homeId)
-        return homeDoc.getString("homeName") ?: ""
+        return homeDoc.getString("homeName").orEmpty()
     }
 
     suspend fun getHomeById(homeId: String): DocumentSnapshot {
-        return firestore.collection("hogares")
-            .document(homeId)
-            .get()
-            .await()
+        require(homeId.isNotBlank()) { "homeId no puede estar vacío" }
+        return firestore.collection("hogares").document(homeId).get().await()
+
     }
 
     suspend fun getMembersByHomeId(homeId: String): List<UserModel> {
