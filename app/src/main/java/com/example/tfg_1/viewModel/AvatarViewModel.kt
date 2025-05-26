@@ -22,8 +22,19 @@ class AvatarViewModel : ViewModel() {
     var selectedAvatar by mutableStateOf<String?>(null)
         private set
 
+    private var avatarAsignadoAutomaticamente = false // <--- FLAG GLOBAL
+
+    private val authListener = FirebaseAuth.AuthStateListener {
+        // cada vez que cambia el usuario logueado, se recarga la imgen
+        //asi no se queda en memoria la dek usuario anterior
+        avatarAsignadoAutomaticamente = false
+        selectedAvatar = null
+        loadFirestore()
+    }
+
     init {
         loadAvatars()
+        auth.addAuthStateListener(authListener)
         loadFirestore()
     }
 
@@ -62,14 +73,18 @@ class AvatarViewModel : ViewModel() {
     }
     private fun loadFirestore() {
         val userId = auth.currentUser?.uid ?: return
-        // leer la imagen
+
         viewModelScope.launch {
-            val imageUrl = firestoreGetAvatarUrl(userId) //obtenermos imagen
-            if (imageUrl.isNullOrEmpty()) {
-                // Si está vacío o nulo cojo uno de los que existen
-                selectedAvatar = avatarList.randomOrNull()?.image
-            } else {
+            val imageUrl = firestoreGetAvatarUrl(userId)
+            if (!imageUrl.isNullOrEmpty()) {
                 selectedAvatar = imageUrl
+            } else if (!avatarAsignadoAutomaticamente) {
+                // solo asigno random si no hay uno guardado ya
+                val randomAvatar = avatarList.randomOrNull()?.image
+                if (randomAvatar != null) {
+                    avatarAsignadoAutomaticamente = true
+                    guardarAvatar(randomAvatar)
+                }
             }
         }
     }
@@ -81,7 +96,7 @@ class AvatarViewModel : ViewModel() {
                 .await()
 
             if (doc.exists()) {
-                doc.getString("image") // campo donde guardas la URL
+                doc.getString("image")
             } else {
                 null
             }

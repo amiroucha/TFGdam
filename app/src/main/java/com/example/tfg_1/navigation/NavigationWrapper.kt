@@ -574,7 +574,6 @@ fun BottomBar(navController: NavHostController, currentRoute: String?) {
 @Composable
 private fun FotoPerfil() {
     val avatarViewModel: AvatarViewModel = viewModel()
-
     var showAvatarPicker by remember { mutableStateOf(false) }
     val selectedAvatar = avatarViewModel.selectedAvatar
 
@@ -596,22 +595,12 @@ private fun FotoPerfil() {
                 .padding(5.dp)
                 .size(85.dp)
                 .clip(CircleShape)
-                .border(
-                    width = 2.dp,
-                    color = colorResource(id = R.color.black),
-                    shape = CircleShape
-                )
+                .border(2.dp, colorResource(id = R.color.black), CircleShape)
                 .background(colorResource(id = R.color.lilaChat))
                 .clickable { showAvatarPicker = true }
         )
     } else {
-        LaunchedEffect(Unit) {
-            val randomAvatar = avatarViewModel.avatarList.randomOrNull()?.image
-            if (randomAvatar != null) {
-                avatarViewModel.guardarAvatar(randomAvatar)
-            }
-        }
-        //mientras carga la imagen
+        // mientras carga:
         Box(
             modifier = Modifier
                 .padding(5.dp)
@@ -621,7 +610,6 @@ private fun FotoPerfil() {
                 .background(colorResource(id = R.color.lilaChat))
         )
     }
-
 }
 
 @Composable
