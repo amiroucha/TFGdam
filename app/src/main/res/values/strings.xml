@@ -148,5 +148,7 @@
     <string name="anio">AÑO</string>
     <string name="usuario_filtrado">Usuario filtrado</string>
     <string name="no_hay_gastos">No hay gastos para mostrar</string>
+    <string name="no_hay_tareas_pendientes">No hay tareas pendientes</string>
+    <string name="no_hay_tareas_completadas">No hay tareas completadas</string>
 
 </resources>

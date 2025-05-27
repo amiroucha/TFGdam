@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -490,14 +491,29 @@ fun Pendientes(viewModel: TasksViewModel) {
     val tareasPendientes by remember {
         derivedStateOf { viewModel.tareasPendientes() }
     }
-
-    LazyColumn {
-        items(tareasPendientes) { tarea ->
-            TareaItem(
-                tarea = tarea,
-                modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
-                eliminarTarea = { viewModel.eliminarTarea(it) }
+    if (tareasPendientes.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.no_hay_tareas_pendientes),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                textAlign = TextAlign.Center
             )
+        }
+    } else {
+        LazyColumn {
+            items(tareasPendientes) { tarea ->
+                TareaItem(
+                    tarea = tarea,
+                    modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
+                    eliminarTarea = { viewModel.eliminarTarea(it) }
+                )
+            }
         }
     }
 }
@@ -508,14 +524,29 @@ fun Completadas(viewModel: TasksViewModel) {
     val tareasCompletadas by remember {
         derivedStateOf { viewModel.tareasCompletadas() }
     }
-
-    LazyColumn {
-        items(tareasCompletadas) { tarea ->
-            TareaItem(
-                tarea = tarea,
-                modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
-                eliminarTarea = { viewModel.eliminarTarea(it) }
+    if (tareasCompletadas.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.no_hay_tareas_completadas),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                textAlign = TextAlign.Center
             )
+        }
+    } else {
+        LazyColumn {
+            items(tareasCompletadas) { tarea ->
+                TareaItem(
+                    tarea = tarea,
+                    modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
+                    eliminarTarea = { viewModel.eliminarTarea(it) }
+                )
+            }
         }
     }
 }

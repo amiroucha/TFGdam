@@ -140,5 +140,7 @@
     <string name="anio">YEAR</string>
     <string name="usuario_filtrado">Filter User:</string>
     <string name="no_hay_gastos">There are not expenses to show</string>
+    <string name="no_hay_tareas_pendientes">There are not tasks to show</string>
+    <string name="no_hay_tareas_completadas">There are not completed tasks to show</string>
 
 </resources>
