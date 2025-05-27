@@ -10,6 +10,7 @@ import com.example.tfg_1.model.TasksModel
 import com.example.tfg_1.repositories.UserRepository
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.State
 import java.util.*
 
 
@@ -17,6 +18,10 @@ class TasksViewModel: ViewModel()
 {
     private val userRepository = UserRepository()
     private var homeId : String? = null
+
+    private val _loading = mutableStateOf(true)
+    val loading: State<Boolean> get() = _loading
+
     //lista de tareas
     private val _tareasList = mutableStateListOf<TasksModel>()
     private val tareasList: List<TasksModel> = _tareasList
@@ -24,12 +29,13 @@ class TasksViewModel: ViewModel()
     private val _usuarios = mutableStateListOf<String>()
     val usuarios: List<String> get() = _usuarios
 
-    private var usuarioFiltrado by mutableStateOf<String?>(null)//null=all users
+    var usuarioFiltrado by mutableStateOf<String?>(null)//null=all users
 
     private var tareasListener: ListenerRegistration? = null
 
     init {
         viewModelScope.launch {
+            _loading.value = true
             homeId = userRepository.getCurrentUserHomeId()
             cargarUsuarios()
             escucharTareas()
@@ -49,6 +55,7 @@ class TasksViewModel: ViewModel()
             tareasListener = userRepository.escucharTareas(id) { tareas ->
                 _tareasList.clear()
                 _tareasList.addAll(tareas)
+                _loading.value = false //quito spinner cuando esten las tareas
             }
         }
     }

@@ -146,6 +146,6 @@
     <string name="semana">SEMANA</string>
     <string name="mes">MES</string>
     <string name="anio">AÑO</string>
-
+    <string name="usuario_filtrado">Usuario filtrado</string>
 
 </resources>

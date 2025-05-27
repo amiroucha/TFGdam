@@ -192,7 +192,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat:Boolean) {
                             }
                         },actions = {
                             //filtro de usuario en tasks y expenses
-                            if (currentRoute == Screens.Tasks.route && tasksViewModel != null)
+                          /*  if (currentRoute == Screens.Tasks.route && tasksViewModel != null)
                             {
                                 var expanded by remember { mutableStateOf(false) }
                                 val tasksviewModel = tasksViewModel!!
@@ -227,7 +227,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat:Boolean) {
                                         }
                                     }
                                 }
-                            }
+                            }*/
                             //filtro usuario pantalla de gastos/expenses
                             if (currentRoute == Screens.Expenses.route && expensesViewModel != null) {
                                 var expanded by remember { mutableStateOf(false) }

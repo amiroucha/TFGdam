@@ -4,10 +4,12 @@ package com.example.tfg_1.ui.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -39,39 +41,49 @@ fun TasksScreenPreview() {
 
 @Composable
 fun TasksScreen(viewModel: TasksViewModel) {
+    val loading by viewModel.loading
     Box(
         Modifier
             .fillMaxSize()
             .background(color = colorResource(id = R.color.greyBackground))
     ) {
-        TasksBody(
-            Modifier
-                .align(Alignment.Center)
-                .padding(10.dp), viewModel )
 
-        var showDialog by remember { mutableStateOf(false) }
-
-        FloatingActionButton(
-            onClick = { showDialog = true },
-            modifier = Modifier
-                .align(Alignment.BottomEnd) // Lo coloca en la esquina inferior derecha
-                .padding(16.dp)
-        ) {
-            Icon(Icons.Filled.Add, stringResource(R.string.nuevaTarea))
-        }
-
-        if (showDialog){
-            NuevaTareaFormulario(
-                dismiss = { showDialog = false },
-                save = {titulo, fecha, asignadoA ->
-                    viewModel.agregarTarea(titulo, fecha, asignadoA)
-                    showDialog = false
-                },
-                usuarios = viewModel.usuarios,
+        if(loading){
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = MaterialTheme.colorScheme.primary
             )
-
-
         }
+        else {
+            TasksBody(
+                Modifier
+                    .align(Alignment.Center)
+                    .padding(10.dp), viewModel )
+
+            var showDialog by remember { mutableStateOf(false) }
+
+            FloatingActionButton(
+                onClick = { showDialog = true },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd) // Lo coloca en la esquina inferior derecha
+                    .padding(16.dp)
+            ) {
+                Icon(Icons.Filled.Add, stringResource(R.string.nuevaTarea))
+            }
+
+            if (showDialog){
+                NuevaTareaFormulario(
+                    dismiss = { showDialog = false },
+                    save = {titulo, fecha, asignadoA ->
+                        viewModel.agregarTarea(titulo, fecha, asignadoA)
+                        showDialog = false
+                    },
+                    usuarios = viewModel.usuarios,
+                )
+
+            }
+        }
+
     }
 
 }
@@ -82,7 +94,6 @@ fun TasksBody (modifier: Modifier, viewModel: TasksViewModel) {
 
     Column{
         TabsPag(viewModel) // Componente para las pestañas
-        Spacer(modifier = modifier.height(10.dp))
     }
 
 }
@@ -141,7 +152,8 @@ fun TabsPag(viewModel: TasksViewModel) {
 
             }
         }
-
+        //filtro del user
+        FiltroUsuarios(viewModel)
         // Contenido para cada tab
         when (selectedTab.intValue) {
             0 -> Pendientes(viewModel)
@@ -401,6 +413,75 @@ fun NuevaTareaFormulario(
             }
         }
     )
+}
+@Composable
+fun FiltroUsuarios(viewModel: TasksViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+
+    // Usuario actualmente filtrado
+    val usuarioSeleccionado = viewModel.usuarios.find { it == viewModel.usuarioFiltrado } ?: stringResource(R.string.todos)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .border(
+                width = 2.dp,
+                color = Color.Black,
+                shape = RoundedCornerShape(2.dp)
+            )
+            .padding(14.dp),//padidng interno
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        // Icono con fondo circular
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .background(MaterialTheme.colorScheme.primary, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            IconButton(onClick = { expanded = true }) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(15.dp))
+
+        // Texto Usuario filtrado: Nombre
+        Text(
+            text = "${stringResource(R.string.usuario_filtrado)}:      $usuarioSeleccionado",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.todos)) },
+                onClick = {
+                    viewModel.modificaUsuarioFiltrado(null)
+                    expanded = false
+                }
+            )
+            viewModel.usuarios.forEach { usuario ->
+                DropdownMenuItem(
+                    text = { Text(usuario) },
+                    onClick = {
+                        viewModel.modificaUsuarioFiltrado(usuario)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
 }
 
 

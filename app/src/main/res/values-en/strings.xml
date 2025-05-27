@@ -138,6 +138,6 @@
     <string name="semana">WEEK</string>
     <string name="mes">MONTH</string>
     <string name="anio">YEAR</string>
-
+    <string name="usuario_filtrado">Filter User:</string>
 
 </resources>
