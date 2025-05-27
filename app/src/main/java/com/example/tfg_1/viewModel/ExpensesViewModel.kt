@@ -159,7 +159,11 @@ class ExpensesViewModel : ViewModel() {
             PeriodoFiltro.SEMANA -> { // Agrupación por semna
                 gastos.groupBy { gasto ->
                     calendar.time = gasto.fecha // fecha del gasto al calendario
-                    calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek) // ajusto primer dia de semana
+                    calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                    calendar.set(Calendar.HOUR_OF_DAY, 0)
+                    calendar.set(Calendar.MINUTE, 0)
+                    calendar.set(Calendar.SECOND, 0)
+                    calendar.set(Calendar.MILLISECOND, 0)
                     calendar.timeInMillis
                 }
             }
@@ -198,12 +202,12 @@ class ExpensesViewModel : ViewModel() {
                 PeriodoFiltro.SEMANA -> {
                     val semana = calendar.get(Calendar.WEEK_OF_YEAR) // numero semana
                     val anio = calendar.get(Calendar.YEAR) % 100 // ultimos 2 dígitos del año
-                    "$semana//$anio"
+                    "$semana-$anio"
                 }
                 PeriodoFiltro.MES -> {
                     val anio = calendar.get(Calendar.YEAR)
                     val mesNombre = SimpleDateFormat("MMM", Locale.getDefault()).format(calendar.time) // nombre mes
-                    "$mesNombre $anio"
+                    "$mesNombre-$anio"
                 }
                 PeriodoFiltro.ANIO -> {
                     val anio = calendar.get(Calendar.YEAR)

@@ -69,10 +69,6 @@ fun ExpensesScreen() {
     // agrupa gastos por semana, mes o año
 
 
-   // val datosChart = remember(gastos, periodoFiltro) {
-      //  agruparGastosPorPeriodo(gastosFiltrados, periodoFiltro) // agrupo y guardo/recuerdo datos para el gráfico
-    //}
-
     var expandedFiltroFecha by remember { mutableStateOf(false) } //menú desplegable está abierto??
     var expandedCategoria by remember { mutableStateOf(false) }     // para categoría en el diálogo
 
