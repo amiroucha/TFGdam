@@ -1,7 +1,6 @@
 package com.example.tfg_1.viewModel
 
 import android.util.Log
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,8 +23,7 @@ class ExpensesViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val userRepository = UserRepository()
 
-    var gastos  by mutableStateOf<List<ExpensesModel>>(emptyList())
-        private set
+    private var gastos by mutableStateOf<List<ExpensesModel>>(emptyList())
 
     //lista de gastos filtrados por usuario
     var gastosFiltrados by mutableStateOf<List<ExpensesModel>>(emptyList())
@@ -41,7 +39,7 @@ class ExpensesViewModel : ViewModel() {
     val uiEvent: SharedFlow<UiEvent> = _uiEvent
 
     // Filtros de usuario
-    private var usuarioFiltrado by mutableStateOf<String?>(null)
+    var usuarioFiltrado by mutableStateOf<String?>(null)
 
     var usuarios by mutableStateOf<List<String>>(emptyList())
 
@@ -157,13 +155,16 @@ class ExpensesViewModel : ViewModel() {
 
         val agrupados: Map<Long, List<ExpensesModel>> = when (filtro) {
             PeriodoFiltro.SEMANA -> { // Agrupación por semna
+                //fecha del primer día de la semana de ese gasto
                 gastos.groupBy { gasto ->
-                    calendar.time = gasto.fecha // fecha del gasto al calendario
+                    calendar.time = gasto.fecha // ajusto calendario al primer día de la semana
                     calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                    //reseteo horas, minutos, segundos y milisegundos a cero para que no se ralle
                     calendar.set(Calendar.HOUR_OF_DAY, 0)
                     calendar.set(Calendar.MINUTE, 0)
                     calendar.set(Calendar.SECOND, 0)
                     calendar.set(Calendar.MILLISECOND, 0)
+                    //timespam como clave para agrupar
                     calendar.timeInMillis
                 }
             }
@@ -171,6 +172,7 @@ class ExpensesViewModel : ViewModel() {
                 gastos.groupBy { gasto ->
                     calendar.time = gasto.fecha // fecha cuando se gasta
                     calendar.set(Calendar.DAY_OF_MONTH, 1) // dia uno del mes
+                    //reseteo valores
                     calendar.set(Calendar.HOUR_OF_DAY, 0)
                     calendar.set(Calendar.MINUTE, 0)
                     calendar.set(Calendar.SECOND, 0)
@@ -182,6 +184,7 @@ class ExpensesViewModel : ViewModel() {
                 gastos.groupBy { gasto ->
                     calendar.time = gasto.fecha // fecha cuando se gasta
                     calendar.set(Calendar.DAY_OF_YEAR, 1) // Día uno del año
+                    //reseteo valores
                     calendar.set(Calendar.HOUR_OF_DAY, 0)
                     calendar.set(Calendar.MINUTE, 0)
                     calendar.set(Calendar.SECOND, 0)
@@ -191,12 +194,13 @@ class ExpensesViewModel : ViewModel() {
             }
         }
 
-        // Se transforma el mapa agrupado en una lista ordenada de DataChart
+        // transformar mapa agrupado en lista ordenada de DataChart
         return agrupados.entries.sortedBy { it.key }.map { (timeMillis, listaGastos) ->
+            // total de los gastos (campo importes)
+            val total = listaGastos.sumOf { it.importe }
 
-            val total = listaGastos.sumOf { it.importe } // total de los gastos (campo iportes)
-
-            calendar.timeInMillis = timeMillis // Se establece la fecha del grupo
+            // Se establece la fecha del grupo
+            calendar.timeInMillis = timeMillis
 
             val label = when (filtro) { //etiqueta segn filtro semana, mes,año
                 PeriodoFiltro.SEMANA -> {
@@ -214,7 +218,49 @@ class ExpensesViewModel : ViewModel() {
                     "$anio"
                 }
             }
+            //mando un objeto DataChart con la etiqueta y el total para el gráfico visual
             DataChart(label = label, value = total.toFloat())
+        }
+    }
+
+    //gastos totales desglosados
+    fun obtenerGastosPorLabel(
+        label: String,
+        filtro: PeriodoFiltro,
+        gastos: List<ExpensesModel>
+    ): List<ExpensesModel> {
+        val calendar = Calendar.getInstance()
+
+        // Filtro la lista de gastos para obtener solo los
+        // que coinciden con la etiqueta del periodo
+        return gastos.filter { gasto ->
+            calendar.time = gasto.fecha
+            // Genero la etiqueta del gasto según el filtro
+            // comparo con la etiqueta recibida
+            val gastoLabel = when (filtro) {
+                PeriodoFiltro.SEMANA -> {
+                    calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                    calendar.set(Calendar.HOUR_OF_DAY, 0)
+                    calendar.set(Calendar.MINUTE, 0)
+                    calendar.set(Calendar.SECOND, 0)
+                    calendar.set(Calendar.MILLISECOND, 0)
+                    val semana = calendar.get(Calendar.WEEK_OF_YEAR)
+                    val anio = calendar.get(Calendar.YEAR) % 100
+                    "$semana-$anio"
+                }
+                PeriodoFiltro.MES -> {
+                    val anio = calendar.get(Calendar.YEAR)
+                    val mesNombre = SimpleDateFormat("MMM", Locale.getDefault()).format(calendar.time)
+                    "$mesNombre-$anio"
+                }
+                PeriodoFiltro.ANIO -> {
+                    calendar.get(Calendar.YEAR).toString()
+                }
+            }
+
+            // Compara  etiqueta generada para el gasto = etiqueta del periodo seleccionado
+            // para filtrar solo los gastos = periodo agrupado semana/ mes / año.
+            gastoLabel == label
         }
     }
 

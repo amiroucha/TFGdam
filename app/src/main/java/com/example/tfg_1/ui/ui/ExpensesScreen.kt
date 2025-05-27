@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import com.github.mikephil.charting.components.XAxis
@@ -44,6 +45,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import com.example.tfg_1.model.PeriodoFiltro
 import com.example.tfg_1.model.toDisplayString
+import java.text.DateFormat
 import java.util.*
 
 
@@ -61,12 +63,12 @@ fun ExpensesScreen() {
     var gastoAEliminar by remember { mutableStateOf<ExpensesModel?>(null) }
     var showConfirmDelete by remember { mutableStateOf(false) }
 
-
     // por defecto es mensual
     var periodoFiltro by remember { mutableStateOf(PeriodoFiltro.MES) }
 
-
-    // agrupa gastos por semana, mes o año
+    // inf extra de total gastos
+    var gastoSeleccionado by remember { mutableStateOf<DataChart?>(null) }
+    val showBottomSheet = remember { mutableStateOf(false) }
 
 
     var expandedFiltroFecha by remember { mutableStateOf(false) } //menú desplegable está abierto??
@@ -175,11 +177,15 @@ fun ExpensesScreen() {
                     }
                 }
 
+                // agrupa gastos por semana, mes o año y tener en cuenta el usuario filtrado
                 val datosChart = remember(gastosFiltrados, periodoFiltro) {
                     vm.agruparGastosPorPeriodo(gastosFiltrados, periodoFiltro)
                 }
-
-                Chart(datosChart) // muestra el gráfico con dato
+                // muestra el gráfico con datos
+                Chart(datosChart){ puntoSeleccionado: DataChart ->
+                    gastoSeleccionado = puntoSeleccionado
+                    showBottomSheet.value = true
+                }
 
                 Spacer(modifier = Modifier.height(10.dp)) // Espacio
                 //lista de los gastos:
@@ -456,6 +462,56 @@ fun ExpensesScreen() {
                 }
             )
         }
+        //informacion del total , de los gastos qye se ha sumado
+        //si hay algun gasto ttoal (punto) seleccionado del grafico
+        if (showBottomSheet.value && gastoSeleccionado != null) {
+            ModalBottomSheet(
+                //cerrar el la sheet
+                onDismissRequest = {
+                    showBottomSheet.value = false
+                    gastoSeleccionado = null //reseteo valor de punto seleccionado
+                }
+            ) {
+                // la lista de gastos = periodo actual y filtro actual
+                val gastosEnPeriodo = vm.obtenerGastosPorLabel(
+                    label = gastoSeleccionado!!.label,// etiqueta del periodo seleccionado
+                    filtro = periodoFiltro,// tipo de filtro (semana, mes, año)
+                    gastos = vm.gastosFiltrados // lista gastos filtrados en el vm
+                )
+
+                LazyColumn(Modifier.padding(16.dp)) {
+                    item {
+                        Text("Periodo: ${gastoSeleccionado!!.label}",
+                            fontWeight = FontWeight.Bold)
+                        Text("Usuario filtrado: ${vm.usuarioFiltrado ?: "Todos"}")
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                    //items dinamicos, los gastos particulares
+                    items(gastosEnPeriodo){ gasto ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        ) {
+                            Column(Modifier.padding(12.dp)) {
+                                //importe con 2 decimales y fecha formateada legible
+                                val dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault())
+                                Text("${gasto.categoria}: ${"%.2f".format(gasto.importe)}€ — ${dateFormat.format(gasto.fecha)}")
+                                Text("Asignado a: ${gasto.asignadoA}")
+
+                                if (gasto.descripcion.isNotBlank()) {
+                                    Text("Descripción: ${gasto.descripcion}")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
 
         // Snackbar para mensajes flotantes
         SnackbarHost(
@@ -480,7 +536,7 @@ fun ExpensesScreen() {
 
 
 @Composable
-fun Chart(datos: List<DataChart>) { //DAtaChart = label and value
+fun Chart(datos: List<DataChart>, onPuntoSeleccionado: (DataChart) -> Unit) { //DAtaChart = label and value
     val context = LocalContext.current
 
     AndroidView( //para introducir vista "tradi" de Android
@@ -553,7 +609,7 @@ fun Chart(datos: List<DataChart>) { //DAtaChart = label and value
             }
 
             chart.data = LineData(dataSet)
-            //dar informacion al tocar los puntos
+            //listener para dar informacion al tocar los puntos
             chart.setOnChartValueSelectedListener(
                 object : OnChartValueSelectedListener {
                     override fun onValueSelected(e: Entry?, h: Highlight?) {
@@ -567,14 +623,18 @@ fun Chart(datos: List<DataChart>) { //DAtaChart = label and value
                                     " -  $labelSeleccionada // ${"%.2f".format(valor)}€",
                                     Toast.LENGTH_SHORT
                                 ).show()
+
+                                //callback con el punto seleccionado
+                                onPuntoSeleccionado(DataChart(labelSeleccionada, valor))
                             }
                         }
                     }
 
                     override fun onNothingSelected() {
-                        // nada
+                        // no hace nada
                     }
-            })
+                }
+            )
             chart.invalidate()//act dibujo con nuevos datos
 
         }
