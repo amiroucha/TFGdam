@@ -147,5 +147,6 @@
     <string name="mes">MES</string>
     <string name="anio">AÑO</string>
     <string name="usuario_filtrado">Usuario filtrado</string>
+    <string name="no_hay_gastos">No hay gastos para mostrar</string>
 
 </resources>

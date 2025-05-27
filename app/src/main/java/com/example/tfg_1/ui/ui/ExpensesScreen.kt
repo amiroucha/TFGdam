@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.LineData
@@ -132,6 +133,7 @@ fun ExpensesScreen() {
 
     //  ui-------------------------------------------------------------
     Box(modifier = Modifier.fillMaxSize()) {
+
         // Lista de gastos
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -212,55 +214,76 @@ fun ExpensesScreen() {
                 )
             }
 
-            // lista de gastos filtrados, tarjeta
-            items(gastosFiltrados.sortedByDescending { it.fecha }) { g ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp, horizontal = 8.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
+            //si esta vacia aviso de que no hay datos
+            if (gastosFiltrados.isEmpty()) {
+                item {
+                    Box(
                         modifier = Modifier
-                            .padding(12.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        //creacion de nuevos gastos
-                        Column(modifier = Modifier.padding(10.dp)) {
-                            Text(
-                                text = "${g.categoria.replaceFirstChar { it.uppercase() }}: ${"%.2f".format(g.importe)}€ -- ${dateFmt.format(g.fecha)}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontSize = 16.sp
-                            )
-                            if (g.descripcion.isNotBlank()) {
-                                Spacer(Modifier.height(4.dp))
-                                Text(text = g.descripcion,
+                        Text(
+                            text = stringResource(R.string.no_hay_gastos),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            } else {
+                // lista de gastos filtrados, tarjeta
+                items(gastosFiltrados.sortedByDescending { it.fecha }) { g ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp, horizontal = 8.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            //creacion de nuevos gastos
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Text(
+                                    text = "${g.categoria.replaceFirstChar { it.uppercase() }}: ${"%.2f".format(g.importe)}€ -- ${dateFmt.format(g.fecha)}",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    fontSize = 15.sp
+                                    fontSize = 16.sp
+                                )
+                                if (g.descripcion.isNotBlank()) {
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(text = g.descripcion,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontSize = 15.sp
+                                    )
+                                }
+
+                                Text(text = "Asignado a: ${g.asignadoA}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontSize = 15.sp)
+
+                            }
+                            IconButton(onClick = {
+                                gastoAEliminar = g
+                                showConfirmDelete = true}
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.eliminar_gasto),
+                                    tint = colorResource(id = R.color.red)
                                 )
                             }
-
-                            Text(text = "Asignado a: ${g.asignadoA}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontSize = 15.sp)
-
-                        }
-                        IconButton(onClick = {
-                            gastoAEliminar = g
-                            showConfirmDelete = true}
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = stringResource(R.string.eliminar_gasto),
-                                tint = colorResource(id = R.color.red)
-                            )
                         }
                     }
                 }
             }
+
+
         }
 
         // Botón añadir gasto

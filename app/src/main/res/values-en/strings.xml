@@ -139,5 +139,6 @@
     <string name="mes">MONTH</string>
     <string name="anio">YEAR</string>
     <string name="usuario_filtrado">Filter User:</string>
+    <string name="no_hay_gastos">There are not expenses to show</string>
 
 </resources>
