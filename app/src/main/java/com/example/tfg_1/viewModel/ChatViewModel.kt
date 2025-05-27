@@ -5,10 +5,9 @@ import android.content.Context
 import android.util.Log
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.app.Person
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
@@ -26,6 +25,9 @@ import kotlinx.coroutines.launch
 class ChatViewModel : ViewModel() {
 
     private val userRepository = UserRepository()
+
+    private var _isLoading = mutableStateOf(true)
+    val isLoading: State<Boolean> = _isLoading
 
     private val _messages = mutableStateListOf<ChatMessageModel>()
     private val messages: List<ChatMessageModel> = _messages
@@ -73,7 +75,6 @@ class ChatViewModel : ViewModel() {
             Color(0xFFA0E0CA), // lila
     )
 
-    private var isLoading by mutableStateOf(true)
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
@@ -83,7 +84,7 @@ class ChatViewModel : ViewModel() {
 
     fun loadChat(context: Context) {
         viewModelScope.launch {
-            isLoading = true
+            _isLoading.value = true
             currentUserId = userRepository.getCurrentUserId()
             currentUserName = userRepository.getCurrentUserName()
             val homeId = userRepository.getCurrentUserHomeId()
@@ -116,7 +117,7 @@ class ChatViewModel : ViewModel() {
 
                 _messages.clear()
                 _messages.addAll(mensajes)
-                isLoading = false
+                _isLoading.value = false
             }
         }
     }

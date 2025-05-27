@@ -45,7 +45,7 @@ fun ChatScreen(viewModel: ChatViewModel, searchText: String) {
     //posición del scroll de la lista, que no se quede en el 1 mensaje
     val listState = rememberLazyListState()
 
-
+    val isLoading by viewModel.isLoading
 
     //cargar la informacion (mensajes)
     LaunchedEffect(Unit) {
@@ -67,99 +67,107 @@ fun ChatScreen(viewModel: ChatViewModel, searchText: String) {
 
     //posicionar lista y caja de texto de manera flexible
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (messageList, chatBox) = createRefs()
-        //convertir lista de mensajes lista de elementos
-        // para etiquetas de fecha cuando cambia dia
-        //dentro de items no puede haber ootro item
-        val chatItems = viewModel.filteredMessages.withDateLabels()
+        val (messageList, chatBox, loadingSpinner) = createRefs()
 
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .constrainAs(messageList) {
-                    //constraints
-                    top.linkTo(parent.top)
-                    bottom.linkTo(chatBox.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    height = Dimension.fillToConstraints
-                },
-            reverseLayout = false //scroll de arriba a abajo
-        ) {
-            //2 opciones : mensaje / fecha
-            items(chatItems) { item ->
-                when (item) {
-                    //fecha centrada y con un color gris
-                    is ChatItem.DateLabel -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = item.label,
-                                color = colorResource(id = R.color.black))
+        if (isLoading) {
+            // Mostrar spinner
+            CircularProgressIndicator(
+                modifier = Modifier.constrainAs(loadingSpinner) {
+                    centerTo(parent)
+                }
+            )
+        } else {
+            //convertir lista de mensajes lista de elementos para etiquetas de fecha cuando cambia dia
+            //porque dentro de items no puede haber ootro item
+            val chatItems = viewModel.filteredMessages.withDateLabels()
+
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .constrainAs(messageList) {
+                        //constraints
+                        top.linkTo(parent.top)
+                        bottom.linkTo(chatBox.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        height = Dimension.fillToConstraints
+                    },
+                reverseLayout = false //scroll de arriba a abajo
+            ) {
+                //2 opciones : mensaje / fecha
+                items(chatItems) { item ->
+                    when (item) {
+                        //fecha centrada y con un color gris
+                        is ChatItem.DateLabel -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = item.label,
+                                    color = colorResource(id = R.color.black))
+                            }
                         }
-                    }
-                    //mensaje =  cuadro de mensaje
-                    is ChatItem.Message -> {
-                        //cpmpruebo si mensaje es del usuario act , para posicionamiento y colr
-                        val isCurrentUser = item.message.senderId == currentUserId
-                        MessageBox(message = item.message, isCurrentUser = isCurrentUser, viewModel = viewModel)
+                        //mensaje =  cuadro de mensaje
+                        is ChatItem.Message -> {
+                            //cpmpruebo si mensaje es del usuario act , para posicionamiento y colr
+                            val isCurrentUser = item.message.senderId == currentUserId
+                            MessageBox(message = item.message, isCurrentUser = isCurrentUser, viewModel = viewModel)
+                        }
                     }
                 }
             }
-        }
-
-        //textInput y btn enviar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .constrainAs(chatBox) {
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-        ) {
-            TextField(
-                value = newMessage,
-                onValueChange = { newMessage = it },
-                modifier = Modifier.weight(1f), //ocupa el ancho - el btn
-                placeholder = { Text(stringResource(R.string.escribe_un_mensaje)) },
-                //accion enviar desde el teclado
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
-                keyboardActions = KeyboardActions(
-                    onSend = {
+            //textInput y btn enviar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .constrainAs(chatBox) {
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+            ) {
+                TextField(
+                    value = newMessage,
+                    onValueChange = { newMessage = it },
+                    modifier = Modifier.weight(1f), //ocupa el ancho - el btn
+                    placeholder = { Text(stringResource(R.string.escribe_un_mensaje)) },
+                    //accion enviar desde el teclado
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
+                    keyboardActions = KeyboardActions(
+                        onSend = {
+                            if (newMessage.isNotBlank()) {
+                                // Enviar = mensaje no vacío
+                                viewModel.sendMessage(newMessage)
+                                newMessage = "" //limpio mi bandeja
+                            }
+                        }
+                    )
+                )
+                // Botón para enviar mensaje
+                IconButton(
+                    onClick = {
                         if (newMessage.isNotBlank()) {
-                            // Enviar = mensaje no vacío
                             viewModel.sendMessage(newMessage)
-                            newMessage = "" //limpio mi bandeja
+                            newMessage = ""// Limpiar campo
                         }
                     }
-                )
-            )
-            // Botón para enviar mensaje
-            IconButton(
-                onClick = {
-                    if (newMessage.isNotBlank()) {
-                        viewModel.sendMessage(newMessage)
-                        newMessage = ""// Limpiar campo
-                    }
-                }
-            ) {
-                Box( //para poder ponerle un fondo e icono circular
-                    modifier = Modifier
-                        .background(colorResource(id = R.color.greenOscuro), shape = CircleShape)
-                        .padding(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Send,
-                        contentDescription = stringResource(R.string.escribe_un_mensaje),
-                        tint = colorResource(id = R.color.white)
-                    )
+                    Box( //para poder ponerle un fondo e icono circular
+                        modifier = Modifier
+                            .background(colorResource(id = R.color.greenOscuro), shape = CircleShape)
+                            .padding(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Send,
+                            contentDescription = stringResource(R.string.escribe_un_mensaje),
+                            tint = colorResource(id = R.color.white)
+                        )
+                    }
                 }
             }
         }
