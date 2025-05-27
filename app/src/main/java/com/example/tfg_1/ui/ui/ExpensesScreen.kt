@@ -3,6 +3,8 @@ package com.example.tfg_1.ui.ui
 
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,8 +30,11 @@ import com.github.mikephil.charting.data.Entry
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
@@ -145,10 +150,16 @@ fun ExpensesScreen() {
                 Spacer(modifier = Modifier.height(10.dp)) // Espacio
 
 
-                Box(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 7.dp, vertical = 7.dp),
+                    horizontalArrangement = Arrangement.spacedBy(1.dp)
+                ) {
                     ExposedDropdownMenuBox(
                         expanded = expandedFiltroFecha,
-                        onExpandedChange = { expandedFiltroFecha = !expandedFiltroFecha }
+                        onExpandedChange = { expandedFiltroFecha = !expandedFiltroFecha },
+                        modifier = Modifier.weight(1f)
                     ) {
                         TextField(
                             readOnly = true,
@@ -175,6 +186,9 @@ fun ExpensesScreen() {
                             }
                         }
                     }
+                    Box(modifier = Modifier.weight(1.7f).fillMaxWidth()) {
+                        FiltroUsuarios(vm)
+                    }
                 }
 
                 // agrupa gastos por semana, mes o año y tener en cuenta el usuario filtrado
@@ -193,7 +207,7 @@ fun ExpensesScreen() {
                     text = stringResource(R.string.lista_de_gastos),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
-                        .padding(top = 9.dp, bottom = 7.dp, start = 15.dp),
+                        .padding(top = 9.dp, bottom = 7.dp, start = 10.dp),
                     fontSize = 19.sp
                 )
             }
@@ -533,6 +547,77 @@ fun ExpensesScreen() {
     }
 }
 
+@Composable
+fun FiltroUsuarios(viewModelExpenses: ExpensesViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+
+    // Usuario seleccionado o "Todos" o "Hogar"
+    val usuarioSeleccionado = when (val filtro = viewModelExpenses.usuarioFiltrado) {
+        null -> stringResource(R.string.todos)
+        stringResource(R.string.todos) -> stringResource(R.string.todos)
+        else -> viewModelExpenses.usuarios.find { it == filtro } ?: filtro
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Icono con fondo circular
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .background(MaterialTheme.colorScheme.primary, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            IconButton(onClick = { expanded = true }) {
+                Icon(Icons.Default.Person, contentDescription = null, tint = Color.White)
+            }
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(
+            text = "${stringResource(R.string.usuario_filtrado)}: $usuarioSeleccionado",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.todos)) },
+                onClick = {
+                    viewModelExpenses.modificaUsuarioFiltrado(null)
+                    expanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Hogar") },
+                onClick = {
+                    viewModelExpenses.modificaUsuarioFiltrado("Hogar")
+                    expanded = false
+                }
+            )
+            viewModelExpenses.usuarios.forEach { usuario ->
+                DropdownMenuItem(
+                    text = { Text(usuario) },
+                    onClick = {
+                        viewModelExpenses.modificaUsuarioFiltrado(usuario)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
 
 
 @Composable

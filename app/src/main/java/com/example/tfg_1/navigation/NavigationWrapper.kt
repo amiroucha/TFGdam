@@ -229,7 +229,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat:Boolean) {
                                 }
                             }*/
                             //filtro usuario pantalla de gastos/expenses
-                            if (currentRoute == Screens.Expenses.route && expensesViewModel != null) {
+                           /* if (currentRoute == Screens.Expenses.route && expensesViewModel != null) {
                                 var expanded by remember { mutableStateOf(false) }
                                 val viewModelExpenses = expensesViewModel!!
                                 Box {
@@ -275,7 +275,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat:Boolean) {
                                         }
                                     }
                                 }
-                            }
+                            }*/
 
                             if (currentRoute == Screens.Chat.route) {
                                 if (showSearchBar) {
