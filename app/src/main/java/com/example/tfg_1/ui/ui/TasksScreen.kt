@@ -49,6 +49,7 @@ fun TasksScreen(viewModel: TasksViewModel) {
         Modifier
             .fillMaxSize()
             .background(color = colorResource(id = R.color.greyBackground))
+
     ) {
 
         if(loading){
@@ -245,14 +246,16 @@ fun TareaItem(tarea: TasksModel,
             .fillMaxWidth()
             .padding(16.dp) // Añadimos padding para toda la caja de la tarea
             .background(colorResource(id = R.color.white), RoundedCornerShape(8.dp)) // Fondo con bordes redondeados
-            .clickable { modificarCompletada(tarea) } // Al hacer clic cambia el estado de la tarea
+            //.clickable { modificarCompletada(tarea) } // Al hacer clic cambia el estado de la tarea
     ) {
         // Checkbox para marcar la tarea como completada o no
         Checkbox(
             checked = tarea.completada,
             // Cuando cambia el checkbox, alterna completada, pregunta ¿seguro?
             onCheckedChange = { showToggleCompletedDialog = true },
-            modifier = Modifier.padding(end = 16.dp) // Separar el checkbox del texto
+            modifier = Modifier
+                .padding(end = 16.dp) // Separar el checkbox del texto
+                .clickable { modificarCompletada(tarea) }
         )
 
         // Columna para colocar el título y la fecha de la tarea
