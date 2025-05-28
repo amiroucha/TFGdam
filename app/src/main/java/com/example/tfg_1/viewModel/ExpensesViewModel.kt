@@ -1,11 +1,13 @@
 package com.example.tfg_1.viewModel
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tfg_1.R
 import com.example.tfg_1.model.DataChart
 import com.example.tfg_1.model.ExpensesModel
 import com.example.tfg_1.model.PeriodoFiltro
@@ -142,10 +144,22 @@ class ExpensesViewModel : ViewModel() {
     }
 
     //eliminar un gasto
-    fun eliminarGasto(gasto: ExpensesModel) {
+    fun eliminarGasto(gasto: ExpensesModel, context: Context) {
         viewModelScope.launch {
+            val usuarioActual = userRepository.getCurrentUserName().trim().lowercase()
+            val asignado = gasto.asignadoA.trim().lowercase()
+
+            // Si el gasto está asignado a != del usuario actual y no es "hogar"
+            // no permitir eliminar
+            if (asignado != "hogar" && asignado != usuarioActual) {
+                viewModelScope.launch {
+                    _uiEvent.emit(UiEvent.Error(context.getString(R.string.nopermiso_eliminar)))
+                }
+                return@launch
+            }
+
             val success = userRepository.deleteExpense(homeIdBD ?: return@launch, gasto.id)
-            if (!success) _uiEvent.emit(UiEvent.Error("Error al eliminar gasto"))
+            if (!success) _uiEvent.emit(UiEvent.Error(context.getString(R.string.error_al_eliminar_gasto)))
         }
     }
 

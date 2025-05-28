@@ -88,7 +88,7 @@ fun ExpensesScreen() {
         vm.uiEvent.collect { ev ->
             when (ev) {
                 ExpensesViewModel.UiEvent.Added ->
-                    snackbarHostState.showSnackbar("Gasto guardado") //salio bien
+                    snackbarHostState.showSnackbar(context.getString(R.string.gasto_guardado)) //salio bien
                 is ExpensesViewModel.UiEvent.Error ->
                     snackbarHostState.showSnackbar(ev.msg) //error con descripcion
             }
@@ -120,7 +120,7 @@ fun ExpensesScreen() {
         val imp = importe.toDoubleOrNull() ?: 0.0 // Se convierte el texto a número
         val cat = if (categoria == "otra") otraCategoria else categoria // Se determina la categoría
         if (cat.isBlank() || imp <= 0) { // Validación básica
-            snackbarHostState.showSnackbar("Completa categoría e importe")
+            snackbarHostState.showSnackbar(context.getString(R.string.completa_categoria_importe))
             return
         }
         if (vm.aniadirGastoVM(cat, descripcion, imp, fecha, asignadaA )) { // Se guarda el gasto en el ViewModel
@@ -188,7 +188,9 @@ fun ExpensesScreen() {
                             }
                         }
                     }
-                    Box(modifier = Modifier.weight(1.7f).fillMaxWidth()) {
+                    Box(modifier = Modifier
+                        .weight(1.7f)
+                        .fillMaxWidth()) {
                         FiltroUsuarios(vm)
                     }
                 }
@@ -482,7 +484,7 @@ fun ExpensesScreen() {
                 text = { Text(stringResource(R.string.seguroEliminarGasto)) },
                 confirmButton = {
                     TextButton(onClick = {
-                        vm.eliminarGasto(gastoAEliminar!!) // elimina gasto
+                        vm.eliminarGasto(gastoAEliminar!!, context) // elimina gasto
                         showConfirmDelete = false
                         gastoAEliminar = null
                     }) {
@@ -586,7 +588,8 @@ fun FiltroUsuarios(viewModelExpenses: ExpensesViewModel) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
-            .padding(12.dp),
+            .padding(12.dp)
+            .clickable { expanded = true }, // clicable toda la fila
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Icono con fondo circular
@@ -726,11 +729,6 @@ fun Chart(datos: List<DataChart>, onPuntoSeleccionado: (DataChart) -> Unit) { //
                             if (index in labels.indices) {
                                 val labelSeleccionada = labels[index]
                                 val valor = e.y
-                                Toast.makeText(
-                                    context,
-                                    " -  $labelSeleccionada // ${"%.2f".format(valor)}€",
-                                    Toast.LENGTH_SHORT
-                                ).show()
 
                                 //callback con el punto seleccionado
                                 onPuntoSeleccionado(DataChart(labelSeleccionada, valor))

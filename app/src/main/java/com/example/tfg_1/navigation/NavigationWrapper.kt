@@ -145,7 +145,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat:Boolean) {
                                             searchText = newText
                                             chatViewModel.updateSearchQuery(newText)
                                         },
-                                        placeholder = { Text("Buscar mensaje...") },
+                                        placeholder = { Text(stringResource(R.string.buscar_mensaje)) },
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .height(70.dp)
@@ -191,92 +191,6 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat:Boolean) {
                                 }
                             }
                         },actions = {
-                            //filtro de usuario en tasks y expenses
-                          /*  if (currentRoute == Screens.Tasks.route && tasksViewModel != null)
-                            {
-                                var expanded by remember { mutableStateOf(false) }
-                                val tasksviewModel = tasksViewModel!!
-                                Box {
-                                    IconButton(onClick = { expanded = true }) {
-                                        Icon(Icons.Default.Person, contentDescription = "Filtrar por usuario")
-                                    }
-
-                                    DropdownMenu(
-                                        expanded = expanded,
-                                        onDismissRequest = { expanded = false }
-                                    ) {
-                                        DropdownMenuItem(
-                                            text = { Text(
-                                                text= stringResource(R.string.todos),
-                                                color= MaterialTheme.colorScheme.onBackground
-                                                ) },
-                                            onClick = {
-                                                tasksviewModel.modificaUsuarioFiltrado(null)
-                                                expanded = false
-                                            }
-                                        )
-                                        tasksviewModel.usuarios.forEach { usuario ->
-                                            DropdownMenuItem(
-                                                text = { Text(text = usuario,
-                                                    color= MaterialTheme.colorScheme.onBackground) },
-                                                onClick = {
-                                                    tasksviewModel.modificaUsuarioFiltrado(usuario)
-                                                    expanded = false
-                                                }
-                                            )
-                                        }
-                                    }
-                                }
-                            }*/
-                            //filtro usuario pantalla de gastos/expenses
-                           /* if (currentRoute == Screens.Expenses.route && expensesViewModel != null) {
-                                var expanded by remember { mutableStateOf(false) }
-                                val viewModelExpenses = expensesViewModel!!
-                                Box {
-                                    IconButton(onClick = { expanded = true }) {
-                                        Icon(Icons.Default.Person,
-                                            contentDescription = "Filtrar por usuario")
-                                    }
-
-                                    DropdownMenu(
-                                        expanded = expanded,
-                                        onDismissRequest = { expanded = false }
-                                    ) {
-                                        DropdownMenuItem(
-                                            text = { Text(
-                                                text= stringResource(R.string.todos),
-                                                color= MaterialTheme.colorScheme.onBackground
-                                            ) },
-                                            onClick = {
-                                                viewModelExpenses.modificaUsuarioFiltrado(null)
-                                                expanded = false
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(
-                                                text="Hogar",
-                                                color= MaterialTheme.colorScheme.onBackground
-                                            ) },
-                                            onClick = {
-                                                viewModelExpenses.modificaUsuarioFiltrado("Hogar")
-                                                expanded = false
-                                            }
-                                        )
-                                        viewModelExpenses.usuarios.forEach { usuario ->
-                                            //por cada usuario me enseña su nombre
-                                            DropdownMenuItem(
-                                                text = { Text(text = usuario,
-                                                    color= MaterialTheme.colorScheme.onBackground) },
-                                                onClick = {
-                                                    viewModelExpenses.modificaUsuarioFiltrado(usuario)
-                                                    expanded = false
-                                                }
-                                            )
-                                        }
-                                    }
-                                }
-                            }*/
-
                             if (currentRoute == Screens.Chat.route) {
                                 if (showSearchBar) {
                                     IconButton(onClick = {

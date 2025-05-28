@@ -2,6 +2,7 @@
 
 package com.example.tfg_1.ui.ui
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tfg_1.model.TasksModel
 import com.example.tfg_1.R
+import com.example.tfg_1.viewModel.ExpensesViewModel
 import com.example.tfg_1.viewModel.TasksViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -84,9 +86,7 @@ fun TasksScreen(viewModel: TasksViewModel) {
 
             }
         }
-
     }
-
 }
 
 
@@ -101,6 +101,7 @@ fun TasksBody (modifier: Modifier, viewModel: TasksViewModel) {
 
 @Composable
 fun TabsPag(viewModel: TasksViewModel) {
+    val context = LocalContext.current
     val selectedTab = remember { mutableIntStateOf(0) }
 
     val tabs = listOf(
@@ -155,10 +156,26 @@ fun TabsPag(viewModel: TasksViewModel) {
         }
         //filtro del user
         FiltroUsuarios(viewModel)
+        // escuchar eventos y mostrar Toast
+        LaunchedEffect(Unit) {
+            viewModel.uiEvent.collect { event ->
+                when (event) {
+                    TasksViewModel.UiEvent.Added -> {
+                        Toast.makeText(context, context.getString(R.string.tarea_guardada), Toast.LENGTH_SHORT).show()
+                    }
+                    is TasksViewModel.UiEvent.Error -> {
+                        Toast.makeText(context, event.msg, Toast.LENGTH_LONG).show()
+                    }
+                    is TasksViewModel.UiEvent.Emit -> {
+                        Toast.makeText(context, event.msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
         // Contenido para cada tab
         when (selectedTab.intValue) {
-            0 -> Pendientes(viewModel)
-            1 -> Completadas(viewModel)
+            0 -> Pendientes(viewModel,context )
+            1 -> Completadas(viewModel, context)
         }
     }
 }
@@ -425,13 +442,14 @@ fun FiltroUsuarios(viewModel: TasksViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)//margen
             .border(
                 width = 2.dp,
                 color = Color.Black,
                 shape = RoundedCornerShape(2.dp)
             )
-            .padding(14.dp),//padidng interno
+            .padding(14.dp)//padidng interno
+            .clickable { expanded = true }, // clicable toda la fila
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Icono con fondo circular
@@ -487,7 +505,7 @@ fun FiltroUsuarios(viewModel: TasksViewModel) {
 
 
 @Composable
-fun Pendientes(viewModel: TasksViewModel) {
+fun Pendientes(viewModel: TasksViewModel, context: Context) {
     val tareasPendientes by remember {
         derivedStateOf { viewModel.tareasPendientes() }
     }
@@ -511,7 +529,7 @@ fun Pendientes(viewModel: TasksViewModel) {
                 TareaItem(
                     tarea = tarea,
                     modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
-                    eliminarTarea = { viewModel.eliminarTarea(it) }
+                    eliminarTarea = { viewModel.eliminarTarea(it, context) }
                 )
             }
         }
@@ -520,7 +538,7 @@ fun Pendientes(viewModel: TasksViewModel) {
 
 
 @Composable
-fun Completadas(viewModel: TasksViewModel) {
+fun Completadas(viewModel: TasksViewModel,context:Context) {
     val tareasCompletadas by remember {
         derivedStateOf { viewModel.tareasCompletadas() }
     }
@@ -544,7 +562,7 @@ fun Completadas(viewModel: TasksViewModel) {
                 TareaItem(
                     tarea = tarea,
                     modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
-                    eliminarTarea = { viewModel.eliminarTarea(it) }
+                    eliminarTarea = { viewModel.eliminarTarea(it, context) }
                 )
             }
         }

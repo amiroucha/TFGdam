@@ -150,5 +150,11 @@
     <string name="no_hay_gastos">No hay gastos para mostrar</string>
     <string name="no_hay_tareas_pendientes">No hay tareas pendientes</string>
     <string name="no_hay_tareas_completadas">No hay tareas completadas</string>
+    <string name="nopermiso_eliminar">No tienes permiso para eliminar este gasto.</string>
+    <string name="nopermiso_eliminar_tarea">No tienes permiso para eliminar esta tarea.</string>
+    <string name="tarea_guardada">Tarea guardada</string>
+    <string name="error_al_eliminar_gasto">Error al eliminar gasto</string>
+    <string name="completa_categoria_importe">Completa categoría e importe</string>
+    <string name="buscar_mensaje">Buscar mensaje...</string>
 
 </resources>
