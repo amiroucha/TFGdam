@@ -1,6 +1,5 @@
 package com.example.tfg_1.ui.ui
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,6 +46,10 @@ fun ChatScreen(viewModel: ChatViewModel, searchText: String) {
 
     val isLoading by viewModel.isLoading
 
+    //convertir lista de mensajes lista de elementos para etiquetas de fecha cuando cambia dia
+    //porque dentro de items no puede haber ootro item
+    val chatItems = viewModel.filteredMessages.withDateLabels()
+
     //cargar la informacion (mensajes)
     LaunchedEffect(Unit) {
         viewModel.init(context)//para notificaciones
@@ -54,9 +57,9 @@ fun ChatScreen(viewModel: ChatViewModel, searchText: String) {
     }
 
     // Auto-scroll al último mensaje cada vez que hay ++ mensaje
-    LaunchedEffect(messages.size) {
+    LaunchedEffect(chatItems.size) {
         if (messages.isNotEmpty()) {
-            listState.scrollToItem(messages.lastIndex)
+            listState.scrollToItem(chatItems.lastIndex)
         }
     }
 
@@ -77,9 +80,6 @@ fun ChatScreen(viewModel: ChatViewModel, searchText: String) {
                 }
             )
         } else {
-            //convertir lista de mensajes lista de elementos para etiquetas de fecha cuando cambia dia
-            //porque dentro de items no puede haber ootro item
-            val chatItems = viewModel.filteredMessages.withDateLabels()
 
             LazyColumn(
                 state = listState,
