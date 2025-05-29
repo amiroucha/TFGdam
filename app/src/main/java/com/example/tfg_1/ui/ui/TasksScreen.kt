@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tfg_1.model.TasksModel
 import com.example.tfg_1.R
-import com.example.tfg_1.viewModel.ExpensesViewModel
 import com.example.tfg_1.viewModel.TasksViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -188,11 +186,13 @@ data class TabData(val title: String, val icon: ImageVector)
 //caja de item, cada tarea creada
 @Composable
 fun TareaItem(tarea: TasksModel,
+              usuarios: List<String>,
               modificarCompletada: (TasksModel) -> Unit,
               eliminarTarea: (TasksModel) -> Unit
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showToggleCompletedDialog by remember { mutableStateOf(false) }
+    val asignadoActivo = usuarios.contains(tarea.asignadoA)
 
     if (showDeleteDialog) {
         AlertDialog(
@@ -292,9 +292,12 @@ fun TareaItem(tarea: TasksModel,
                 )
 
                 Text(
-                    text = stringResource(R.string.asignado_a, tarea.asignadoA),
+                    text = if (asignadoActivo)
+                        stringResource(R.string.asignado_a, tarea.asignadoA)
+                    else
+                        stringResource(R.string.asignado_a, "${tarea.asignadoA} - dado de baja"),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Estilo de texto más tenue para el asignado
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(8.dp)
                 )
             }
@@ -522,6 +525,8 @@ fun Pendientes(viewModel: TasksViewModel, context: Context) {
     val tareasPendientes by remember {
         derivedStateOf { viewModel.tareasPendientes() }
     }
+    val usuarios = viewModel.usuarios
+
     if (tareasPendientes.isEmpty()) {
         Box(
             modifier = Modifier
@@ -541,6 +546,7 @@ fun Pendientes(viewModel: TasksViewModel, context: Context) {
             items(tareasPendientes) { tarea ->
                 TareaItem(
                     tarea = tarea,
+                    usuarios = usuarios,
                     modificarCompletada = { viewModel.comprobarEstadoTarea(it,context) },
                     eliminarTarea = { viewModel.eliminarTarea(it, context) }
                 )
@@ -555,6 +561,7 @@ fun Completadas(viewModel: TasksViewModel,context:Context) {
     val tareasCompletadas by remember {
         derivedStateOf { viewModel.tareasCompletadas() }
     }
+    val usuarios = viewModel.usuarios
     if (tareasCompletadas.isEmpty()) {
         Box(
             modifier = Modifier
@@ -574,6 +581,7 @@ fun Completadas(viewModel: TasksViewModel,context:Context) {
             items(tareasCompletadas) { tarea ->
                 TareaItem(
                     tarea = tarea,
+                    usuarios = usuarios,
                     modificarCompletada = { viewModel.comprobarEstadoTarea(it,context, deCompletadas = true) },
                     eliminarTarea = { viewModel.eliminarTarea(it, context, deCompletadas = true) }
                 )
