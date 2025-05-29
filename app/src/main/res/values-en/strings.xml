@@ -148,6 +148,7 @@
     <string name="error_al_eliminar_gasto">Error deleting expense</string>
     <string name="completa_categoria_importe">Complete category and amount</string>
     <string name="buscar_mensaje">Search message…</string>
+    <string name="nopermiso_modificar_tarea">You do not have permission to mark as pending this task.</string>
 
 
 </resources>

@@ -156,5 +156,6 @@
     <string name="error_al_eliminar_gasto">Error al eliminar gasto</string>
     <string name="completa_categoria_importe">Completa categoría e importe</string>
     <string name="buscar_mensaje">Buscar mensaje...</string>
+    <string name="nopermiso_modificar_tarea">No tienes permiso para descompletar esta tarea</string>
 
 </resources>

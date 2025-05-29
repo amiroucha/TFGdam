@@ -93,21 +93,30 @@ class TasksViewModel: ViewModel()
         }
     }
 
-    fun comprobarEstadoTarea(tarea: TasksModel) {
-        val nueva = tarea.copy(completada = !tarea.completada)
+    fun comprobarEstadoTarea(tarea: TasksModel, context: Context, deCompletadas: Boolean = false) {
         viewModelScope.launch {
+            val usuarioActual = userRepository.getCurrentUserName().trim().lowercase()
+            val asignado = tarea.asignadoA.trim().lowercase()
+
+            // solo restringir si se intenta desmarcar una completada
+            if (deCompletadas && asignado != usuarioActual) {
+                _uiEvent.emit(UiEvent.Error(context.getString(R.string.nopermiso_modificar_tarea)))
+                return@launch
+            }
+
+            val nueva = tarea.copy(completada = !tarea.completada)
             userRepository.actualizarTarea(nueva)
         }
     }
 
-    fun eliminarTarea(tarea: TasksModel, context: Context) {
+    fun eliminarTarea(tarea: TasksModel, context: Context, deCompletadas: Boolean = false) {
         viewModelScope.launch {
             val usuarioActual = userRepository.getCurrentUserName().trim().lowercase()
             val asignado = tarea.asignadoA.trim().lowercase()
 
             // Si tarea está asignado a != del usuario actual
             // no permitir eliminar
-            if (asignado != usuarioActual) {
+            if (asignado != usuarioActual && deCompletadas ) {
                 _uiEvent.emit(UiEvent.Error(context.getString(R.string.nopermiso_eliminar_tarea)))
                 return@launch
             }

@@ -541,7 +541,7 @@ fun Pendientes(viewModel: TasksViewModel, context: Context) {
             items(tareasPendientes) { tarea ->
                 TareaItem(
                     tarea = tarea,
-                    modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
+                    modificarCompletada = { viewModel.comprobarEstadoTarea(it,context) },
                     eliminarTarea = { viewModel.eliminarTarea(it, context) }
                 )
             }
@@ -574,8 +574,8 @@ fun Completadas(viewModel: TasksViewModel,context:Context) {
             items(tareasCompletadas) { tarea ->
                 TareaItem(
                     tarea = tarea,
-                    modificarCompletada = { viewModel.comprobarEstadoTarea(it) },
-                    eliminarTarea = { viewModel.eliminarTarea(it, context) }
+                    modificarCompletada = { viewModel.comprobarEstadoTarea(it,context, deCompletadas = true) },
+                    eliminarTarea = { viewModel.eliminarTarea(it, context, deCompletadas = true) }
                 )
             }
         }
