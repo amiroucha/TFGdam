@@ -293,7 +293,6 @@ fun TareaItem(tarea: TasksModel,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(8.dp)
                 )
-
                 Text(
                     text =  buildAnnotatedString {
                         // agregar texto base con stringResource
