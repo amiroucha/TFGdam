@@ -159,5 +159,6 @@
     <string name="nopermiso_modificar_tarea">No tienes permiso para descompletar esta tarea</string>
     <string name="unirse_a_hogar_existente">UNIRSE A HOGAR EXISTENTE</string>
     <string name="crear_nuevo_hogar">CREAR NUEVO HOGAR</string>
+    <string name="dado_de_baja">Dado de baja</string>
 
 </resources>

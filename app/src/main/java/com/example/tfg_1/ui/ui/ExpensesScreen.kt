@@ -35,9 +35,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.LineData
@@ -51,6 +54,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import com.example.tfg_1.model.PeriodoFiltro
 import com.example.tfg_1.model.toDisplayString
+import com.google.android.play.core.integrity.g
 import java.text.DateFormat
 import java.util.*
 
@@ -75,7 +79,6 @@ fun ExpensesScreen() {
     // inf extra de total gastos
     var gastoSeleccionado by remember { mutableStateOf<DataChart?>(null) }
     val showBottomSheet = remember { mutableStateOf(false) }
-
 
     var expandedFiltroFecha by remember { mutableStateOf(false) } //menú desplegable está abierto??
     var expandedCategoria by remember { mutableStateOf(false) }     // para categoría en el diálogo
@@ -236,6 +239,7 @@ fun ExpensesScreen() {
             } else {
                 // lista de gastos filtrados, tarjeta
                 items(gastosFiltrados.sortedByDescending { it.fecha }) { g ->
+                    val estaActivo = g.asignadoA == "Hogar" || vm.usuarios.contains(g.asignadoA)
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -266,7 +270,15 @@ fun ExpensesScreen() {
                                     )
                                 }
 
-                                Text(text = "Asignado a: ${g.asignadoA}",
+                                Text(text = buildAnnotatedString {
+                                    append("Asignado a: ${g.asignadoA}")
+                                    if (!estaActivo) {
+                                        append(" - ")
+                                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.error)) {
+                                            append(stringResource(R.string.dado_de_baja))
+                                        }
+                                    }
+                                },
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontSize = 15.sp)
 

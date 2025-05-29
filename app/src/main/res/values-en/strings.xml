@@ -151,6 +151,7 @@
     <string name="nopermiso_modificar_tarea">You do not have permission to mark as pending this task.</string>
     <string name="unirse_a_hogar_existente">JOIN A EXISTING HOME</string>
     <string name="crear_nuevo_hogar">CREATE A NEW HOME</string>
+    <string name="dado_de_baja">Dismissed</string>
 
 
 </resources>

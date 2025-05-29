@@ -23,8 +23,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tfg_1.model.TasksModel
@@ -292,10 +295,16 @@ fun TareaItem(tarea: TasksModel,
                 )
 
                 Text(
-                    text = if (asignadoActivo)
-                        stringResource(R.string.asignado_a, tarea.asignadoA)
-                    else
-                        stringResource(R.string.asignado_a, "${tarea.asignadoA} - dado de baja"),
+                    text =  buildAnnotatedString {
+                        // agregar texto base con stringResource
+                        append(stringResource(R.string.asignado_a, tarea.asignadoA))
+                        if (!asignadoActivo) {
+                            append(" - ")
+                            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.error)) {
+                                append(stringResource(R.string.dado_de_baja))
+                            }
+                        }
+                    },
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(8.dp)
