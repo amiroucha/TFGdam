@@ -28,6 +28,7 @@ import java.util.Calendar
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 
 @Preview(showBackground = true)
@@ -43,7 +44,7 @@ fun RegisterScreen(viewModel: RegisterViewModel) {
     Box(
         Modifier
             .fillMaxSize()
-            .background(color = colorResource(id = R.color.greyBackground))
+            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(40.dp))
     ) {
         RegisterBody(
             Modifier
@@ -192,19 +193,20 @@ fun NameFieldReg(name: String, error: String?, onTextFieldChanged: (String) -> U
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-                .border(2.dp, Color.Black),
+                .border(3.dp, MaterialTheme.colorScheme.primary),
             placeholder = { Text(text = stringResource(R.string.nombre)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             isError = error != null,
             colors = TextFieldDefaults.colors(
-                focusedTextColor = colorResource(id = R.color.white),
-                unfocusedTextColor = colorResource(id = R.color.white),
-                focusedContainerColor = colorResource(id = R.color.white),
-                unfocusedContainerColor = colorResource(id = R.color.white),
-                disabledContainerColor = colorResource(id = R.color.white),
-                errorContainerColor = colorResource(id = R.color.white),
-                errorIndicatorColor = colorResource(id = R.color.red)
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.DarkGray,
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color(0xFFF0F0F0),
+                cursorColor = Color.Blue,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                errorIndicatorColor = Color.Red,
             )
         )
         error?.let { //si el error!=null -> hay error , entonces:
@@ -227,19 +229,18 @@ fun EmailFieldReg(email: String,error: String?, onTextFieldChanged: (String) -> 
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-                .border(2.dp, Color.Black),
+                .border(3.dp, MaterialTheme.colorScheme.primary),
             placeholder = { Text(text = stringResource(R.string.email)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             isError = error != null,
             colors = TextFieldDefaults.colors(
-                focusedTextColor = colorResource(id = R.color.white),
-                unfocusedTextColor = colorResource(id = R.color.white),
-                focusedContainerColor = colorResource(id = R.color.white),
-                unfocusedContainerColor = colorResource(id = R.color.white),
-                disabledContainerColor = colorResource(id = R.color.white),
-                errorContainerColor = colorResource(id = R.color.white),
-                errorIndicatorColor = colorResource(id = R.color.red)
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                focusedContainerColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedContainerColor = MaterialTheme.colorScheme.onBackground,
+                errorIndicatorColor = MaterialTheme.colorScheme.onBackground,
+                errorCursorColor = MaterialTheme.colorScheme.onBackground
             )
         )
         error?.let { //si el error!=null -> hay error , entonces:
@@ -264,7 +265,7 @@ fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (Stri
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-                .border(2.dp, Color.Black),
+                .border(3.dp, MaterialTheme.colorScheme.primary),
             placeholder = { Text(stringResource(R.string.contraseña)) },
             singleLine = true,
             isError = error != null,
@@ -275,16 +276,14 @@ fun PasswordFieldReg(password: String, error: String?, onTextFieldChanged: (Stri
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(imageVector = image,
                         contentDescription = stringResource(R.string.mostrarContraseña),
-                        tint = colorResource(id = R.color.black) )
+                        tint = MaterialTheme.colorScheme.onBackground )
                 }
             },
             colors = TextFieldDefaults.colors(
-                focusedTextColor = colorResource(id = R.color.black),
+                focusedTextColor = colorResource(id = R.color.white),
                 unfocusedTextColor = colorResource(id = R.color.black),
-                focusedContainerColor = colorResource(id = R.color.white),
+                focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-                disabledContainerColor = colorResource(id = R.color.white),
-                errorContainerColor = colorResource(id = R.color.white),
                 errorIndicatorColor = colorResource(id = R.color.red)
             )
         )
@@ -312,7 +311,7 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-                .border(2.dp, Color.Black),
+                .border(3.dp, MaterialTheme.colorScheme.primary),
             placeholder = { Text(stringResource(R.string.repetirContraseña)) },
             singleLine = true,
             isError = error != null,
@@ -327,12 +326,10 @@ fun PasswordFieldReg2(password: String, error: String?, onTextFieldChanged: (Str
                 }
             },
             colors = TextFieldDefaults.colors(
-                focusedTextColor = colorResource(id = R.color.black),
+                focusedTextColor = colorResource(id = R.color.white),
                 unfocusedTextColor = colorResource(id = R.color.black),
-                focusedContainerColor = colorResource(id = R.color.white),
+                focusedContainerColor = colorResource(id = R.color.black),
                 unfocusedContainerColor = colorResource(id = R.color.white),
-                disabledContainerColor = colorResource(id = R.color.white),
-                errorContainerColor = colorResource(id = R.color.white),
                 errorIndicatorColor = colorResource(id = R.color.red)
             )
         )
@@ -380,18 +377,19 @@ fun FechaNacimientoField(viewModel: RegisterViewModel) {
             TextField(
                 value = fecha,
                 onValueChange = {},
-                label = { Text(stringResource(R.string.fechanacimiento), color = colorResource(id = R.color.black)) },
+                label = { Text(stringResource(R.string.fechanacimiento), color = MaterialTheme.colorScheme.onPrimaryContainer) },
                 modifier = Modifier
                     .weight(1f)
                     .height(70.dp)
-                    .border(2.dp, Color.Black),
+                    .border(3.dp, MaterialTheme.colorScheme.primary),
                 readOnly = true,
                 enabled = false,
                 colors = TextFieldDefaults.colors(
-                    disabledTextColor = Color.Black,
-                    focusedContainerColor = colorResource(id = R.color.white),
+                    focusedTextColor = colorResource(id = R.color.white),
+                    unfocusedTextColor = colorResource(id = R.color.black),
+                    focusedContainerColor = colorResource(id = R.color.black),
                     unfocusedContainerColor = colorResource(id = R.color.white),
-                    disabledContainerColor = colorResource(id = R.color.white)
+                    errorIndicatorColor = colorResource(id = R.color.red)
                 )
             )
 
@@ -424,16 +422,16 @@ fun RegisterButtonReg(viewModel: RegisterViewModel) {
             .height(48.dp)
             .width(250.dp),
         colors = ButtonDefaults.buttonColors(
-            colorResource(id= R.color.green),//boton habilitado
-            colorResource(id= R.color.white),//boton desabilitado
-            colorResource(id= R.color.green), //color contenido
-            disabledContentColor = colorResource(id= R.color.green)
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor= MaterialTheme.colorScheme.onPrimaryContainer,
+            disabledContainerColor= MaterialTheme.colorScheme.primaryContainer,
+            disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer
 
         ), enabled = true
     ) {
         Text(text = stringResource(R.string.registrarseBtn),
             fontSize = 20.sp,
-            color = colorResource(id = R.color.black),
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
         )
     }
 }

@@ -241,11 +241,12 @@ fun ExpensesScreen() {
                             .fillMaxWidth()
                             .padding(vertical = 4.dp, horizontal = 8.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(20.dp)
                     ) {
                         Row(
                             modifier = Modifier
-                                .padding(12.dp)
+                                .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp))
+                                .padding(10.dp)
                                 .fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
@@ -587,7 +588,7 @@ fun FiltroUsuarios(viewModelExpenses: ExpensesViewModel) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
+            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
             .padding(12.dp)
             .clickable { expanded = true }, // clicable toda la fila
         verticalAlignment = Alignment.CenterVertically

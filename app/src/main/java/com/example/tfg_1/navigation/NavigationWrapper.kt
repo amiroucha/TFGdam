@@ -222,11 +222,11 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat:Boolean) {
 
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = colorResource(id = R.color.greyBackground),
+                            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(40.dp),
                             titleContentColor = MaterialTheme.colorScheme.onSurface,
                             navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                             actionIconContentColor = MaterialTheme.colorScheme.onSurface
-                        ),
+                        )
                     )
                 }
             },
@@ -313,13 +313,15 @@ private fun DrawerApp(
                     Spacer(modifier = Modifier.height(30.dp))
                     Card(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
+                            .padding(8.dp)
+                            .fillMaxWidth(),
                         elevation = CardDefaults.cardElevation(8.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(
-                            modifier = Modifier.padding(8.dp)
+                            modifier = Modifier
+                                .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
+                                .padding(8.dp)
                         ) {
                             // Encabezado con el nombre del usuario
                             Text(
@@ -342,13 +344,15 @@ private fun DrawerApp(
                     // caja que envuelve los items
                     Card(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
+                            .padding(8.dp)
+                            .fillMaxWidth(),
                         elevation = CardDefaults.cardElevation(8.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(20.dp)
                     ) {
                         Column(
-                            modifier = Modifier.padding(8.dp)
+                            modifier = Modifier
+                                .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp))
+                                .padding(8.dp)
                         ) {
                             //nombre del hogar
                             Text(
@@ -359,61 +363,93 @@ private fun DrawerApp(
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
-
-                            NavigationDrawerItem(
-                                label = { Text(stringResource(id = R.string.hogar)) },
-                                selected = false,
-                                icon = {
-                                    Icon(
-                                        Icons.Outlined.Home,
-                                        contentDescription = stringResource(id = R.string.hogar)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    .border(
+                                        width = 2.dp,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(20.dp)
                                     )
-                                },
-                                onClick = {
-                                    scope.launch {
-                                        navController.navigate(Screens.Tasks.route)
-                                        delay(500)
-                                        drawerState.close()
+                            ) {
+                                NavigationDrawerItem(
+                                    label = { Text(stringResource(id = R.string.hogar)) },
+                                    selected = false,
+                                    icon = {
+                                        Icon(
+                                            Icons.Outlined.Home,
+                                            contentDescription = stringResource(id = R.string.hogar)
+                                        )
+                                    },
+                                    onClick = {
+                                        scope.launch {
+                                            navController.navigate(Screens.Tasks.route)
+                                            delay(500)
+                                            drawerState.close()
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                             Spacer(Modifier.height(30.dp))
-                            NavigationDrawerItem(
-                                label = { Text(stringResource(id = R.string.settings)) },
-                                selected = false,
-                                icon = {
-                                    Icon(
-                                        Icons.Outlined.Settings,
-                                        contentDescription = stringResource(id = R.string.settings)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    .border(
+                                        width = 2.dp,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(20.dp)
                                     )
-                                },
-                                onClick = {
-                                    scope.launch {
-                                        navController.navigate(Screens.Settings.route)
-                                        delay(500)
-                                        drawerState.close()
+                            ) {
+                                NavigationDrawerItem(
+                                    label = { Text(stringResource(id = R.string.settings)) },
+                                    selected = false,
+                                    icon = {
+                                        Icon(
+                                            Icons.Outlined.Settings,
+                                            contentDescription = stringResource(id = R.string.settings)
+                                        )
+                                    },
+                                    onClick = {
+                                        scope.launch {
+                                            navController.navigate(Screens.Settings.route)
+                                            delay(500)
+                                            drawerState.close()
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                             Spacer(Modifier.height(60.dp))
                             LineaSeparacion()
                             Spacer(Modifier.height(50.dp))
-                            NavigationDrawerItem(
-                                label = { Text(stringResource(id = R.string.cerrarSesion)) },
-                                selected = false,
-                                icon = {
-                                    Icon(
-                                        Icons.Default.ExitToApp,
-                                        contentDescription = stringResource(id = R.string.cerrarSesion)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    .border(
+                                        width = 2.dp,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(20.dp)
                                     )
-                                },
-                                onClick = {
-                                    loginViewModel.logout()
-                                    navController.navigate(Screens.Login.route) {
-                                        popUpTo(0) { inclusive = true }
+                            ) {
+                                NavigationDrawerItem(
+                                    label = { Text(stringResource(id = R.string.cerrarSesion)) },
+                                    selected = false,
+                                    icon = {
+                                        Icon(
+                                            Icons.Default.ExitToApp,
+                                            contentDescription = stringResource(id = R.string.cerrarSesion)
+                                        )
+                                    },
+                                    onClick = {
+                                        loginViewModel.logout()
+                                        navController.navigate(Screens.Login.route) {
+                                            popUpTo(0) { inclusive = true }
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
                     }
 

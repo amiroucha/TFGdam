@@ -77,7 +77,7 @@ class ExpensesViewModel : ViewModel() {
         }
         userRepository.escucharHomeIdUsuarioActual { homeId ->
             //si es null me voy
-            if (homeId == null) {
+            if (homeId.isNullOrBlank()) {
                 loading = false
                 viewModelScope.launch {
                     _uiEvent.emit(UiEvent.Error("Error leyendo usuario o homeId"))

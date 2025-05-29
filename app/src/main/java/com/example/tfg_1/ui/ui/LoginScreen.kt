@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -77,7 +79,8 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
         }
     } else {
         LazyColumn(
-            modifier = modifier
+            modifier = modifier //containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(40.dp))
                 .fillMaxSize()
                 .padding(top = 50.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -100,7 +103,8 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
                             // modifier = Modifier.padding(start = 8.dp, end = 15.dp),
                             fontSize = 40.sp,
                             fontWeight = FontWeight.Bold,
-                            maxLines = 1
+                            maxLines = 1,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         // LogoHeader(Modifier)
                     }
@@ -184,7 +188,7 @@ fun LoginBody(modifier: Modifier, viewModel: LoginViewModel, navController: NavC
                     Text(
                         text = stringResource(R.string.no_tienes_cuenta),
                         fontSize = 20.sp,
-                        color = colorResource(id = R.color.black),
+                        color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier
                             .padding(10.dp)
                             .align(Alignment.CenterHorizontally)
@@ -205,7 +209,9 @@ fun TituloLogin(modifier: Modifier) {
         modifier = modifier.padding(10.dp),
         fontSize = 40.sp,
         maxLines = 1,
-        fontWeight = FontWeight.Bold
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onBackground
+
     )
 }
 
@@ -299,7 +305,7 @@ fun ForgotPassword(modifier: Modifier, viewModel: LoginViewModel, context: Conte
             .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 16.dp),
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
-        color = colorResource(id = R.color.black),
+        color = MaterialTheme.colorScheme.onBackground,
         textDecoration = TextDecoration.Underline
     )
 
@@ -351,15 +357,16 @@ fun LoginButton(viewModel: LoginViewModel, navController: NavController,context:
         },
         modifier = Modifier
             .height(48.dp)
+            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp))
             .width(250.dp),
         colors = ButtonDefaults.buttonColors(
-            colorResource(id = R.color.brown)
+            containerColor = MaterialTheme.colorScheme.onSecondary,
         )
     ) {
         Text(
             text = stringResource(R.string.iniciarSesion),
             fontSize = 20.sp,
-            color = colorResource(id = R.color.black)
+            color = MaterialTheme.colorScheme.onSecondaryContainer
         )
     }
 }
@@ -373,18 +380,16 @@ fun GoogleButton(viewModel: LoginViewModel, navController: NavController) {
         },
         modifier = Modifier
             .height(48.dp)
+            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp))
             .width(250.dp),
         colors = ButtonDefaults.buttonColors(
-            Color(0xFFFF4303),
-            Color(0xFFF78058),
-            colorResource(id = R.color.blue),
-            disabledContentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
         )
     ) {
         Text(
             text = stringResource(R.string.iniciar_con_google),
             fontSize = 20.sp,
-            color = colorResource(id = R.color.black)
+            color = MaterialTheme.colorScheme.onPrimaryContainer
         )
         Spacer(modifier = Modifier.width(8.dp))
         Icon(
@@ -401,17 +406,18 @@ fun RegisterButton(navController: NavController) {
     Button(
         onClick = { navController.navigate(Screens.Register.route) },
         modifier = Modifier
+            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp))
             .height(48.dp)
             .width(250.dp),
         colors = ButtonDefaults.buttonColors(
-            colorResource(id = R.color.brownRegister)
+            MaterialTheme.colorScheme.tertiary,
         )
     ) {
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = stringResource(R.string.registrate_aqu),
             fontSize = 20.sp,
-            color = colorResource(id = R.color.black)
+            color = MaterialTheme.colorScheme.onTertiary
         )
     }
 }

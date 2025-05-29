@@ -36,7 +36,7 @@
     <string name="completadas">Completed</string>
     <string name="nuevaTarea">New task</string>
     <string name="titulo">Title</string>
-    <string name="fechaMax">Deadline (dd/mm/yyyy)</string>
+    <string name="fechaMax">Deadline</string>
     <string name="asignadoA.">Assigned to…</string>
     <string name="completaTodosCampos">Please complete all fields.</string>
     <string name="cancelar">Cancel</string>

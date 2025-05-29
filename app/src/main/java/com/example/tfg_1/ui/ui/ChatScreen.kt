@@ -69,12 +69,16 @@ fun ChatScreen(viewModel: ChatViewModel, searchText: String) {
     }
 
     //posicionar lista y caja de texto de manera flexible
-    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+    ConstraintLayout(modifier = Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colorScheme.background)
+    ) {
         val (messageList, chatBox, loadingSpinner) = createRefs()
 
         if (isLoading) {
             // Mostrar spinner
             CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.constrainAs(loadingSpinner) {
                     centerTo(parent)
                 }
@@ -108,7 +112,8 @@ fun ChatScreen(viewModel: ChatViewModel, searchText: String) {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(text = item.label,
-                                    color = colorResource(id = R.color.black))
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    fontSize = 17.sp)
                             }
                         }
                         //mensaje =  cuadro de mensaje
@@ -225,6 +230,7 @@ fun MessageBox(
             Text(
                 text = message.text,
                 fontSize = 16.sp,
+                color = Color.Black,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
@@ -232,7 +238,7 @@ fun MessageBox(
             Text(
                 text = formatTime(message.timestamp),
                 fontSize = 11.sp,
-                color = Color.Gray,
+                color = Color.Black,
                 modifier = Modifier
                     .align(Alignment.End)
             )

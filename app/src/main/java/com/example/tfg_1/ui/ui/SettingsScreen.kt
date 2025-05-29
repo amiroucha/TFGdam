@@ -2,6 +2,7 @@ package com.example.tfg_1.ui.ui
 
 import android.content.*
 import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -75,6 +76,7 @@ fun SettingsScreen(
         ) {
             Row(
                 modifier = Modifier
+                    .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp))
                     .fillMaxWidth()
                     .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -105,7 +107,10 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            Column(Modifier.padding(20.dp)) {
+            Column(Modifier
+                .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
+                .padding(20.dp))
+            {
                 Text(
                     text = stringResource(R.string.hogarNombre, homeName),
                     style = TextStyle(
@@ -144,7 +149,8 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            Column(Modifier.padding(20.dp)) {
+            Column(Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
+                .padding(20.dp)) {
                 Text(
                     text = stringResource(R.string.aniadeMiembros),
                     style = MaterialTheme.typography.titleMedium,
@@ -190,7 +196,8 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            Column(Modifier.padding(20.dp)) {
+            Column(Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
+                .padding(20.dp)) {
                 Text(
                     text = stringResource(R.string.unirse_a_un_hogar),
                     style = MaterialTheme.typography.titleMedium,
@@ -225,11 +232,6 @@ fun SettingsScreen(
                         showDialog = false
                         //borrar idhome
                         viewModel.clearCurrentHome()
-
-                       /*
-                        navController.navigate("home") {
-                            popUpTo(0) { inclusive = true }
-                        }*/
                     }
                 ) { Text("Sí") }
             },

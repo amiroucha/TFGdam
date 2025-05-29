@@ -39,7 +39,7 @@
     <string name="completadas">Completadas</string>
     <string name="nuevaTarea">Nueva tarea</string>
     <string name="titulo">Título</string>
-    <string name="fechaMax">Fecha límite (dd/mm/aaaa)</string>
+    <string name="fechaMax">Fecha límite</string>
     <string name="asignadoA.">Asignado a…</string>
     <string name="completaTodosCampos">Por favor, completa todos los campos.</string>
     <string name="cancelar">Cancelar</string>

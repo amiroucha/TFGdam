@@ -48,7 +48,7 @@ fun TasksScreen(viewModel: TasksViewModel) {
     Box(
         Modifier
             .fillMaxSize()
-            .background(color = colorResource(id = R.color.greyBackground))
+            .background(color = MaterialTheme.colorScheme.background)
 
     ) {
 
@@ -240,61 +240,71 @@ fun TareaItem(tarea: TasksModel,
             }
         )
     }
-    // Contenedor de la tarea con padding y márgenes
-    Row(
+    // Contenedor de la tarea con padding y márgenes background(color = MaterialTheme.colorScheme.background)
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp) // Añadimos padding para toda la caja de la tarea
-            .background(colorResource(id = R.color.white), RoundedCornerShape(8.dp)) // Fondo con bordes redondeados
-            //.clickable { modificarCompletada(tarea) } // Al hacer clic cambia el estado de la tarea
+            .padding(vertical = 4.dp, horizontal = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(20.dp)
     ) {
-        // Checkbox para marcar la tarea como completada o no
-        Checkbox(
-            checked = tarea.completada,
-            // Cuando cambia el checkbox, alterna completada, pregunta ¿seguro?
-            onCheckedChange = { showToggleCompletedDialog = true },
+        Row(
             modifier = Modifier
-                .padding(end = 16.dp) // Separar el checkbox del texto
-                .clickable { modificarCompletada(tarea) }
-        )
-
-        // Columna para colocar el título y la fecha de la tarea
-        Column(
-            modifier = Modifier
-                .weight(1f) // Esto asegura que el texto ocupe el espacio restante disponible
-                .padding(end = 8.dp)
+                .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp))
+                .padding(8.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+            //.clickable { modificarCompletada(tarea) } // Al hacer clic cambia el estado de la tarea
         ) {
-            // Título de la tarea
-            Text(
-                text = tarea.titulo,
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 1, // Limitar a una línea,
-                modifier = Modifier.padding(8.dp),
-                overflow = TextOverflow.Ellipsis, // si es muy largo ...
-                color = colorResource(id = R.color.black)
+            // Checkbox para marcar la tarea como completada o no
+            Checkbox(
+                checked = tarea.completada,
+                // Cuando cambia el checkbox, alterna completada, pregunta ¿seguro?
+                onCheckedChange = { showToggleCompletedDialog = true },
+                modifier = Modifier
+                    .padding(end = 16.dp) // Separar el checkbox del texto
+                    .clickable { modificarCompletada(tarea) }
             )
 
-            // Fecha de la tarea
-            Text(
-                text = stringResource(R.string.fechaTarea, tarea.fecha),
-                style = MaterialTheme.typography.bodyLarge,
-                color = colorResource(id = R.color.black) ,
-                modifier = Modifier.padding(8.dp)
-            )
+            // Columna para colocar el título y la fecha de la tarea
+            Column(
+                modifier = Modifier
+                    .weight(1f) // Esto asegura que el texto ocupe el espacio restante disponible
+                    .padding(end = 8.dp)
+            ) {
+                // Título de la tarea
+                Text(
+                    text = tarea.titulo,
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1, // Limitar a una línea,
+                    modifier = Modifier.padding(8.dp),
+                    overflow = TextOverflow.Ellipsis, // si es muy largo ...
+                    color = MaterialTheme.colorScheme.onSurface
+                )
 
-            Text(
-                text = stringResource(R.string.asignado_a, tarea.asignadoA),
-                style = MaterialTheme.typography.bodyLarge,
-                color = colorResource(id = R.color.black), // Estilo de texto más tenue para el asignado
-                modifier = Modifier.padding(8.dp)
-            )
-        }
-        IconButton(onClick = { showDeleteDialog = true  }) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = stringResource(R.string.eliminar_tarea),
-                tint = Color.Red
-            )
+                // Fecha de la tarea
+                Text(
+                    text = stringResource(R.string.fechaTarea, tarea.fecha),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(8.dp)
+                )
+
+                Text(
+                    text = stringResource(R.string.asignado_a, tarea.asignadoA),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Estilo de texto más tenue para el asignado
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+            IconButton(onClick = { showDeleteDialog = true  }) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.eliminar_tarea),
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }
@@ -366,9 +376,9 @@ fun NuevaTareaFormulario(
                         modifier = Modifier.fillMaxWidth(),
                         enabled = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black,
-                            disabledTextColor = Color.Black
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -388,9 +398,9 @@ fun NuevaTareaFormulario(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         modifier = Modifier.menuAnchor(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black,
-                            disabledTextColor = Color.Black
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     )
 
@@ -448,7 +458,7 @@ fun FiltroUsuarios(viewModel: TasksViewModel) {
             .padding(horizontal = 16.dp, vertical = 8.dp)//margen
             .border(
                 width = 2.dp,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(2.dp)
             )
             .padding(14.dp)//padidng interno
