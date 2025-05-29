@@ -1,13 +1,18 @@
 package com.example.tfg_1.ui.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -75,10 +80,12 @@ fun HomeBody(
     Column(
         modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.greyBackground))
+            .verticalScroll(rememberScrollState())
+            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(40.dp))
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+
         Text(
             text = stringResource(R.string.bienvenidaHome),
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -89,61 +96,115 @@ fun HomeBody(
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = name,
-            onValueChange = onNameChange,
-            label = { Text(text = stringResource(R.string.nombreHogar),
-                fontSize = 18.sp) },
-            modifier = Modifier.fillMaxWidth()
+        Text(
+            text = stringResource(R.string.crear_nuevo_hogar),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground
         )
-
-        OutlinedTextField(
-            value = address,
-            onValueChange = onAddressChange,
-            label = { Text(text= stringResource(R.string.direccion),
-                fontSize = 18.sp) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        //boton de crear
-        Button(
-            onClick = onCreate,
-            enabled = name.isNotBlank(),
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                colorResource(id = R.color.blue),
-                colorResource(id = R.color.black),
-                colorResource(id = R.color.blue), //color de fondo
-                colorResource(id = R.color.black)//color del texto
-            ),
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp)),
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            Text(text = stringResource(R.string.crearHogar),
-                fontSize = 18.sp)
+            OutlinedTextField(
+                value = name,
+                onValueChange = onNameChange,
+                label = {
+                    Text(
+                        text = stringResource(R.string.nombreHogar),
+                        fontSize = 18.sp
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+
+            OutlinedTextField(
+                value = address,
+                onValueChange = onAddressChange,
+                label = {
+                    Text(
+                        text = stringResource(R.string.direccion),
+                        fontSize = 18.sp
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+            //boton de crear
+            Button(
+                onClick = onCreate,
+                enabled = name.isNotBlank(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                ),
+            ) {
+                Text(
+                    text = stringResource(R.string.crearHogar),
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
         }
-
         Spacer(Modifier.height(24.dp))
-
-        OutlinedTextField(
-            value = code,
-            onValueChange = onCodeChange,
-            label = { Text(text = stringResource(R.string.codigoHogarExistente),
-                fontSize = 18.sp) },
-            modifier = Modifier.fillMaxWidth()
+        Text(
+            text = stringResource(R.string.unirse_a_hogar_existente),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground
         )
-
-        Button(
-            onClick = onJoin,
-            enabled = code.isNotBlank(),
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(id = R.color.green) ,
-                contentColor =  colorResource(id = R.color.black),
-                disabledContentColor = colorResource(id = R.color.green), //color de fondo
-                disabledContainerColor = colorResource(id = R.color.black)//color del texto
-            ),
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp)),
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            Text(text = stringResource(R.string.unirmehogar),
-                fontSize = 18.sp)
+            OutlinedTextField(
+                value = code,
+                onValueChange = onCodeChange,
+                label = {
+                    Text(
+                        text = stringResource(R.string.codigoHogarExistente),
+                        fontSize = 18.sp
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+
+            Button(
+                onClick = onJoin,
+                enabled = code.isNotBlank(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,),
+            ) {
+                Text(
+                    text = stringResource(R.string.unirmehogar),
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
         }
     }
 }

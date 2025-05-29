@@ -420,7 +420,8 @@ fun RegisterButtonReg(viewModel: RegisterViewModel) {
         onClick = { viewModel.botonRegistro(context) },
         modifier = Modifier
             .height(48.dp)
-            .width(250.dp),
+            .width(250.dp)
+            .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(20.dp)),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor= MaterialTheme.colorScheme.onPrimaryContainer,

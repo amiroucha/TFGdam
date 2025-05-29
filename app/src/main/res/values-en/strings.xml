@@ -149,6 +149,8 @@
     <string name="completa_categoria_importe">Complete category and amount</string>
     <string name="buscar_mensaje">Search message…</string>
     <string name="nopermiso_modificar_tarea">You do not have permission to mark as pending this task.</string>
+    <string name="unirse_a_hogar_existente">JOIN A EXISTING HOME</string>
+    <string name="crear_nuevo_hogar">CREATE A NEW HOME</string>
 
 
 </resources>

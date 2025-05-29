@@ -109,6 +109,7 @@ fun SettingsScreen(
         ) {
             Column(Modifier
                 .border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
+                .fillMaxWidth()
                 .padding(20.dp))
             {
                 Text(
@@ -150,6 +151,7 @@ fun SettingsScreen(
             elevation = CardDefaults.cardElevation(4.dp)
         ) {
             Column(Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
+                .fillMaxWidth()
                 .padding(20.dp)) {
                 Text(
                     text = stringResource(R.string.aniadeMiembros),
