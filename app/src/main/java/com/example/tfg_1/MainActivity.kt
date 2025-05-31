@@ -1,6 +1,5 @@
 package com.example.tfg_1
 
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,7 +14,6 @@ import com.example.tfg_1.ui.theme.Tfg_1Theme
 import com.example.tfg_1.viewModel.ThemeViewModel
 import androidx.compose.runtime.getValue
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.color.DynamicColorsOptions
 
 
 class MainActivity : ComponentActivity() {

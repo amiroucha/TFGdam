@@ -15,18 +15,10 @@ class MyApp : Application() {
 
     override fun onCreate(){
         super.onCreate()
-        Firebase.messaging.token.addOnCompleteListener {
-            if(!it.isSuccessful){
-                println("El token no fue generado")
-                return@addOnCompleteListener
-            }
-            val token = it.result
-            println("El token es :  $token")
-            createNotificationChannel()
-        }
+        createNotificationChannel()
     }
 
-    private  fun createNotificationChannel(){
+    private fun createNotificationChannel(){
         if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.O){
             val channel = NotificationChannel(
                 NOTIFICATION_ID,
