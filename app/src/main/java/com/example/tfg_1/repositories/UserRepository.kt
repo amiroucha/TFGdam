@@ -3,9 +3,6 @@ package com.example.tfg_1.repositories
 import android.content.Context
 import android.util.Log
 import com.example.tfg_1.R
-import com.example.tfg_1.model.ChatMessageModel
-import com.example.tfg_1.model.ExpensesModel
-import com.example.tfg_1.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
@@ -16,7 +13,7 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
-import com.example.tfg_1.model.TasksModel
+import com.example.tfg_1.model.*
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.auth.GoogleAuthProvider
 
@@ -66,6 +63,7 @@ class UserRepository(
             .get()
             .await()
     }
+
     //ACTUALIZAR EL home id DEL usuario, SE CAMBIA DE CASA
     suspend fun updateUserHomeId(uid: String, homeId: String) {
         firestore.collection("usuarios")
@@ -77,12 +75,12 @@ class UserRepository(
     //crear un hogar
     suspend fun createHome(homeName: String, address: String): String {
         val newHomeRef = firestore.collection("hogares").document()
-        val data = mapOf(
-            "homeId" to newHomeRef.id,
-            "homeName" to homeName,
-            "adress" to address
+        val home  = HomeModel(
+            homeId =  newHomeRef.id,
+            homeName = homeName,
+            adress= address
         )
-        newHomeRef.set(data).await()
+        newHomeRef.set(home).await()
         return newHomeRef.id
     }
 
