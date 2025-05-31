@@ -38,7 +38,7 @@ import com.example.tfg_1.ui.ui.AvatarSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationWrapper(themeViewModel: ThemeViewModel, openChat:Boolean) {
+fun NavigationWrapper(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
 
     val loginViewModel: LoginViewModel = viewModel()

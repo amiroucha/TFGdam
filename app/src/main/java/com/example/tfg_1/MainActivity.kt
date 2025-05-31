@@ -20,15 +20,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Carga bitmap desde drawable
-       // val bitmap = BitmapFactory.decodeResource(resources, R.drawable.coloresapp)
-
         // Aplica colores dinámicos basados en contenido
         DynamicColors.applyToActivityIfAvailable(this)
 
-        // Notificaciones
-        val shouldNavigateToChat = intent?.getBooleanExtra("navigateToChat", false) ?: false
-
+        // extender app a pantalla completa
         enableEdgeToEdge()
 
         setContent {
@@ -37,7 +32,7 @@ class MainActivity : ComponentActivity() {
 
             Tfg_1Theme(darkTheme = isDark, dynamicColor = true) {
                 Surface(Modifier.fillMaxSize()) {
-                    NavigationWrapper(themeViewModel = themeViewModel, openChat = shouldNavigateToChat)
+                    NavigationWrapper(themeViewModel = themeViewModel)
                 }
             }
         }
