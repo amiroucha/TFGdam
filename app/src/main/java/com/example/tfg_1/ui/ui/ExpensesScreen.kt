@@ -54,7 +54,6 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import com.example.tfg_1.model.PeriodoFiltro
 import com.example.tfg_1.model.toDisplayString
-import com.google.android.play.core.integrity.g
 import java.text.DateFormat
 import java.util.*
 

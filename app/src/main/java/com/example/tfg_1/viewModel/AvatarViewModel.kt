@@ -88,7 +88,7 @@ class AvatarViewModel : ViewModel() {
             }
         }
     }
-    suspend fun firestoreGetAvatarUrl(userId: String): String? {
+    private suspend fun firestoreGetAvatarUrl(userId: String): String? {
         return try {
             val doc = Firebase.firestore.collection("usuarios")
                 .document(userId)

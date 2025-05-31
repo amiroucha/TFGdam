@@ -13,7 +13,6 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.State
 import com.example.tfg_1.R
-import com.example.tfg_1.viewModel.ExpensesViewModel.UiEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import java.util.*

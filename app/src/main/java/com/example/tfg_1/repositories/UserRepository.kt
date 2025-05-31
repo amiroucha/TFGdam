@@ -153,7 +153,7 @@ class UserRepository(
 
             val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
 
-            val authResult = auth.signInWithCredential(firebaseCredential).await()
+            auth.signInWithCredential(firebaseCredential).await()
             val user = auth.currentUser
 
             // Guardar datos usuario

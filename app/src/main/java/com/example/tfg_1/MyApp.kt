@@ -4,8 +4,6 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import com.google.firebase.Firebase
-import com.google.firebase.messaging.messaging
 
 class MyApp : Application() {
 

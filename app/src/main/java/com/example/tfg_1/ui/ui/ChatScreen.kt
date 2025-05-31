@@ -27,7 +27,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.tfg_1.R
 import com.example.tfg_1.model.ChatMessageModel
-import com.example.tfg_1.notifications.PreferenceMnger
 import com.example.tfg_1.viewModel.ChatViewModel
 import java.text.SimpleDateFormat
 import java.util.*

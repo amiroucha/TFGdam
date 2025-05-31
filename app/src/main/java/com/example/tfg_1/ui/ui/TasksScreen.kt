@@ -61,9 +61,7 @@ fun TasksScreen(viewModel: TasksViewModel) {
         }
         else {
             TasksBody(
-                Modifier
-                    .align(Alignment.Center)
-                    .padding(10.dp), viewModel )
+                 viewModel )
 
             var showDialog by remember { mutableStateOf(false) }
 
@@ -93,7 +91,7 @@ fun TasksScreen(viewModel: TasksViewModel) {
 
 
 @Composable
-fun TasksBody (modifier: Modifier, viewModel: TasksViewModel) {
+fun TasksBody ( viewModel: TasksViewModel) {
 
     Column{
         TabsPag(viewModel) // Componente para las pestañas
