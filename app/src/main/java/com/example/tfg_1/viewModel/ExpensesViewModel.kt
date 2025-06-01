@@ -116,6 +116,7 @@ class ExpensesViewModel : ViewModel() {
         super.onCleared()
         listenerRegistration?.remove()
     }
+
     //añadir un gasto
     suspend fun aniadirGastoVM(
         categoria: String,
@@ -244,9 +245,7 @@ class ExpensesViewModel : ViewModel() {
         gastos: List<ExpensesModel>
     ): List<ExpensesModel> {
         val calendar = Calendar.getInstance()
-
-        // Filtro la lista de gastos para obtener solo los
-        // que coinciden con la etiqueta del periodo
+        // Filtro la lista de gastos para obtener solo los que coinciden con la etiqueta del periodo
         return gastos.filter { gasto ->
             calendar.time = gasto.fecha
             // Genero la etiqueta del gasto según el filtro
@@ -271,7 +270,6 @@ class ExpensesViewModel : ViewModel() {
                     calendar.get(Calendar.YEAR).toString()
                 }
             }
-
             // Compara  etiqueta generada para el gasto = etiqueta del periodo seleccionado
             // para filtrar solo los gastos = periodo agrupado semana/ mes / año.
             gastoLabel == label

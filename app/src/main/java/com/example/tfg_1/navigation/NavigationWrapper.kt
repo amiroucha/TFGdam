@@ -55,7 +55,9 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
 
     //para que pantalla se va a ver cada barra
     val showTopBar = currentRoute != Screens.Home.route
-    val showBottomBar = currentRoute == Screens.Tasks.route || currentRoute == Screens.Expenses.route || currentRoute == Screens.Chat.route
+    val showBottomBar = currentRoute == Screens.Tasks.route ||
+            currentRoute == Screens.Expenses.route ||
+            currentRoute == Screens.Chat.route
 
     //filtro de tareas por usesr
     var tasksViewModel by remember { mutableStateOf<TasksViewModel?>(null) }
@@ -78,7 +80,7 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
 
     val navBackStackEntry = navController.currentBackStackEntryAsState()
 
-    // Observa los cambios en authState para manejo de navegación
+    // si no está logueado y le da para atras no entra
     LaunchedEffect(authState) {
         if (navBackStackEntry.value != null) {
             if (authState is LoginViewModel.AuthState.Unauthenticated) {
@@ -94,8 +96,10 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
     LaunchedEffect(homeUiState, settingsUiState) {
         if (navBackStackEntry.value != null) {
             when (homeUiState) {
+                //en caso de que tenga homeId
                 is HomeViewModel.UiState.HasHome -> {
                     //navega solo cuando ha cambiado ya de hogar
+                    //no esta cargando ni esta como abandonado hogar
                     if (settingsUiState !is SettingsViewModel.SettingsUiState.LeftHome &&
                         settingsUiState !is SettingsViewModel.SettingsUiState.Loading) {
 
@@ -104,9 +108,11 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                         }
                     }
                 }
+                //si no tiene homeId
                 is HomeViewModel.UiState.NotHome -> {
+                    //navega a home (obligo a que se una o crea un hogar si o si)
                     navController.navigate(Screens.Home.route) {
-                        popUpTo(0) { inclusive = true }
+                        popUpTo(0) { inclusive = true } //no permito que vaya hacia atras
                     }
                 }
                 else -> {}
@@ -119,8 +125,8 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
         if (navBackStackEntry.value != null) {
             if (settingsUiState is SettingsViewModel.SettingsUiState.LeftHome) {
                 //refresca HomeViewModel
-                homeViewModel.loadUser()
-
+                homeViewModel.loadUser() //cargo el usuario para actualizar
+                // ya no tiene hogar
                 // pantalla Home
                 navController.navigate(Screens.Home.route) {
                     popUpTo(0) { inclusive = true }
@@ -217,7 +223,6 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
                                         .padding(5.dp)
                                         .size(50.dp)
                                         .clip(CircleShape)
-                                    // .border(7.dp, color = Color.Black)
                                 )
 
                         },
@@ -471,7 +476,6 @@ private fun DrawerApp(
 fun ScreenInitialize(navController: NavController, loginViewModel: LoginViewModel) {
     val authState by loginViewModel.authState.collectAsState()
 
-    // No navegamos aquí: NavigationWrapper lo hará.
     if (authState is LoginViewModel.AuthState.Unauthenticated) {
         // Usuario no logueado → ir a Login
         LaunchedEffect(Unit) {

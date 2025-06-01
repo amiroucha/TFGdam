@@ -29,7 +29,7 @@ class SettingsViewModel(
 
     private fun loadHome() = viewModelScope.launch {
         val user = repository.getCurrentUser()
-        if (user == null) {
+        if (user == null) { //no autenticado
             _uiState.value = SettingsUiState.Error("Usuario no autenticado")
             return@launch
         }
@@ -39,15 +39,15 @@ class SettingsViewModel(
             val hid = doc.getString("homeId").orEmpty()
             _homeId.value = hid
 
-            if (hid.isBlank()) {
+            if (hid.isBlank()) { //no tiene hogarId
                 _members.value = emptyList()
                 _uiState.value = SettingsUiState.NoHome
                 return@launch
             }
-
+            //recojo ususarios según idHogar
             val membersList = repository.getMembersByHomeId(hid)
             _members.value = membersList
-            _uiState.value = SettingsUiState.HasHome
+            _uiState.value = SettingsUiState.HasHome//act valor de estado
 
         } catch (e: Exception) {
             _uiState.value = SettingsUiState.Error(e.message)
@@ -58,13 +58,13 @@ class SettingsViewModel(
         if (_homeId.value.isBlank()) return@launch
 
         _uiState.value = SettingsUiState.Loading
-        val user = repository.getCurrentUser()
+        val user = repository.getCurrentUser()//consigo usuario actual
         if (user == null) {
             _uiState.value = SettingsUiState.Error("Usuario no autenticado")
             return@launch
         }
 
-        try {
+        try { //borro idHome y vacío valores y cambio estado de usuario
             repository.updateUserHomeId(user.uid, "")
             _homeId.value = ""
             _members.value = emptyList()

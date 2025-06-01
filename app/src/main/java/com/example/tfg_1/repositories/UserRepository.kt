@@ -45,7 +45,7 @@ class UserRepository(
     }
 
     //id del hogar del user actual
-    //lo uso en el chat,, es importante no tocar
+    //lo uso en el chat, es importante no tocar
     suspend fun getCurrentUserHomeId(): String {
         val uid = getCurrentUserId()
         if (uid.isEmpty()) {
@@ -104,11 +104,12 @@ class UserRepository(
     }
 
     suspend fun getMembersByHomeId(homeId: String): List<UserModel> {
+        //comparo hasta encontrar un homeId = al que paso
         val snap = firestore.collection("usuarios")
             .whereEqualTo("homeId", homeId)
             .get()
             .await()
-        return snap.documents.mapNotNull { u ->
+        return snap.documents.mapNotNull { u ->//recojo los usuarios con ese homeId
             UserModel(
                 id = u.id,
                 name = u.getString("name").orEmpty(),
@@ -124,36 +125,37 @@ class UserRepository(
     suspend fun loginWithEmail(email: String, password: String): Result<FirebaseUser?> {
         return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
-            Result.success(result.user)
+            Result.success(result.user) //Result con el usuario
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(e) //o el error
         }
     }
 
 
     suspend fun loginWithGoogle(context: Context): Result<FirebaseUser?> {
         try {
-            val credentialManager = CredentialManager.create(context)  // inicializas aquí
+            //instancia del gestor de credenciales
+            val credentialManager = CredentialManager.create(context)
 
             val googleIdOption = GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(false)
+                .setFilterByAuthorizedAccounts(false) // mostrar todas las cuentas disponibles
                 .setServerClientId(context.getString(R.string.idWeb))
-                .setAutoSelectEnabled(false)
+                .setAutoSelectEnabled(false)// No seleccionar automáticamente la cuenta
                 .build()
 
             val request = GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
+                .addCredentialOption(googleIdOption) // Añade opción de Google
                 .build()
 
-            val result = credentialManager.getCredential(context, request)
-            val credential = result.credential
+            val result = credentialManager.getCredential(context, request)// Pide las credenciales
+            val credential = result.credential //las guardo
 
-            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-            val googleIdToken = googleIdTokenCredential.idToken
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)//convierto esos datos
+            val googleIdToken = googleIdTokenCredential.idToken //tokrn google
 
             val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
 
-            auth.signInWithCredential(firebaseCredential).await()
+            auth.signInWithCredential(firebaseCredential).await()// Inicia sesión con Firebase
             val user = auth.currentUser
 
             // Guardar datos usuario
@@ -163,7 +165,7 @@ class UserRepository(
                 "name" to (user?.displayName ?: "")
             )
             user?.uid?.let {
-                firestore.collection("usuarios").document(it).set(userMap, SetOptions.merge()).await()
+                firestore.collection("usuarios").document(it).set(userMap, SetOptions.merge()).await() //Guardar datos en Firestore
             }
 
             return Result.success(user)
@@ -188,7 +190,7 @@ class UserRepository(
             val user = result.user
 
             user?.uid?.let { uid ->
-                val userModel = UserModel(
+                val userModel = UserModel( //modelo de datos de usuario
                     id = uid,
                     name = name,
                     email = email,
@@ -196,7 +198,7 @@ class UserRepository(
                     birthDate = birthDate,
                     image = ""
                 )
-                firestore.collection("usuarios")
+                firestore.collection("usuarios") //guasrdar
                     .document(uid)
                     .set(userModel)
                     .await()
@@ -213,8 +215,8 @@ class UserRepository(
     fun escucharMensajes(homeId: String, onMessagesChanged: (List<ChatMessageModel>) -> Unit): ListenerRegistration {
         return firestore.collection("hogares")
             .document(homeId)
-            .collection("mensajes")
-            .orderBy("timestamp")
+            .collection("mensajes") //subcoleccion
+            .orderBy("timestamp")// Orden cronológico
             .addSnapshotListener { snapshot, error ->
                 if (error != null || snapshot == null) {
                     Log.e("UserRepository", "Error escuchando mensajes", error)
@@ -223,7 +225,7 @@ class UserRepository(
                 }
 
                 val mensajes = snapshot.documents.mapNotNull { doc ->
-                    try {
+                    try { //convertir los mensajes al modelo de mensajes
                         doc.toObject(ChatMessageModel::class.java)
                     } catch (e: Exception) {
                         Log.e("UserRepository", "Error parsing message: ${doc.id}", e)
@@ -250,6 +252,7 @@ class UserRepository(
 
 
     //expenses ------------------------------------------------------------------
+    // Escucha en tiempo real el campo homeId del usuario
     fun escucharHomeIdUsuarioActual(onChange: (String?) -> Unit): ListenerRegistration? {
         val uid = auth.currentUser?.uid ?: return null
 
@@ -261,7 +264,7 @@ class UserRepository(
                     return@addSnapshotListener
                 }
 
-                val homeId = snapshot.getString("homeId")
+                val homeId = snapshot.getString("homeId")// conseguir el homeId
                 Log.d("UserRepository", "Snapshot usuario -> homeId=$homeId")
                 onChange(homeId)
             }
@@ -269,6 +272,7 @@ class UserRepository(
 
 
     //obtener y actualizar gastos
+    // Escucha en tiempo real los gastos del hogar
     fun escucharGastos(homeId: String, onChange: (List<ExpensesModel>) -> Unit): ListenerRegistration {
         return firestore.collection("hogares").document(homeId)
             .collection("gastos")
@@ -342,6 +346,7 @@ class UserRepository(
             }
     }
 
+    //añadir nuevba tarea
     suspend fun agregarTarea(tarea: TasksModel): Boolean {
         return try {
             firestore.collection("hogares").document(tarea.homeId)
@@ -354,6 +359,7 @@ class UserRepository(
         }
     }
 
+    // Actualiza una tarea existente
     suspend fun actualizarTarea(tarea: TasksModel): Boolean {
         return try {
             firestore.collection("hogares").document(tarea.homeId)
@@ -365,7 +371,7 @@ class UserRepository(
             false
         }
     }
-
+    // Elimina una tarea específica
     suspend fun eliminarTarea(homeId: String, tareaId: String): Boolean {
         return try {
             firestore.collection("hogares").document(homeId)

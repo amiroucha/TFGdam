@@ -50,31 +50,36 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun Tfg_1Theme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = isSystemInDarkTheme(), //modo oscuro
+    //color dinamico (Android 12+)
     dynamicColor: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit//contenido donde se aplican clores
 ) {
     val colorScheme = when {
+        //usar colores dinamicos si estan disponibles
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+        //si no hay colores dinámicos usaar los predefinidos
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
+    val view = LocalView.current //actual vista
+    if (!view.isInEditMode) { //cuando no esta en vista previa
+        SideEffect { //
             val window = (view.context as Activity).window
+            //color de barra de estado
             window.statusBarColor = colorScheme.primary.toArgb()
+            // color del texto de la barra de estado
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
-
+    //se aplica a todo el contenido
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
+        colorScheme = colorScheme, //esquema de colores
+        typography = Typography, //tipografía
         content = content
     )
 }

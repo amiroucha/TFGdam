@@ -74,7 +74,6 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
         _password.value = password
         _password2.value = password2
         _name.value = name
-        //_registerEnable.value = (validEmail(email) && validPassword(password)) and (passwordsSame(password, password2) && name.isNotEmpty())
     }
 
     fun dateSeleccionada(anio: Int, mes: Int, dia: Int) {
@@ -145,6 +144,7 @@ class RegisterViewModel(navController: NavController) : ViewModel() {
                 _dateError.value.isEmpty() &&
                 _nameError.value.isEmpty()
     }
+    //accion de registro
     fun botonRegistro(context: Context){
         if (!validateOnSubmit(context)) return
 

@@ -29,21 +29,23 @@ fun AvatarSheet(
     onDismiss: () -> Unit
 ) {
     val avatarViewModel: AvatarViewModel = viewModel()
-    val avatars = avatarViewModel.avatarList
+    val avatars = avatarViewModel.avatarList //lista de avatares
 
+    //hoja inferior modal
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = onDismiss, // Acción al cerrar la hoja
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         dragHandle = {BottomSheetDefaults.DragHandle()}
     )
     {
-        LazyVerticalGrid(
+        LazyVerticalGrid(// Grid adaptativo para mostrar avatares de forma responsiva
+            // Celdas de mínimo 100dp- se adaptan al tamaño de pantalla
             columns = GridCells.Adaptive(minSize = 100.dp),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ){
-            items(avatars){ character  ->
+            items(avatars){ character  -> //estilo de cada avtar
                 AsyncImage(
                     model = character.image,
                     contentDescription = character.name,

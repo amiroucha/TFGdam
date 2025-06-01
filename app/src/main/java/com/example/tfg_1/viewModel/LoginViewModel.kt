@@ -54,8 +54,6 @@ class LoginViewModel : ViewModel()
     fun onLoginChanges(email: String, password: String) {
         _email.value = email
         _password.value = password
-       // _loginEnable.value = validEmail(email) && validPassword(password)
-
         // Limpiar errores al modificar campos
         _emailError.value = null
         _passwordError.value = null
@@ -64,7 +62,7 @@ class LoginViewModel : ViewModel()
         }
     }
 
-
+    //validaciones de los mensajes
     private fun validateOnSubmit(context: Context): Boolean {
         val email = _email.value
         val password = _password.value
@@ -84,10 +82,12 @@ class LoginViewModel : ViewModel()
         return _emailError.value == null && _passwordError.value == null
     }
 
+    //comprobar el estado del usuario
     private fun checkAuthStatus() {
         _authState.value = if (auth.currentUser != null) AuthState.Authenticated else AuthState.Unauthenticated
     }
 
+    //enviar mensaje de recuperación de contraseña
     fun sendResetPassword(email: String, context: Context) {
         FirebaseAuth.getInstance().sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
@@ -99,6 +99,7 @@ class LoginViewModel : ViewModel()
                 }
             }
     }
+
     fun clearPasswordResetMessage() {
         _passwordResetMessage.value = null
     }
@@ -106,16 +107,17 @@ class LoginViewModel : ViewModel()
         _passwordResetMessage.value = message
     }
 
+    //loguearse con email y contraseña
     fun login(navController: NavController, context: Context) {
         val email = _email.value
         val password = _password.value
-        if (!validateOnSubmit(context)) {
+        if (!validateOnSubmit(context)) { //los datos no son correctos
             _authState.value = AuthState.Unauthenticated
             return
         }
 
         _isLoading.value = true
-        _authState.value = AuthState.Loading
+        _authState.value = AuthState.Loading //estado cargando
 
         viewModelScope.launch {
             val result = userRepository.loginWithEmail(email, password)
@@ -126,11 +128,11 @@ class LoginViewModel : ViewModel()
                 //val user = result.getOrNull()
                 val homeId = userRepository.getCurrentUserHomeId()
 
-                if (homeId != "") {
+                if (homeId != "") { //tiene un homeId
                     navController.navigate(Screens.Tasks.route) {
                         popUpTo(Screens.Login.route) { inclusive = true }
                     }
-                } else {
+                } else { //va a home, no tiene u homeId
                     navController.navigate(Screens.Home.route) {
                         popUpTo(Screens.Login.route) { inclusive = true }
                     }
@@ -141,8 +143,7 @@ class LoginViewModel : ViewModel()
         }
     }
 
-
-
+    //loguearse con google-------------------------------------------
     fun loginGoogle(context: Context, navController: NavController) {
         _isLoading.value = true
         _authState.value = AuthState.Loading
@@ -170,6 +171,7 @@ class LoginViewModel : ViewModel()
             }
         }
     }
+    //cerrar sesión y actualizar los estados del usuario y valor de correo y contraseña
     fun logout() {
         userRepository.logout() // cierra sesión en Firebase
         _email.value = ""
@@ -177,7 +179,7 @@ class LoginViewModel : ViewModel()
         _authState.value = AuthState.Unauthenticated
     }
 
-
+    //estados del usuario
     sealed class AuthState {
         data object Authenticated : AuthState()
         data object Unauthenticated : AuthState()

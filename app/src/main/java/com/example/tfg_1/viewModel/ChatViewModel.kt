@@ -80,8 +80,7 @@ class ChatViewModel : ViewModel() {
         _searchQuery.value = query
     }
 
-
-
+    //cargo los mensajes
     fun loadChat(context: Context) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -89,16 +88,18 @@ class ChatViewModel : ViewModel() {
             currentUserName = userRepository.getCurrentUserName()
             val homeId = userRepository.getCurrentUserHomeId()
 
-            listenerRegistration?.remove()
+            listenerRegistration?.remove()//evitar duplicaciones
 
             listenerRegistration = userRepository.escucharMensajes(homeId) { mensajes ->
                 Log.d("ChatViewModel", "Mensajes recibidos: ${mensajes.size}")
 
+                //mensajes != del user actual y mas recientes que el ultimo mensaje notificado
                 val mensajesNuevos = mensajes.filter {
                     it.senderId != currentUserId && it.timestamp > lastNotifiedTimestamp
                 }
 
-                mensajesNuevos.forEach { mensaje ->
+                mensajesNuevos.forEach { mensaje -> //se envia de manera local las notificaciones
+                    //por cada mensaje
                     sendLocalNotification(
                         context = context,
                         senderName = mensaje.senderName,
@@ -107,9 +108,11 @@ class ChatViewModel : ViewModel() {
                 }
 
                 if (mensajes.isNotEmpty()) {
+                    //mayor tiempo entre los mensajes/ ultimo mensaje
                     val maxTimestamp = mensajes.maxOf { it.timestamp }
-                    if (maxTimestamp > lastNotifiedTimestamp) {
-                        lastNotifiedTimestamp = maxTimestamp
+                    if (maxTimestamp > lastNotifiedTimestamp) { //tiempo > al ultimoREgistrado
+                        lastNotifiedTimestamp = maxTimestamp //actualizo tiempo del ultimo mensaje notificado
+                        //Se guarda el nuevo timestamp en SharedPreferences
                         preferencesManager.setLastNotifiedTimestamp(lastNotifiedTimestamp)
                         Log.d("ChatViewModel", "Actualizado timestamp: $lastNotifiedTimestamp")
                     }
@@ -122,7 +125,7 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-
+    //gaurdo los mensajes
     fun sendMessage(text: String) {
         viewModelScope.launch {
             val homeId = userRepository.getCurrentUserHomeId()
@@ -141,11 +144,13 @@ class ChatViewModel : ViewModel() {
 
     // Notificación local
     private fun sendLocalNotification(context: Context, senderName: String, message: String) {
+        //servicio del sistema que gestiona las notificaciones
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
+        //mi canal creado a usar
         val channelId = MyApp.NOTIFICATION_ID
 
-        val person = Person.Builder()
+        val person = Person.Builder() //Person , nombre e icono
             .setName(senderName)
             .setIcon(IconCompat.createWithResource(context, R.drawable.logotfg)) // tu logo
             .build()
@@ -153,20 +158,21 @@ class ChatViewModel : ViewModel() {
         // Estilo tipo chat con encabezado FlowHome
         val messageStyle = NotificationCompat.MessagingStyle(person)
             .setConversationTitle("FLOWHOME") // Encabezado
-            .addMessage(message, System.currentTimeMillis(), person) // Mensaje
+            .addMessage(message, System.currentTimeMillis(), person) // Mensaje con hora y autor
 
-
+        //construccion de la notificacion
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.logotfg) // icono superior
             .setStyle(messageStyle)
             .setAutoCancel(true)
             .build()
 
+        //se envia la notificacion
         notificationManager.notify(senderName.hashCode() + System.currentTimeMillis().toInt(), notification)
     }
 
 
-    //cada usuario tenga un color diferente, cojo los que no s ehan usado
+    //cada usuario tenga un color diferente, cojo los que no se han usado
     fun getUserColor(userId: String): Color {
         return userColors.getOrPut(userId) {
             val usedColors = userColors.values.toSet()

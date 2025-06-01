@@ -22,11 +22,11 @@ class AvatarViewModel : ViewModel() {
     var selectedAvatar by mutableStateOf<String?>(null)
         private set
 
-    private var avatarAsignadoAutomaticamente = false // <--- FLAG GLOBAL
+    private var avatarAsignadoAutomaticamente = false //
 
     private val authListener = FirebaseAuth.AuthStateListener {
         // cada vez que cambia el usuario logueado, se recarga la imgen
-        //asi no se queda en memoria la dek usuario anterior
+        //asi no se queda en memoria la del usuario anterior
         avatarAsignadoAutomaticamente = false
         selectedAvatar = null
         loadFirestore()

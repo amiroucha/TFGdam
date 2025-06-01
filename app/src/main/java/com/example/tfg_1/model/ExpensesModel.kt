@@ -10,5 +10,4 @@ data class ExpensesModel  (
     val fecha: Date = Date(),
     val homeId:String = "",
     val importe: Double = 0.0,
-
 )

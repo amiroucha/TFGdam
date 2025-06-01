@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Aplica colores dinámicos basados en contenido
+        // Aplica colores dinámicos basados en contenido del usuario
         DynamicColors.applyToActivityIfAvailable(this)
 
         // extender app a pantalla completa
